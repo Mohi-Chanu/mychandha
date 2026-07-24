@@ -45,20 +45,21 @@ The repository contains tests for:
 - architecture boundaries and request-context safety.
 
 These gates require Java 21, Maven, and a Docker-compatible Testcontainers
-runtime. They remain pending until the repository runs in the configured CI
-environment.
+runtime. They passed in GitHub Actions run `30084269566`, job `89452672191`, on
+2026-07-24.
+
+The same run also passed the OCI image build, CycloneDX SBOM generation,
+artifact upload, and Trivy scanning with zero vulnerabilities and zero secrets.
 
 ## External staging gates
 
-Acceptance is not complete until all of the following evidence is recorded:
+Staging acceptance is not complete until all of the following evidence is
+recorded:
 
-1. `mvn verify` is green.
-2. The OCI build and Trivy high/critical gate are green.
-3. The generated CycloneDX SBOM is retained with the CI run.
-4. The Render Blueprint validates and a staging deployment becomes ready.
-5. Supabase JWT issuer, audience, signature, expiry, and subject checks pass.
-6. Same-tenant access succeeds and cross-tenant probes are denied.
-7. Audit verification, idempotent replay, outbox retry/recovery, health, and
+1. The Render Blueprint validates and a staging deployment becomes ready.
+2. Supabase JWT issuer, audience, signature, expiry, and subject checks pass.
+3. Same-tenant access succeeds and cross-tenant probes are denied.
+4. Audit verification, idempotent replay, outbox retry/recovery, health, and
    rollback checks pass in staging.
 
 No Supabase or Render resources were provisioned during the local validation

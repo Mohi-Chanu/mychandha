@@ -21,6 +21,10 @@ See [Phase 1 scope](docs/phase-1-review.md), [architecture](docs/architecture.md
 [validation status](docs/phase-1-validation.md), and
 [local development](docs/local-development.md).
 
+For continued Codex Desktop work, begin with [repository instructions](AGENTS.md),
+[current status](docs/current-status.md), [product decisions](docs/product-decisions.md),
+and the [delivery roadmap](docs/roadmap.md).
+
 ## Prerequisites
 
 - Java 21

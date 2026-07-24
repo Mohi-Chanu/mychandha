@@ -1,0 +1,64 @@
+# Delivery roadmap and approval gates
+
+The roadmap is incremental, but the target remains the complete enterprise GA
+baseline. A phase boundary controls risk and review; it does not make later
+baseline capabilities optional.
+
+## Phase 1 — Platform foundation
+
+Implemented:
+
+- Java 21 / Spring Boot application foundation.
+- Pluggable managed identity with Supabase Auth adapter.
+- PostgreSQL tenancy, RLS, membership/RBAC, and tenant transaction boundary.
+- Append-only reproducible audit chain.
+- Idempotency and durable outbox/inbox processing with recovery and metrics.
+- Health, correlation, safe errors, structured logs, OCI image, SBOM, and CI.
+
+CI acceptance is complete. Staging acceptance remains open.
+
+## Staging acceptance gate
+
+Requires explicit approval before creating or modifying external resources.
+
+1. Provision or select non-production Supabase and Render resources.
+2. Configure secrets, separate database roles, TLS, rate limits, alerts,
+   backups, and log drain.
+3. Deploy the exact CI-verified OCI image and apply Flyway migrations.
+4. Verify JWT issuer, audience, signature, time, and subject handling.
+5. Prove same-tenant access and cross-tenant denial with non-owner API roles.
+6. Verify audit-chain recomputation, idempotent replay, inbox deduplication,
+   outbox retry/stale-claim recovery, and dead-letter behavior.
+7. Verify liveness, readiness, metrics protection, backup restore, rollback,
+   and forward-fix procedures.
+8. Record evidence and close every failure before approving Phase 2.
+
+## Phase 2 — Organization and event publishing
+
+Not started. Approved scope boundary:
+
+- Organization onboarding and manual verification.
+- Memberships, roles, and administrative workflows.
+- Event editions and explicit lifecycle transitions.
+- English, Telugu, and Hindi content.
+- Review, publication requirements, immutable publication snapshots, and QR
+  links.
+
+Before implementation, produce and obtain approval for the domain model,
+authorization matrix, migrations/RLS policies, API contracts, audit events,
+localization model, test plan, rollout plan, and rollback approach.
+
+## Later baseline domains
+
+These remain part of the enterprise product baseline but are outside Phase 2:
+
+- Contributions, Razorpay Route settlement, webhook processing, manual refund
+  recording, receipts, and reconciliation.
+- Cash collection controls and finance reporting.
+- 80G/FCRA/GST evidence and eligibility presentation.
+- Email, SMS, WhatsApp, media, moderation, abuse, and notification workflows.
+- Public experience, search/discovery, reporting, operations, billing, and
+  remaining GA readiness.
+
+Each major domain requires a new explicit approval after its design and
+dependencies are reviewed.
