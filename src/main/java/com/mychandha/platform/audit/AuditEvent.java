@@ -7,4 +7,8 @@ public record AuditEvent(
         String resourceType,
         String resourceId,
         Map<String, Object> data) {
+
+    public AuditEvent {
+        data = data == null ? Map.of() : Map.copyOf(data);
+    }
 }

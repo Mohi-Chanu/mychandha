@@ -1,5 +1,6 @@
 package com.mychandha.platform.security;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,17 +19,23 @@ public final class CorrelationIdFilter extends OncePerRequestFilter {
     private static final Pattern SAFE_ID = Pattern.compile("[A-Za-z0-9._:-]{1,100}");
 
     @Override
+    @SuppressFBWarnings(
+            value = "HRS_REQUEST_PARAMETER_TO_HTTP_HEADER",
+            justification = "The request value is accepted only after a strict ASCII allowlist check.")
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-        String supplied = request.getHeader(HEADER);
-        String correlationId = supplied != null && SAFE_ID.matcher(supplied).matches()
-                ? supplied
-                : UUID.randomUUID().toString();
+        String correlationId = safeCorrelationId(request.getHeader(HEADER));
         response.setHeader(HEADER, correlationId);
         try (MDC.MDCCloseable ignored = MDC.putCloseable("correlationId", correlationId)) {
             filterChain.doFilter(request, response);
         }
+    }
+
+    static String safeCorrelationId(String supplied) {
+        return supplied != null && SAFE_ID.matcher(supplied).matches()
+                ? supplied
+                : UUID.randomUUID().toString();
     }
 }

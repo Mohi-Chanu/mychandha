@@ -23,5 +23,9 @@ public class OrganizationAccessController {
     }
 
     public record AccessResponse(UUID organizationId, Set<String> confirmedPermissions) {
+
+        public AccessResponse {
+            confirmedPermissions = Set.copyOf(confirmedPermissions);
+        }
     }
 }

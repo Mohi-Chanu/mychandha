@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mychandha.platform.tenancy.OrganizationContext;
 import com.mychandha.platform.tenancy.TenantJdbcExecutor;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.slf4j.MDC;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -15,6 +16,9 @@ public class OutboxService {
     private final TenantJdbcExecutor tenantJdbc;
     private final ObjectMapper objectMapper;
 
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "Dependencies are container-managed stateless collaborators.")
     public OutboxService(TenantJdbcExecutor tenantJdbc, ObjectMapper objectMapper) {
         this.tenantJdbc = tenantJdbc;
         this.objectMapper = objectMapper;

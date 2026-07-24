@@ -2,6 +2,7 @@ package com.mychandha.platform.audit;
 
 import com.mychandha.platform.tenancy.OrganizationContext;
 import com.mychandha.platform.tenancy.TenantJdbcExecutor;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -15,6 +16,9 @@ public class AuditIntegrityService {
 
     private final TenantJdbcExecutor tenantJdbc;
 
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "TenantJdbcExecutor is a container-managed stateless collaborator.")
     public AuditIntegrityService(TenantJdbcExecutor tenantJdbc) {
         this.tenantJdbc = tenantJdbc;
     }

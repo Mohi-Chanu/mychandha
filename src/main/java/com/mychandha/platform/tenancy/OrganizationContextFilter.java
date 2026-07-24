@@ -3,6 +3,7 @@ package com.mychandha.platform.tenancy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mychandha.platform.identity.CurrentActor;
 import com.mychandha.platform.identity.ExternalIdentity;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,9 @@ public final class OrganizationContextFilter extends OncePerRequestFilter {
     private final TenantAccessService tenantAccess;
     private final ObjectMapper objectMapper;
 
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "Dependencies are container-managed stateless collaborators.")
     public OrganizationContextFilter(
             CurrentActor currentActor,
             TenantAccessService tenantAccess,

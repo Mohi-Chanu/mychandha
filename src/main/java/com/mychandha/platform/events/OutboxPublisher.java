@@ -1,5 +1,6 @@
 package com.mychandha.platform.events;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.sql.ResultSet;
@@ -28,6 +29,9 @@ public class OutboxPublisher {
     private final Counter published;
     private final Counter failed;
 
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "Dependencies are container-managed infrastructure collaborators.")
     public OutboxPublisher(
             JdbcClient jdbc,
             TransactionTemplate transactions,

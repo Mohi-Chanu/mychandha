@@ -2,6 +2,7 @@ package com.mychandha.platform.idempotency;
 
 import com.mychandha.platform.tenancy.OrganizationContext;
 import com.mychandha.platform.tenancy.TenantJdbcExecutor;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -14,6 +15,9 @@ public class IdempotencyService {
 
     private final TenantJdbcExecutor tenantJdbc;
 
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "TenantJdbcExecutor is a container-managed stateless collaborator.")
     public IdempotencyService(TenantJdbcExecutor tenantJdbc) {
         this.tenantJdbc = tenantJdbc;
     }
