@@ -1,0 +1,106 @@
+# Phase 1 architecture
+
+## Outcome
+
+Phase 1 creates the control plane on which later MyChandha domains will run. It
+is deliberately a modular Spring Boot application rather than a collection of
+networked microservices. Public delivery, webhook ingress, reporting, and
+worker profiles can be extracted when those workloads exist.
+
+## Runtime boundaries
+
+```mermaid
+flowchart TD
+    Client["Authenticated client"] --> API["Spring Boot core API"]
+    API --> Auth["Identity provider port"]
+    Auth --> Supabase["Supabase Auth"]
+    API --> Guard["Tenant and RBAC guard"]
+    Guard --> PG["PostgreSQL + RLS"]
+    API --> Outbox["Transactional outbox"]
+    Worker["Durable dispatcher"] --> Outbox
+    Worker --> Consumer["Versioned event consumers"]
+```
+
+The initial OCI image runs the API and durable dispatcher in one process.
+Render is the first deployment adapter. The image and environment contract do
+not depend on Render-specific runtime APIs.
+
+## Request security sequence
+
+1. The bearer token signature is validated against the configured Supabase JWKS.
+2. Issuer, expiry, not-before, and `authenticated` audience are validated.
+3. The identity adapter maps `sub`, email, and phone into an external identity.
+4. `X-Organization-Id`, when supplied, is parsed as a UUID.
+5. Active membership is checked with the requested organization bound to the
+   transaction-local RLS setting.
+6. A request-local organization context is established.
+7. `@RequiresPermission` checks role/permission assignments.
+8. Organization repositories execute only through `TenantJdbcExecutor`, which
+   binds organization and actor with transaction-local `set_config`.
+9. The context is removed in a `finally` block.
+
+A tenant header selects a requested scope; it never grants access by itself.
+
+## Identity boundary
+
+`IdentityProvider` and `IdentityProviderRegistry` isolate provider claims from
+application code. `SupabaseIdentityProvider` is the initial implementation.
+Replacing Supabase requires a new adapter plus configuration, not changes to
+tenant, audit, or future product modules.
+
+The application stores provider/subject links and masked contact hints. It does
+not store passwords, OTP secrets, access tokens, or refresh tokens.
+
+## Persistence conventions
+
+- PostgreSQL UUID identifiers; money-bearing modules will use minor units and
+  ISO currency codes.
+- Every organization-scoped row includes `organization_id`.
+- RLS is mandatory for organization business tables. `FORCE ROW LEVEL
+  SECURITY` is used where cross-tenant worker access is not required.
+- API code uses transaction-local tenant settings, never session-persistent
+  settings.
+- Audit rows are append-only and hash-linked per organization. The exact
+  canonical event representation is retained so integrity verification can
+  reproduce every stored hash.
+- Outbox events include aggregate identity, event type, schema version, tenant,
+  correlation ID, retry state, and delivery timestamps.
+- Inbox events deduplicate
+  `(organization_id, source, external_event_id)` and detect payload
+  substitution.
+- Sensitive commands use `Idempotency-Key` with a request hash. Reusing a key
+  for different input is a conflict; transaction-scoped advisory locks
+  serialize concurrent use of the same key.
+- Migrations are forward-only Flyway scripts. Production rollouts use
+  expand/migrate/contract changes.
+
+## Durable delivery
+
+Domain changes and outbox rows must be written through the same
+`TenantJdbcExecutor` transaction. The launch dispatcher uses
+`FOR UPDATE SKIP LOCKED`, bounded exponential retry, claim ownership, and a
+dead-letter state. Expired processing leases are reclaimed after a configurable
+timeout so a worker crash cannot strand an event indefinitely. The
+`EventTransport` port permits later Kafka adoption without changing domain
+event contracts.
+
+The platform tables deliberately use RLS without `FORCE` so their owner/worker
+role can claim work across organizations. Before product launch, deployment
+must split migration/worker and API database credentials; the API role must not
+own or bypass these tables.
+
+## API conventions
+
+- Versioned REST routes under `/api/v1`.
+- RFC 9457 Problem Details with stable codes and correlation IDs.
+- No PII in paths, correlation IDs, metrics, or logs.
+- `ETag`/`If-Match` will protect mutable product resources.
+- `Idempotency-Key` is required for sensitive commands.
+- Cursor pagination and allow-listed filters/sorts will be used for large
+  tables.
+
+## Deferred by design
+
+Organization onboarding, verification, events, public pages, donations,
+payments, refunds, receipts, finance, messaging, media, and billing begin in
+later approval-gated phases.

@@ -1,0 +1,10 @@
+spring:
+  task:
+    scheduling:
+      enabled: false
+mychandha:
+  identity:
+    provider: supabase
+    issuer: https://test.supabase.co/auth/v1
+    jwk-set-uri: https://test.supabase.co/auth/v1/.well-known/jwks.json
+    audience: authenticated
