@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.HexFormat;
 import java.util.Map;
@@ -90,7 +92,7 @@ public class AuditService {
                     .param("eventDataCanonical", canonicalData)
                     .param("previousHash", previous.eventHash().isBlank() ? null : previous.eventHash())
                     .param("eventHash", eventHash)
-                    .param("recordedAt", recordedAt)
+                    .param("recordedAt", OffsetDateTime.ofInstant(recordedAt, ZoneOffset.UTC))
                     .update();
             return eventId;
         });
