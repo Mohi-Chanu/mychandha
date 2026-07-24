@@ -7,7 +7,9 @@ COPY src src
 RUN --mount=type=cache,target=/root/.m2 mvn -B package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
-RUN addgroup -S mychandha && adduser -S mychandha -G mychandha
+RUN apk upgrade --no-cache \
+    && addgroup -S mychandha \
+    && adduser -S mychandha -G mychandha
 WORKDIR /app
 COPY --from=build /workspace/target/mychandha-platform-*.jar app.jar
 USER mychandha
