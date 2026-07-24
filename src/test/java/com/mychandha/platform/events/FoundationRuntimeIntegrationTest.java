@@ -87,7 +87,8 @@ class FoundationRuntimeIntegrationTest {
         DriverManagerDataSource ownerDataSource = new DriverManagerDataSource(
                 POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
         var transactionManager = new DataSourceTransactionManager(ownerDataSource);
-        try (SimpleMeterRegistry metrics = new SimpleMeterRegistry()) {
+        SimpleMeterRegistry metrics = new SimpleMeterRegistry();
+        try {
             OutboxPublisher publisher = new OutboxPublisher(
                     JdbcClient.create(ownerDataSource),
                     new TransactionTemplate(transactionManager),
@@ -105,6 +106,8 @@ class FoundationRuntimeIntegrationTest {
             assertThat(claimed).hasSize(1);
             assertThat(claimed.getFirst().id()).isEqualTo(eventId);
             assertThat(claimed.getFirst().attempts()).isEqualTo(2);
+        } finally {
+            metrics.close();
         }
     }
 
