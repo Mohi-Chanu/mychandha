@@ -22,11 +22,11 @@ behavior.
 | OCI image build | Passed | CI image build completed |
 | CycloneDX SBOM | Passed | CI verification artifact |
 | HIGH/CRITICAL vulnerability gate | Passed | Zero findings in the configured Trivy scope |
-| Explicit secret-scanning gate | Not passed | Trivy summary reported secrets as not scanned |
+| Explicit secret-scanning gate | PR CI passed | Blocking, pinned full-history Gitleaks passed in PR run `30164823504`; complete Gate B CI evidence remains pending |
 | Readiness design package | Approved | `docs/phase-1-platform-foundation-readiness.md` |
-| Repository-change proposal | Gate A approved | Gate B and Gate C remain unapproved |
+| Repository-change proposal | Gate A accepted; Gate B draft PR open | Gate B CI evidence and Gate C approval remain open |
 | Runtime database-role separation | CI verified | V2 roles, routines, and runtime profiles passed the Docker-backed integration suite; deployment evidence remains open |
-| Immutable deployable CI artifact | Not implemented | CI image is not published for digest-based deployment |
+| Immutable deployable CI artifact | Draft PR open | OCI retention and no-rebuild promotion workflows require successful CI evidence; nothing published |
 | Non-production resources | Not started | External approval not granted |
 | Staging deployment | Not started | Depends on design, repository, and external approvals |
 | Staging security acceptance | Not started | No Supabase/Render staging environment |
@@ -60,7 +60,7 @@ Blocking security work remains:
 
 - deployed verification of the non-owner API and dispatcher database-role
   enforcement;
-- explicit secret scanning;
+- successful CI evidence from the explicit secret scanner;
 - staging JWT and cross-tenant acceptance;
 - rate-limit and metrics-access validation;
 - backup/restore and rollback evidence; and
@@ -83,8 +83,9 @@ Production targets remain:
   integration suite but have not been applied to a staging environment.
 - The current Render blueprint is intentionally incompatible with the Gate A
   profile guard until the separately approved Gate C alignment.
+- Gate B has partial CI evidence, but has not yet produced a fully verified and
+  retained OCI archive.
 - The CI-built image is not yet published as an immutable deployable digest.
-- The current CI evidence does not prove zero secrets.
 - External rate limits, alerts, backups, log drain, and restore behavior are
   unverified.
 
@@ -104,13 +105,13 @@ blueprint must not deploy until Gate C aligns it with the new execution model.
 
 ## Pending approvals
 
-The readiness design and Gate A implementation are approved. Pending approvals
-or evidence are:
+The readiness design, Gate A, and Gate B repository implementation are
+approved. Pending approvals or evidence are:
 
-- Gate A CI evidence acceptance;
-- Gate B CI and immutable-release changes;
+- Gate B CI and immutable-release evidence;
 - Gate C deployment-adapter changes;
-- any GitHub package, protected-environment, or release-workflow change;
+- GitHub package creation, protected-environment configuration, or
+  release-workflow execution;
 - exact non-production resources and operational plans; and
 - provisioning and staging execution.
 
@@ -123,7 +124,10 @@ or evidence are:
 - [x] Gate A repository implementation approved.
 - [x] Gate A repository changes implemented locally.
 - [x] Gate A complete `mvn verify` and configured CI checks green.
-- [ ] Gate A evidence review explicitly accepted.
+- [x] Gate A evidence review explicitly accepted.
+- [x] Gate B repository implementation approved.
+- [x] Gate B repository changes committed, pushed, and opened as draft PR `#2`.
+- [ ] Gate B CI, retained OCI, secret-scan, and release-path evidence accepted.
 - [ ] Exact external resource proposal approved.
 - [ ] Staging deployment ready.
 - [ ] Identity and tenant-isolation acceptance passed.
@@ -137,6 +141,7 @@ or evidence are:
 
 **Proceed to Phase 2: NO**
 
-Next action: review and explicitly accept Gate A run `30160139310`, then decide
-whether to approve Gate B. Do not begin Gate B or provision external resources
-until their separate approval gates are satisfied.
+Next action: obtain a successful corrected CI run on draft PR `#2`, then review
+and explicitly accept or reject the Gate B evidence. Do not execute the release
+workflow, create or configure GitHub package/environment resources, begin Gate
+C, or provision external resources without their separate approvals.

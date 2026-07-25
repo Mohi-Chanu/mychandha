@@ -1,0 +1,248 @@
+name: Promote verified OCI image
+
+on:
+  workflow_dispatch:
+    inputs:
+      verified_run_id:
+        description: Successful CI workflow run containing the retained OCI artifact
+        required: true
+        type: string
+      commit_sha:
+        description: Full verified commit SHA to promote
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  packages: write
+
+concurrency:
+  group: staging-release
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: staging-release
+    steps:
+      - name: Validate release inputs
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+        run: |
+          case "$COMMIT_SHA" in
+            *[!0-9a-f]*)
+              echo "commit_sha must be a full 40-character lowercase SHA." >&2
+              exit 1
+              ;;
+          esac
+          test "${#COMMIT_SHA}" -eq 40 || {
+            echo "commit_sha must be a full 40-character lowercase SHA." >&2
+            exit 1
+          }
+          case "$VERIFIED_RUN_ID" in
+            '' | *[!0-9]*)
+              echo "verified_run_id must be numeric." >&2
+              exit 1
+              ;;
+          esac
+      - name: Check out the verified commit and full history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.commit_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify the accepted CI run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+        run: |
+          run_json=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${VERIFIED_RUN_ID}")
+          test "$(jq -r '.head_sha' <<< "$run_json")" = "$COMMIT_SHA" || {
+            echo "CI run head SHA does not match commit_sha." >&2
+            exit 1
+          }
+          test "$(jq -r '.conclusion' <<< "$run_json")" = "success" || {
+            echo "CI run was not successful." >&2
+            exit 1
+          }
+          test "$(jq -r '.name' <<< "$run_json")" = "CI" || {
+            echo "verified_run_id does not identify the CI workflow." >&2
+            exit 1
+          }
+          test "$(jq -r '.head_branch' <<< "$run_json")" = "main" || {
+            echo "Only a successful post-merge main CI run may be promoted." >&2
+            exit 1
+          }
+      - name: Download retained OCI release candidate
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: mychandha-oci-${{ inputs.commit_sha }}
+          path: target/release
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.verified_run_id }}
+      - name: Verify retained evidence and checksums
+        id: evidence
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+        run: |
+          image_digest=$(
+            sh scripts/verify-release-evidence.sh \
+              target/release \
+              "$COMMIT_SHA" \
+              "$VERIFIED_RUN_ID"
+          )
+          sbom_sha256=$(jq -er '.sbom_sha256' target/release/release-evidence.json)
+          echo "image_digest=$image_digest" >> "$GITHUB_OUTPUT"
+          echo "sbom_sha256=$sbom_sha256" >> "$GITHUB_OUTPUT"
+      - name: Rerun full-history secret scan
+        id: release_gitleaks
+        continue-on-error: true
+        run: >-
+          docker run --rm
+          -v "${{ github.workspace }}:/repo"
+          zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+          git /repo --redact --no-banner
+      - name: Record sanitized release secret-scan evidence
+        if: always()
+        env:
+          GITLEAKS_OUTCOME: ${{ steps.release_gitleaks.outcome }}
+        run: |
+          mkdir -p target/release-validation
+          {
+            echo "scanner=gitleaks"
+            echo "version=8.30.1"
+            echo "scope=full-git-history"
+            echo "commit=${{ inputs.commit_sha }}"
+            if [ "$GITLEAKS_OUTCOME" = "success" ]; then
+              echo "result=passed"
+            else
+              echo "result=failed"
+            fi
+          } > target/release-validation/gitleaks-evidence.txt
+      - name: Enforce release secret-scan result
+        if: steps.release_gitleaks.outcome != 'success'
+        run: |
+          echo "Blocking release Gitleaks scan did not pass." >&2
+          exit 1
+      - name: Extract retained OCI layout for scanning
+        run: |
+          mkdir -p target/release/mychandha.oci
+          tar -xf target/release/mychandha.oci.tar \
+            -C target/release/mychandha.oci
+          test -s target/release/mychandha.oci/index.json
+          test -s target/release/mychandha.oci/oci-layout
+      - name: Rerun OCI vulnerability gate
+        id: release_trivy
+        continue-on-error: true
+        run: >-
+          docker run --rm
+          -v "${{ github.workspace }}:/workspace"
+          -v trivy-release-cache:/root/.cache/
+          aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
+          image --input /workspace/target/release/mychandha.oci
+          --format json
+          --output /workspace/target/release-validation/trivy-vulnerability-report.json
+          --exit-code 1
+          --ignore-unfixed
+          --vuln-type os,library
+          --severity CRITICAL,HIGH
+      - name: Enforce release vulnerability result
+        if: steps.release_trivy.outcome != 'success'
+        run: |
+          echo "Blocking release Trivy scan did not pass." >&2
+          exit 1
+      - name: Set up ORAS
+        uses: oras-project/setup-oras@1d808f7d7f6995cc68b7bf507bfe5c5446e1dc9d # v2.0.1
+        with:
+          version: 1.3.2
+      - name: Promote exact OCI image without rebuilding
+        id: publish
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          EXPECTED_DIGEST: ${{ steps.evidence.outputs.image_digest }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          registry_image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          printf '%s' "$GH_TOKEN" | oras login ghcr.io \
+            --username "$GITHUB_ACTOR" \
+            --password-stdin
+          oras cp \
+            --from-oci-layout \
+            "target/release/mychandha.oci.tar@${EXPECTED_DIGEST}" \
+            "${registry_image}:${COMMIT_SHA}"
+          published_digest=$(oras resolve "${registry_image}:${COMMIT_SHA}")
+          test "$published_digest" = "$EXPECTED_DIGEST" || {
+            echo "Published digest differs from the verified OCI digest." >&2
+            exit 1
+          }
+          echo "registry_image=$registry_image" >> "$GITHUB_OUTPUT"
+          echo "published_digest=$published_digest" >> "$GITHUB_OUTPUT"
+      - name: Record release identity
+        if: always()
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+          SOURCE_IMAGE_DIGEST: ${{ steps.evidence.outputs.image_digest }}
+          SOURCE_SBOM_SHA256: ${{ steps.evidence.outputs.sbom_sha256 }}
+          GITLEAKS_OUTCOME: ${{ steps.release_gitleaks.outcome }}
+          TRIVY_OUTCOME: ${{ steps.release_trivy.outcome }}
+          REGISTRY_IMAGE: ${{ steps.publish.outputs.registry_image }}
+          PUBLISHED_DIGEST: ${{ steps.publish.outputs.published_digest }}
+        run: |
+          mkdir -p target/release-validation
+          jq -n \
+            --arg commit "$COMMIT_SHA" \
+            --arg source_ci_run_id "$VERIFIED_RUN_ID" \
+            --arg source_image_digest "$SOURCE_IMAGE_DIGEST" \
+            --arg source_sbom_sha256 "$SOURCE_SBOM_SHA256" \
+            --arg gitleaks_outcome "$GITLEAKS_OUTCOME" \
+            --arg trivy_outcome "$TRIVY_OUTCOME" \
+            --arg registry_image "$REGISTRY_IMAGE" \
+            --arg published_digest "$PUBLISHED_DIGEST" \
+            --arg approver "$GITHUB_ACTOR" \
+            --arg release_workflow_run_id "$GITHUB_RUN_ID" \
+            '{
+              schema_version: 1,
+              commit: $commit,
+              source_ci_run_id: $source_ci_run_id,
+              source_image_digest: $source_image_digest,
+              source_sbom_sha256: $source_sbom_sha256,
+              release_gitleaks_outcome: $gitleaks_outcome,
+              release_trivy_outcome: $trivy_outcome,
+              registry_image: $registry_image,
+              published_digest: $published_digest,
+              approver: $approver,
+              release_workflow_run_id: $release_workflow_run_id
+            }' > target/release-validation/release-record.json
+          {
+            echo "### Immutable staging-release candidate"
+            echo
+            echo "- Commit: \`$COMMIT_SHA\`"
+            echo "- CI run: \`$VERIFIED_RUN_ID\`"
+            echo "- Source SBOM SHA-256: \`$SOURCE_SBOM_SHA256\`"
+            if [ -n "$PUBLISHED_DIGEST" ]; then
+              echo "- OCI reference: \`${REGISTRY_IMAGE}@${PUBLISHED_DIGEST}\`"
+            else
+              echo "- Publication: not completed"
+            fi
+            echo "- Approver: \`$GITHUB_ACTOR\`"
+            echo "- Release workflow run: \`$GITHUB_RUN_ID\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: mychandha-release-evidence-${{ inputs.commit_sha }}-${{ github.run_id }}
+          path: |
+            target/release/release-evidence.json
+            target/release/mychandha.cdx.json
+            target/release-validation/gitleaks-evidence.txt
+            target/release-validation/trivy-vulnerability-report.json
+            target/release-validation/release-record.json
+          if-no-files-found: warn
+          retention-days: 14

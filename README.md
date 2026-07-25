@@ -15,7 +15,9 @@ contains no festival, contribution, payment, or finance product workflows yet.
   redacted error responses.
 - OCI image, local PostgreSQL Compose profile, and Render deployment blueprint.
 - Unit, architecture, security, migration, RLS, and durable-delivery tests.
-- CI checks under `.github/workflows/ci.yml`.
+- Read-only CI verification, full-history secret scanning, retained OCI
+  evidence, and a separately protected immutable-promotion workflow under
+  `.github/workflows/`.
 
 See [Phase 1 scope](docs/phase-1-review.md), [architecture](docs/architecture.md),
 [validation status](docs/phase-1-validation.md), and

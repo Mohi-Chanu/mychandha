@@ -118,3 +118,15 @@ previous decision.
   routines, API/error and observability contracts, module-boundary evidence,
   tests, and local developer experience. It does not approve Gate B CI/release
   changes, Gate C deployment configuration, external resources, or Phase 2.
+- 2026-07-25: Gate A CI evidence was accepted after PR `#1` merged and the
+  post-merge `main` workflow passed. Gate B repository implementation was
+  separately approved. The approval covers immutable CI inputs, blocking
+  full-history Gitleaks, retained OCI/SBOM/scan evidence, and a protected
+  no-rebuild promotion workflow. It does not authorize a push, GitHub package
+  or environment configuration, image publication, Gate C, deployment,
+  external resources, or Phase 2.
+- 2026-07-25: Committing and pushing Gate B to
+  `codex/phase-1-gate-b` and opening draft PR `#2` were separately approved.
+  This does not authorize merge, release-workflow execution, GitHub package or
+  environment configuration, image publication, Gate C, deployment, external
+  resources, or Phase 2.

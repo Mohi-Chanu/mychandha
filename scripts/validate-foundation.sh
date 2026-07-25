@@ -5,6 +5,9 @@ required_files="
 pom.xml
 Dockerfile
 render.yaml
+.github/workflows/ci.yml
+.github/workflows/release.yml
+scripts/verify-release-evidence.sh
 src/main/resources/db/migration/V1__platform_foundation.sql
 src/main/resources/db/migration/V2__runtime_role_isolation.sql
 src/main/resources/application-api.yml
@@ -37,8 +40,40 @@ if grep -q "FOR UPDATE SKIP LOCKED" src/main/java/com/mychandha/platform/events/
   echo "Direct cross-tenant outbox claim SQL remains in Java" >&2
   exit 1
 fi
-grep -q "trivy-action@" .github/workflows/ci.yml
-grep -q "format: cyclonedx" .github/workflows/ci.yml
+grep -q "actions/checkout@[0-9a-f]\\{40\\}" .github/workflows/ci.yml
+grep -q "actions/setup-java@[0-9a-f]\\{40\\}" .github/workflows/ci.yml
+grep -q "actions/upload-artifact@[0-9a-f]\\{40\\}" .github/workflows/ci.yml
+grep -q "docker/setup-buildx-action@[0-9a-f]\\{40\\}" .github/workflows/ci.yml
+grep -q "postgres:17-alpine@sha256:" .github/workflows/ci.yml
+grep -q "zricethezav/gitleaks:v8.30.1@sha256:" .github/workflows/ci.yml
+grep -q "aquasec/trivy:0.72.0@sha256:" .github/workflows/ci.yml
+grep -q "type=oci" .github/workflows/ci.yml
+grep -q "tar -xf.*OCI_ARCHIVE" .github/workflows/ci.yml
+grep -q "image --input /workspace/target/release/mychandha.oci" .github/workflows/ci.yml
+grep -q "format cyclonedx" .github/workflows/ci.yml
+grep -q "sh scripts/verify-release-evidence.sh" .github/workflows/ci.yml
+grep -q "permissions:" .github/workflows/release.yml
+grep -q "packages: write" .github/workflows/release.yml
+grep -q "environment: staging-release" .github/workflows/release.yml
+grep -q "oras cp" .github/workflows/release.yml
+grep -q "tar -xf target/release/mychandha.oci.tar" .github/workflows/release.yml
+grep -q "image --input /workspace/target/release/mychandha.oci" .github/workflows/release.yml
+grep -q "sh scripts/verify-release-evidence.sh" .github/workflows/release.yml
+grep -q "oras-project/setup-oras@[0-9a-f]\\{40\\}" .github/workflows/release.yml
+grep -q "actions/download-artifact@[0-9a-f]\\{40\\}" .github/workflows/release.yml
+grep -q "actions/upload-artifact@[0-9a-f]\\{40\\}" .github/workflows/release.yml
+grep -q "FROM maven:3.9.11-eclipse-temurin-21@sha256:" Dockerfile
+grep -q "FROM eclipse-temurin:21-jre-alpine@sha256:" Dockerfile
+if grep -h "uses:" .github/workflows/*.yml \
+  | grep -Ev "uses: [^[:space:]#]+@[0-9a-f]{40}([[:space:]]*#.*)?$"; then
+  echo "A GitHub Action is not pinned to a full commit SHA" >&2
+  exit 1
+fi
+if grep "^FROM " Dockerfile \
+  | grep -Ev "@sha256:[0-9a-f]{64}([[:space:]]+AS[[:space:]]+[[:alnum:]_-]+)?$"; then
+  echo "A Dockerfile build/runtime image is not pinned to a full digest" >&2
+  exit 1
+fi
 grep -q "Idempotency-Key" docs/architecture.md
 grep -q "Supabase" docs/architecture.md
 grep -q "Render" docs/operations.md

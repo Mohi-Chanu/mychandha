@@ -24,6 +24,29 @@ migration profiles. The target controlled migration sequence, immutable
 artifact deployment, acceptance evidence, and approval boundaries are in
 `docs/phase-1-platform-foundation-readiness.md`.
 
+## Immutable CI and release evidence
+
+The Gate B CI workflow builds one `linux/amd64` OCI archive, extracts its OCI
+layout for Trivy inspection, and retains the original archive with a
+checksummed evidence manifest for 14 days. The manifest binds the commit and
+workflow run to the OCI manifest digest, archive checksum, CycloneDX SBOM
+checksum, HIGH/CRITICAL Trivy report checksum, and sanitized full-history
+Gitleaks evidence checksum. Ordinary CI has read-only repository permissions.
+
+The separate `Promote verified OCI image` workflow is manual and bound to the
+`staging-release` environment. It accepts a successful `main` CI run and full
+commit SHA, verifies the retained bundle, reruns Gitleaks and Trivy, and copies
+the exact OCI archive to GHCR with ORAS without rebuilding. The resulting
+deployment identity is the registry reference plus digest, never the commit tag
+alone.
+
+The workflow is repository configuration only until separately approved
+GitHub package and protected-environment changes exist. Do not execute it or
+publish an image without that approval. Retained GitHub Actions artifacts are
+readable by users with repository Actions access and expire after 14 days;
+authorized repository operators may delete them earlier under incident or
+cleanup procedures.
+
 ## Health and metrics
 
 | Signal | Endpoint/metric | Alert intent |
@@ -59,15 +82,18 @@ Initial production requirements:
 ## Deployment checklist
 
 1. `mvn verify` passes with Java 21 and a Docker-capable test runtime.
-2. OCI image build passes, runs as the non-root `mychandha` user, has no
-   unresolved high/critical findings, and produces a CycloneDX SBOM.
-3. Flyway migration reviewed; no destructive migration is present.
-4. Supabase issuer, JWKS URI, and audience point to the production project.
-5. Database credentials are secrets and TLS is required.
-6. Readiness is green and the outbox age is zero.
-7. A valid JWT can call `/api/v1/platform/me`.
-8. A cross-tenant access probe receives a denial.
-9. Rollback image and database forward-fix plan are recorded.
+2. The full-history Gitleaks gate passes and records sanitized evidence.
+3. The retained OCI image build passes, runs as the non-root `mychandha` user,
+   has no unresolved high/critical findings, and produces a CycloneDX SBOM.
+4. The evidence manifest verifies the commit, CI run, OCI digest, and all
+   retained checksums.
+5. Flyway migration reviewed; no destructive migration is present.
+6. Supabase issuer, JWKS URI, and audience point to the production project.
+7. Database credentials are secrets and TLS is required.
+8. Readiness is green and the outbox age is zero.
+9. A valid JWT can call `/api/v1/platform/me`.
+10. A cross-tenant access probe receives a denial.
+11. Rollback image and database forward-fix plan are recorded.
 
 ## Incident priorities
 

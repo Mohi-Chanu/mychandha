@@ -45,18 +45,20 @@ The repository contains tests for:
 - architecture boundaries and request-context safety.
 
 These gates require Java 21, Maven, and a Docker-compatible Testcontainers
-runtime. The latest successful evidence is GitHub Actions run `30160139310`,
-job `89684030456`, on commit
-`2e42b4ad82cb77a9e62bfdd389f25e1ef1fa4f37` on 2026-07-25.
+runtime. The accepted Gate A evidence is GitHub Actions run `30160139310`, job
+`89684030456`, on commit
+`2e42b4ad82cb77a9e62bfdd389f25e1ef1fa4f37` on 2026-07-25. PR `#1` then
+merged, and post-merge `main` run `30161138292`, job `89686534126`, passed on
+commit `605b4fff9a026c0dbb804c97686e054b4b0370cb`.
 
 The run passed all 52 tests with zero failures, errors, or skips. It also
 passed static analysis, the OCI image build, CycloneDX SBOM generation,
 artifact upload, and the configured HIGH/CRITICAL Trivy vulnerability gate
 with zero findings.
 
-The Trivy summary reported the secrets column as `-`, defined by the report as
-not scanned. An explicit blocking secret-scanning control remains required
-before staging deployment.
+The Gate A Trivy summary reported the secrets column as `-`, defined by the
+report as not scanned. Gate B implements the required blocking full-history
+Gitleaks control; successful Gate B CI evidence remains pending.
 
 ## Gate A local implementation evidence
 
@@ -81,6 +83,42 @@ health contributor reused its health-group name. The correction tests the API
 privilege and owner-level trigger as separate controls and uses the distinct
 `startupState` contributor identifier. The corrected run `30160139310`
 completed successfully.
+
+## Gate B local implementation evidence
+
+Gate B repository implementation was approved on 2026-07-25. The local change
+adds:
+
+- immutable action, service, scanner, Dockerfile frontend, builder, and runtime
+  references;
+- a blocking, redacted Gitleaks `8.30.1` scan over full Git history;
+- an OCI archive exported once by Buildx for retention and later promotion;
+- extraction of that archive into an OCI layout for CycloneDX and
+  HIGH/CRITICAL Trivy `0.72.0` inspection;
+- a checksummed JSON evidence manifest and a fail-closed verifier;
+- 14-day retained verification and OCI artifacts; and
+- a protected manual release workflow that validates a successful `main` CI
+  run and promotes the exact digest with ORAS, without rebuilding.
+
+Local validation on 2026-07-25 recorded:
+
+- Actionlint `1.7.12` passed both workflow files;
+- POSIX shell syntax checks passed both repository scripts;
+- checksum-verified Gitleaks `8.30.1` scanned all 11 existing commits with
+  redaction enabled and found no leaks;
+- the release-evidence verifier accepted a valid fixture and rejected a
+  checksum-tampered fixture;
+- `scripts/validate-foundation.sh` passed;
+- Java `21.0.12` and Maven `3.9.11` compiled the project and passed all 37
+  non-Docker tests, Checkstyle, PMD, JaCoCo report generation, and SpotBugs
+  with zero findings; and
+- the unfiltered `mvn verify` reached the Testcontainers suites and failed only
+  because this workstation has no Docker-compatible runtime.
+
+Docker-backed PostgreSQL tests, OCI construction, Gitleaks/Trivy execution,
+artifact upload/download, and promotion-path evidence require the later
+approved GitHub CI/PR step. The release workflow has not run and no registry
+package or environment exists.
 
 ## External staging gates
 
