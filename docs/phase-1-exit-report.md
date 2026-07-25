@@ -18,14 +18,14 @@ behavior.
 | Area | Status | Evidence or blocker |
 |---|---|---|
 | Foundation source | Passed | Implemented on `main` |
-| Automated tests and static analysis | Passed | GitHub Actions run `30085167487` |
+| Automated tests and static analysis | Passed | Gate A GitHub Actions run `30160139310` |
 | OCI image build | Passed | CI image build completed |
 | CycloneDX SBOM | Passed | CI verification artifact |
 | HIGH/CRITICAL vulnerability gate | Passed | Zero findings in the configured Trivy scope |
 | Explicit secret-scanning gate | Not passed | Trivy summary reported secrets as not scanned |
 | Readiness design package | Approved | `docs/phase-1-platform-foundation-readiness.md` |
 | Repository-change proposal | Gate A approved | Gate B and Gate C remain unapproved |
-| Runtime database-role separation | Implemented locally | V2 and runtime profiles require Docker-backed verification, CI, and deployment evidence |
+| Runtime database-role separation | CI verified | V2 roles, routines, and runtime profiles passed the Docker-backed integration suite; deployment evidence remains open |
 | Immutable deployable CI artifact | Not implemented | CI image is not published for digest-based deployment |
 | Non-production resources | Not started | External approval not granted |
 | Staging deployment | Not started | Depends on design, repository, and external approvals |
@@ -36,19 +36,19 @@ behavior.
 
 ## Tests
 
-The latest successful CI evidence records:
+The latest successful Gate A CI evidence, run `30160139310`, records:
 
 - Temurin Java 21;
-- 21 tests, zero failures, zero errors, zero skips;
+- 52 tests, zero failures, zero errors, zero skips;
 - Checkstyle, PMD, JaCoCo, and SpotBugs;
 - PostgreSQL/Testcontainers migration and RLS integration tests;
 - OCI image build; and
 - CycloneDX SBOM generation.
 
 Gate A local validation used Java 21 and Maven 3.9.11. All sources compiled,
-36 non-Docker tests passed, and Checkstyle, PMD, SpotBugs, and the structural
-validator passed. The workstation has no Docker-compatible runtime, so the 15
-PostgreSQL/Testcontainers tests still require a complete `mvn verify` and CI.
+37 non-Docker tests passed, and Checkstyle, PMD, SpotBugs, and the structural
+validator passed. GitHub Actions then ran the complete Docker-backed
+`mvn verify`, including all 15 PostgreSQL/Testcontainers tests.
 
 ## Security
 
@@ -58,8 +58,8 @@ IDs, idempotency, and durable-delivery tests.
 
 Blocking security work remains:
 
-- Docker-backed and deployed verification of the non-owner API and dispatcher
-  database-role enforcement;
+- deployed verification of the non-owner API and dispatcher database-role
+  enforcement;
 - explicit secret scanning;
 - staging JWT and cross-tenant acceptance;
 - rate-limit and metrics-access validation;
@@ -79,8 +79,8 @@ Production targets remain:
 
 ## Known risks
 
-- The repository-defined role and profile boundaries have not passed the
-  Docker-backed integration suite or been applied to an environment.
+- The repository-defined role and profile boundaries passed the Docker-backed
+  integration suite but have not been applied to a staging environment.
 - The current Render blueprint is intentionally incompatible with the Gate A
   profile guard until the separately approved Gate C alignment.
 - The CI-built image is not yet published as an immutable deployable digest.
@@ -107,7 +107,7 @@ blueprint must not deploy until Gate C aligns it with the new execution model.
 The readiness design and Gate A implementation are approved. Pending approvals
 or evidence are:
 
-- Gate A Docker-backed verification, green CI, and evidence acceptance;
+- Gate A CI evidence acceptance;
 - Gate B CI and immutable-release changes;
 - Gate C deployment-adapter changes;
 - any GitHub package, protected-environment, or release-workflow change;
@@ -122,7 +122,8 @@ or evidence are:
 - [x] Readiness design decisions approved.
 - [x] Gate A repository implementation approved.
 - [x] Gate A repository changes implemented locally.
-- [ ] Gate A complete `mvn verify`, CI, and evidence review green.
+- [x] Gate A complete `mvn verify` and configured CI checks green.
+- [ ] Gate A evidence review explicitly accepted.
 - [ ] Exact external resource proposal approved.
 - [ ] Staging deployment ready.
 - [ ] Identity and tenant-isolation acceptance passed.
@@ -136,6 +137,6 @@ or evidence are:
 
 **Proceed to Phase 2: NO**
 
-Next action: run the complete Docker-backed Java 21 `mvn verify`, obtain a green
-Gate A CI run, and review the evidence. Do not begin Gate B or provision
-external resources until their separate approval gates are satisfied.
+Next action: review and explicitly accept Gate A run `30160139310`, then decide
+whether to approve Gate B. Do not begin Gate B or provision external resources
+until their separate approval gates are satisfied.

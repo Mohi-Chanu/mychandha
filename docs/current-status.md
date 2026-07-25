@@ -4,13 +4,14 @@ Last updated: 2026-07-25
 
 ## Outcome
 
-The previously accepted Phase 1 foundation remains green. The latest
-successful GitHub Actions evidence is run `30085167487`, job `89455532377`, on
-commit `b12ff66fc7e4868eebc6b6de9de11951aafb8261`. It passed:
+The previously accepted Phase 1 foundation and the Gate A repository checks
+are green. The latest successful GitHub Actions evidence is run `30160139310`,
+job `89684030456`, on commit
+`2e42b4ad82cb77a9e62bfdd389f25e1ef1fa4f37`. It passed:
 
 - Java 21 `mvn verify`.
-- Unit, architecture, security, migration, RLS, and PostgreSQL integration
-  tests.
+- 52 unit, architecture, security, migration, RLS, runtime-profile, and
+  PostgreSQL integration tests with zero failures, errors, or skips.
 - Checkstyle, PMD, JaCoCo, and SpotBugs.
 - OCI image build.
 - CycloneDX SBOM generation and artifact upload.
@@ -60,17 +61,17 @@ Gate A repository implementation was approved and completed locally on
 Local Java 21 evidence currently shows:
 
 - all production and test sources compile;
-- 36 non-Docker unit, architecture, configuration, API, and observability
+- 37 non-Docker unit, architecture, configuration, API, and observability
   tests pass;
 - Checkstyle reports zero violations;
 - PMD passes;
 - SpotBugs reports zero findings; and
 - `scripts/validate-foundation.sh` passes.
 
-This workstation has no Docker-compatible runtime. The 15 PostgreSQL/
-Testcontainers tests, including the V2 role, RLS, routine, and runtime-profile
-integration evidence, have therefore compiled but have not run locally. Gate A
-is not accepted until the complete Java 21 `mvn verify` and CI run pass.
+This workstation has no Docker-compatible runtime. GitHub Actions run
+`30160139310` supplied the required Docker-backed evidence: all 15 PostgreSQL/
+Testcontainers tests passed, including the V2 role, RLS, dispatcher-routine,
+and runtime-profile integration checks.
 
 Draft PR `#1` triggered Gate A CI run `30159737559`. Its Docker-backed suite
 exposed two deterministic corrections before the later image gates could run:
@@ -78,7 +79,8 @@ the custom `startup` health contributor clashed with the health group of the
 same name, and the audit immutability test still expected the trigger response
 through an API role that V2 now correctly denies table mutation. The branch
 renames the contributor to `startupState` and separately verifies API privilege
-denial and owner-level trigger enforcement. A green rerun remains required.
+denial and owner-level trigger enforcement. The corrected rerun
+`30160139310` passed all configured CI stages.
 
 ## Closed validation issues
 
@@ -131,9 +133,9 @@ requirement.
 
 ## Next action
 
-Run the complete Java 21 `mvn verify` with Docker, obtain a green CI run for
-Gate A, and review its role-boundary evidence. Do not begin Gate B until that
-evidence is accepted and Gate B receives separate approval.
+Review and explicitly accept Gate A run `30160139310` and its role-boundary
+evidence. Do not begin Gate B until that evidence is accepted and Gate B
+receives separate approval.
 
 Do not provision or modify Supabase, Render, PostgreSQL, GitHub, an artifact
 registry, or another external resource until the applicable later proposal

@@ -45,11 +45,12 @@ The repository contains tests for:
 - architecture boundaries and request-context safety.
 
 These gates require Java 21, Maven, and a Docker-compatible Testcontainers
-runtime. The latest successful evidence is GitHub Actions run `30085167487`,
-job `89455532377`, on commit `b12ff66fc7e4868eebc6b6de9de11951aafb8261`
-on 2026-07-24.
+runtime. The latest successful evidence is GitHub Actions run `30160139310`,
+job `89684030456`, on commit
+`2e42b4ad82cb77a9e62bfdd389f25e1ef1fa4f37` on 2026-07-25.
 
-The same run also passed the OCI image build, CycloneDX SBOM generation,
+The run passed all 52 tests with zero failures, errors, or skips. It also
+passed static analysis, the OCI image build, CycloneDX SBOM generation,
 artifact upload, and the configured HIGH/CRITICAL Trivy vulnerability gate
 with zero findings.
 
@@ -62,15 +63,15 @@ before staging deployment.
 On 2026-07-25, using Temurin Java 21.0.11 and Maven 3.9.11:
 
 - production and test compilation passed;
-- 36 non-Docker tests passed with zero failures, errors, or skips;
+- 37 non-Docker tests passed with zero failures, errors, or skips;
 - Checkstyle passed with zero violations;
 - PMD passed;
 - SpotBugs passed with zero findings; and
 - `scripts/validate-foundation.sh` passed.
 
-The workstation did not have Docker. The 15 PostgreSQL/Testcontainers tests
-compiled but were not executed. Gate A therefore still requires a complete
-Docker-backed `mvn verify` and green CI evidence before acceptance.
+The workstation did not have Docker. GitHub Actions run `30160139310` executed
+all 15 PostgreSQL/Testcontainers tests successfully as part of the complete
+Java 21 `mvn verify`.
 
 The first draft-PR run, `30159737559`, executed the Docker-backed suite and
 failed before image construction with one assertion failure and one application
@@ -78,7 +79,8 @@ startup error. The evidence confirmed that the V2 API role denies audit-table
 mutation before the append-only trigger is reached, and that the custom startup
 health contributor reused its health-group name. The correction tests the API
 privilege and owner-level trigger as separate controls and uses the distinct
-`startupState` contributor identifier. A green rerun is still required.
+`startupState` contributor identifier. The corrected run `30160139310`
+completed successfully.
 
 ## External staging gates
 
