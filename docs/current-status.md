@@ -103,8 +103,12 @@ full-history Gitleaks scan, Java/PostgreSQL verification, static analysis, and
 retained OCI build. CycloneDX generation then exposed that Trivy requires the
 tarred OCI layout to be extracted before inspection. The workflow now retains
 and checksums the original archive while scanning its extracted layout. The
-corrected PR run remains the evidence gate. No image was published and no
-package, GitHub environment, or other external resource was created or changed.
+next run, `30165273109`, passed CycloneDX generation and the HIGH/CRITICAL
+Trivy gate, then exposed that the non-executable evidence verifier must be
+invoked through `sh`. Both CI and release verification now use that explicit
+POSIX invocation. The corrected PR run remains the evidence gate. No image was
+published and no package, GitHub environment, or other external resource was
+created or changed.
 
 Gate B local validation passed Actionlint `1.7.12`, POSIX shell syntax,
 checksum-verified Gitleaks `8.30.1` over all 11 existing commits with no leaks,

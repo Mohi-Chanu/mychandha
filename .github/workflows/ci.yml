@@ -155,7 +155,7 @@ jobs:
               artifact_retention_days: 14
             }' > target/release/release-evidence.json
           cp target/security/gitleaks-evidence.txt target/release/gitleaks-evidence.txt
-          scripts/verify-release-evidence.sh \
+          sh scripts/verify-release-evidence.sh \
             target/release \
             "$GITHUB_SHA" \
             "$GITHUB_RUN_ID"

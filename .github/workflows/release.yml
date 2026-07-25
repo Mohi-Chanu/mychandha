@@ -91,7 +91,7 @@ jobs:
           VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
         run: |
           image_digest=$(
-            scripts/verify-release-evidence.sh \
+            sh scripts/verify-release-evidence.sh \
               target/release \
               "$COMMIT_SHA" \
               "$VERIFIED_RUN_ID"

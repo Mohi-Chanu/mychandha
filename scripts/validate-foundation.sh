@@ -51,12 +51,14 @@ grep -q "type=oci" .github/workflows/ci.yml
 grep -q "tar -xf.*OCI_ARCHIVE" .github/workflows/ci.yml
 grep -q "image --input /workspace/target/release/mychandha.oci" .github/workflows/ci.yml
 grep -q "format cyclonedx" .github/workflows/ci.yml
+grep -q "sh scripts/verify-release-evidence.sh" .github/workflows/ci.yml
 grep -q "permissions:" .github/workflows/release.yml
 grep -q "packages: write" .github/workflows/release.yml
 grep -q "environment: staging-release" .github/workflows/release.yml
 grep -q "oras cp" .github/workflows/release.yml
 grep -q "tar -xf target/release/mychandha.oci.tar" .github/workflows/release.yml
 grep -q "image --input /workspace/target/release/mychandha.oci" .github/workflows/release.yml
+grep -q "sh scripts/verify-release-evidence.sh" .github/workflows/release.yml
 grep -q "oras-project/setup-oras@[0-9a-f]\\{40\\}" .github/workflows/release.yml
 grep -q "actions/download-artifact@[0-9a-f]\\{40\\}" .github/workflows/release.yml
 grep -q "actions/upload-artifact@[0-9a-f]\\{40\\}" .github/workflows/release.yml
