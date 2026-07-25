@@ -5,8 +5,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
-import org.slf4j.MDC;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -15,6 +14,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile({"api", "local", "test"})
 public final class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
@@ -31,12 +31,11 @@ public final class RestAuthenticationEntryPoint implements AuthenticationEntryPo
             HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException authException) throws IOException {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-                HttpStatus.UNAUTHORIZED, "Authentication is required.");
-        problem.setType(URI.create("https://api.mychandha.in/problems/authentication-required"));
-        problem.setTitle("Authentication required");
-        problem.setProperty("code", "AUTHENTICATION_REQUIRED");
-        problem.setProperty("correlationId", MDC.get("correlationId"));
+        ProblemDetail problem = ApiProblemDetails.create(
+                HttpStatus.UNAUTHORIZED,
+                "Authentication required",
+                "AUTHENTICATION_REQUIRED",
+                "Authentication is required.");
         response.setStatus(401);
         response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
         objectMapper.writeValue(response.getOutputStream(), problem);

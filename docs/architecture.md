@@ -21,9 +21,15 @@ flowchart TD
     Worker --> Consumer["Versioned event consumers"]
 ```
 
-The initial OCI image runs the API and durable dispatcher in one process.
-Render is the first deployment adapter. The image and environment contract do
-not depend on Render-specific runtime APIs.
+The OCI artifact now supports separate `api`, `dispatcher`, and `migration`
+profiles. The `local` profile may compose API and dispatcher behavior only for
+developer convenience. Render is the first deployment adapter, but its current
+blueprint has not yet been aligned in Gate C.
+
+The approved readiness target separates API, dispatcher, and migration
+execution profiles while retaining one modular-monolith artifact. The decision
+history is in `docs/adr/`, and capability/dependency rules are in
+`docs/module-boundaries.md`.
 
 ## Request security sequence
 
@@ -84,10 +90,11 @@ timeout so a worker crash cannot strand an event indefinitely. The
 `EventTransport` port permits later Kafka adoption without changing domain
 event contracts.
 
-The platform tables deliberately use RLS without `FORCE` so their owner/worker
-role can claim work across organizations. Before product launch, deployment
-must split migration/worker and API database credentials; the API role must not
-own or bypass these tables.
+The platform outbox remains RLS-protected for ordinary queries. The dispatcher
+has no direct table privileges and claims or transitions work only through the
+V2 security-definer routines with fixed `search_path`, validated inputs, and
+claim-ownership checks. The API role can enqueue tenant-bound rows but cannot
+execute dispatcher routines or read the outbox directly.
 
 ## API conventions
 
@@ -98,6 +105,10 @@ own or bypass these tables.
 - `Idempotency-Key` is required for sensitive commands.
 - Cursor pagination and allow-listed filters/sorts will be used for large
   tables.
+
+The normative versioning and RFC 9457 response contract is
+`docs/api-contract.md`. The normative logging, metrics, tracing-compatibility,
+and health categories are in `docs/observability-standards.md`.
 
 ## Deferred by design
 

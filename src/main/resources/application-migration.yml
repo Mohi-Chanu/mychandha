@@ -1,0 +1,16 @@
+spring:
+  main:
+    web-application-type: none
+  datasource:
+    url: ${MIGRATION_DATABASE_URL}
+    username: ${MIGRATION_DATABASE_USERNAME}
+    password: ${MIGRATION_DATABASE_PASSWORD}
+  flyway:
+    enabled: true
+  task:
+    scheduling:
+      enabled: false
+
+mychandha:
+  runtime:
+    profile: migration

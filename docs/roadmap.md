@@ -15,9 +15,33 @@ Implemented:
 - Idempotency and durable outbox/inbox processing with recovery and metrics.
 - Health, correlation, safe errors, structured logs, OCI image, SBOM, and CI.
 
-CI acceptance is complete. Staging acceptance remains open.
+Configured CI acceptance is complete. Platform-foundation readiness and staging
+acceptance remain open.
 
-## Staging acceptance gate
+## Phase 1 Platform Foundation Readiness Gate
+
+The repository-owned design package is
+`docs/phase-1-platform-foundation-readiness.md`. It covers only the existing
+Phase 1 application context and infrastructure necessary to validate it.
+Reference examples do not add providers or dependencies.
+
+The gate uses separate approvals:
+
+1. readiness design approval (completed 2026-07-25);
+2. review `docs/phase-1-repository-change-proposal.md`;
+3. Gate A: profiles, roles, security, contracts, tests, and developer
+   experience — implemented locally; Docker-backed verification and CI
+   evidence pending;
+4. Gate B: CI hardening and immutable release;
+5. Gate C: deployment-adapter configuration;
+6. approve the exact non-production resource proposal;
+7. execute staging acceptance; and
+8. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.
+
+Repository-change approval does not authorize external changes. External
+resource approval does not authorize Phase 2.
+
+### Staging acceptance execution stage
 
 Requires explicit approval before creating or modifying external resources.
 
@@ -32,6 +56,11 @@ Requires explicit approval before creating or modifying external resources.
 7. Verify liveness, readiness, metrics protection, backup restore, rollback,
    and forward-fix procedures.
 8. Record evidence and close every failure before approving Phase 2.
+
+The accepted evidence must also prove explicit secret scanning and deployment
+of the immutable CI-built image digest. The existing durable outbox dispatcher
+must use approved least-privilege database access. No Redis, generic worker
+platform, or unrelated provider is required.
 
 ## Phase 2 — Organization and event publishing
 

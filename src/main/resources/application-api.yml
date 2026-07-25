@@ -1,0 +1,25 @@
+spring:
+  main:
+    web-application-type: servlet
+  datasource:
+    url: ${API_DATABASE_URL}
+    username: ${API_DATABASE_USERNAME}
+    password: ${API_DATABASE_PASSWORD}
+  flyway:
+    enabled: false
+  task:
+    scheduling:
+      enabled: false
+
+management:
+  endpoint:
+    health:
+      group:
+        readiness:
+          include: readinessState,db,startupState
+        startup:
+          include: startupState
+
+mychandha:
+  runtime:
+    profile: api

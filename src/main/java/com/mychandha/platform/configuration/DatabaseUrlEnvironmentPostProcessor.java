@@ -3,6 +3,7 @@ package com.mychandha.platform.configuration;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.boot.SpringApplication;
@@ -23,7 +24,7 @@ public final class DatabaseUrlEnvironmentPostProcessor
     public void postProcessEnvironment(
             ConfigurableEnvironment environment,
             SpringApplication application) {
-        String raw = environment.getProperty("DATABASE_URL");
+        String raw = environment.getProperty(databaseUrlProperty(environment));
         if (raw == null || !(raw.startsWith("postgres://") || raw.startsWith("postgresql://"))) {
             return;
         }
@@ -42,6 +43,20 @@ public final class DatabaseUrlEnvironmentPostProcessor
         }
         environment.getPropertySources().addFirst(
                 new MapPropertySource("normalizedDatabaseUrl", normalized));
+    }
+
+    private String databaseUrlProperty(ConfigurableEnvironment environment) {
+        var profiles = Arrays.asList(environment.getActiveProfiles());
+        if (profiles.contains("api")) {
+            return "API_DATABASE_URL";
+        }
+        if (profiles.contains("dispatcher")) {
+            return "DISPATCHER_DATABASE_URL";
+        }
+        if (profiles.contains("migration")) {
+            return "MIGRATION_DATABASE_URL";
+        }
+        return "DATABASE_URL";
     }
 
     private String decode(String value) {

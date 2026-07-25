@@ -19,7 +19,16 @@ contains no festival, contribution, payment, or finance product workflows yet.
 
 See [Phase 1 scope](docs/phase-1-review.md), [architecture](docs/architecture.md),
 [validation status](docs/phase-1-validation.md), and
-[local development](docs/local-development.md).
+[local development](docs/local-development.md). Phase 1 closure is controlled
+by the [Platform Foundation Readiness package](docs/phase-1-platform-foundation-readiness.md),
+[repository-change proposal](docs/phase-1-repository-change-proposal.md), and
+[Phase 1 exit report](docs/phase-1-exit-report.md).
+
+Engineering standards are recorded in the [ADR index](docs/adr/README.md),
+[module boundaries](docs/module-boundaries.md),
+[observability standards](docs/observability-standards.md),
+[API contract](docs/api-contract.md), and
+[developer-experience guidelines](docs/developer-experience.md).
 
 For continued Codex Desktop work, begin with [repository instructions](AGENTS.md),
 [current status](docs/current-status.md), [product decisions](docs/product-decisions.md),
@@ -39,6 +48,10 @@ docker compose up -d postgres
 set -a && source .env && set +a
 mvn spring-boot:run
 ```
+
+The Compose database initializes the stable roles required by Flyway V2.
+Existing pre-V2 local volumes must be recreated before running the new
+migration.
 
 Verify:
 

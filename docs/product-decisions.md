@@ -95,3 +95,26 @@ previous decision.
   approved.
 - 2026-07-24: Phase 1 CI acceptance completed without weakening quality or
   vulnerability gates.
+- 2026-07-25: Preparation of the Phase 1 Platform Foundation Readiness package
+  approved as documentation-only work. Reference examples do not approve new
+  providers or infrastructure. Add only capabilities necessary for the
+  application context; Redis, generic workers, and other examples remain out of
+  scope unless explicitly and separately approved. Staging acceptance remains
+  a mandatory execution stage before Phase 1 closure.
+- 2026-07-25: The readiness package's open design decisions were reviewed and
+  approved. This approves the control directions, not repository
+  implementation or external resources. Exact resource names, regions, plans,
+  costs, owners, credentials, and provider-side changes remain subject to later
+  explicit approval.
+- 2026-07-25: The repository-change proposal review requested ADRs, explicit
+  module/dependency boundaries, observability standards, API versioning,
+  unified RFC 9457 errors, and developer-experience guidance. These are
+  documentation enhancements, not implementation approval. The established
+  `dispatcher` term is retained; empty future modules, feature-flag
+  infrastructure, and an OpenTelemetry backend remain deferred until an
+  approved use case requires them.
+- 2026-07-25: Gate A repository implementation was approved. The approval is
+  limited to runtime/profile separation, V2 database-role and dispatcher
+  routines, API/error and observability contracts, module-boundary evidence,
+  tests, and local developer experience. It does not approve Gate B CI/release
+  changes, Gate C deployment configuration, external resources, or Phase 2.

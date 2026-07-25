@@ -8,7 +8,7 @@ unstarted.
 | Gate | Result |
 |---|---|
 | Required foundation files and invariants | Passed |
-| Java source parsing | 47 files passed |
+| Java 21 source/test compilation | 48 main and 15 test source files passed |
 | YAML and XML parsing | Passed |
 | GitHub Actions workflow lint | Passed except the linter's obsolete runner-label catalog; `ubuntu-24.04` is a supported GitHub-hosted runner |
 | Archive integrity | Passed before validation changes |
@@ -45,11 +45,42 @@ The repository contains tests for:
 - architecture boundaries and request-context safety.
 
 These gates require Java 21, Maven, and a Docker-compatible Testcontainers
-runtime. They passed in GitHub Actions run `30084269566`, job `89452672191`, on
-2026-07-24.
+runtime. The latest successful evidence is GitHub Actions run `30160139310`,
+job `89684030456`, on commit
+`2e42b4ad82cb77a9e62bfdd389f25e1ef1fa4f37` on 2026-07-25.
 
-The same run also passed the OCI image build, CycloneDX SBOM generation,
-artifact upload, and Trivy scanning with zero vulnerabilities and zero secrets.
+The run passed all 52 tests with zero failures, errors, or skips. It also
+passed static analysis, the OCI image build, CycloneDX SBOM generation,
+artifact upload, and the configured HIGH/CRITICAL Trivy vulnerability gate
+with zero findings.
+
+The Trivy summary reported the secrets column as `-`, defined by the report as
+not scanned. An explicit blocking secret-scanning control remains required
+before staging deployment.
+
+## Gate A local implementation evidence
+
+On 2026-07-25, using Temurin Java 21.0.11 and Maven 3.9.11:
+
+- production and test compilation passed;
+- 37 non-Docker tests passed with zero failures, errors, or skips;
+- Checkstyle passed with zero violations;
+- PMD passed;
+- SpotBugs passed with zero findings; and
+- `scripts/validate-foundation.sh` passed.
+
+The workstation did not have Docker. GitHub Actions run `30160139310` executed
+all 15 PostgreSQL/Testcontainers tests successfully as part of the complete
+Java 21 `mvn verify`.
+
+The first draft-PR run, `30159737559`, executed the Docker-backed suite and
+failed before image construction with one assertion failure and one application
+startup error. The evidence confirmed that the V2 API role denies audit-table
+mutation before the append-only trigger is reached, and that the custom startup
+health contributor reused its health-group name. The correction tests the API
+privilege and owner-level trigger as separate controls and uses the distinct
+`startupState` contributor identifier. The corrected run `30160139310`
+completed successfully.
 
 ## External staging gates
 
@@ -61,6 +92,8 @@ recorded:
 3. Same-tenant access succeeds and cross-tenant probes are denied.
 4. Audit verification, idempotent replay, outbox retry/recovery, health, and
    rollback checks pass in staging.
+5. The immutable CI-built image digest, SBOM, vulnerability scan, and explicit
+   secret scan are retained as deployment evidence.
 
 No Supabase or Render resources were provisioned during the local validation
 pass.

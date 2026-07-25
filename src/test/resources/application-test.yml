@@ -1,8 +1,14 @@
 spring:
+  main:
+    web-application-type: servlet
+  flyway:
+    enabled: true
   task:
     scheduling:
       enabled: false
 mychandha:
+  runtime:
+    profile: test
   identity:
     provider: supabase
     issuer: https://test.supabase.co/auth/v1

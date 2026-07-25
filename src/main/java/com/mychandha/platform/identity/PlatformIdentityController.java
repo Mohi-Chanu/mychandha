@@ -2,12 +2,14 @@ package com.mychandha.platform.identity;
 
 import java.util.UUID;
 import org.springframework.security.core.Authentication;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/platform")
+@Profile({"api", "local", "test"})
 public class PlatformIdentityController {
 
     private final CurrentActor currentActor;

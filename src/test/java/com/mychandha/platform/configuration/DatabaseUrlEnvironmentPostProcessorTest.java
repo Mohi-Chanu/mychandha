@@ -26,4 +26,24 @@ class DatabaseUrlEnvironmentPostProcessorTest {
         assertThat(environment.getProperty("spring.datasource.username")).isEqualTo("app@user");
         assertThat(environment.getProperty("spring.datasource.password")).isEqualTo("s#cret+value");
     }
+
+    @Test
+    void usesCredentialClassForSelectedRuntime() {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setActiveProfiles("api");
+        environment.getPropertySources().addFirst(new MapPropertySource(
+                "test",
+                Map.of(
+                        "DATABASE_URL", "postgres://wrong:wrong@legacy:5432/legacy",
+                        "API_DATABASE_URL",
+                        "postgres://api_user:api_password@db.internal:5432/mychandha")));
+
+        new DatabaseUrlEnvironmentPostProcessor()
+                .postProcessEnvironment(environment, new SpringApplication());
+
+        assertThat(environment.getProperty("spring.datasource.url"))
+                .isEqualTo("jdbc:postgresql://db.internal:5432/mychandha");
+        assertThat(environment.getProperty("spring.datasource.username"))
+                .isEqualTo("api_user");
+    }
 }

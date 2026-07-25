@@ -4,6 +4,7 @@ import com.mychandha.platform.identity.IdentityProviderProperties;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -29,6 +30,7 @@ import org.springframework.util.StringUtils;
 
 @Configuration
 @EnableMethodSecurity
+@Profile({"api", "local", "test"})
 public class SecurityConfiguration {
 
     @Bean
@@ -36,7 +38,8 @@ public class SecurityConfiguration {
             HttpSecurity http,
             CorrelationIdFilter correlationIdFilter,
             OrganizationContextFilter organizationContextFilter,
-            RestAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+            RestAuthenticationEntryPoint authenticationEntryPoint,
+            RestAccessDeniedHandler accessDeniedHandler) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
@@ -49,7 +52,9 @@ public class SecurityConfiguration {
                 .oauth2ResourceServer(resource -> resource
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(authenticationConverter()))
                         .authenticationEntryPoint(authenticationEntryPoint))
-                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(authenticationEntryPoint))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
                 .headers(headers -> headers
                         .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'"))
                         .frameOptions(frame -> frame.deny())
