@@ -147,14 +147,20 @@ class PlatformMigrationIntegrationTest {
                     """.formatted(eventId, organizationId));
             connection.commit();
         }
-        try (Connection connection = connection()) {
-            connection.setAutoCommit(false);
-            setOrganization(connection, organizationId);
-            assertThatThrownBy(() -> connection.createStatement().executeUpdate(
+        try (Connection api = connection()) {
+            api.setAutoCommit(false);
+            setOrganization(api, organizationId);
+            assertThatThrownBy(() -> api.createStatement().executeUpdate(
+                    "DELETE FROM audit.audit_event WHERE id = '" + eventId + "'"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("permission denied");
+            api.rollback();
+        }
+        try (Connection owner = ownerConnection()) {
+            assertThatThrownBy(() -> owner.createStatement().executeUpdate(
                     "DELETE FROM audit.audit_event WHERE id = '" + eventId + "'"))
                     .isInstanceOf(SQLException.class)
                     .hasMessageContaining("immutable");
-            connection.rollback();
         }
     }
 

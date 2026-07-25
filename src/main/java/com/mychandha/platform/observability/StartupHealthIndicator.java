@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-@Component("startup")
+@Component("startupState")
 @Profile({"api", "dispatcher", "local"})
 public final class StartupHealthIndicator
         implements HealthIndicator, ApplicationListener<ApplicationReadyEvent> {

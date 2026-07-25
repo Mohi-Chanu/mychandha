@@ -72,6 +72,14 @@ Testcontainers tests, including the V2 role, RLS, routine, and runtime-profile
 integration evidence, have therefore compiled but have not run locally. Gate A
 is not accepted until the complete Java 21 `mvn verify` and CI run pass.
 
+Draft PR `#1` triggered Gate A CI run `30159737559`. Its Docker-backed suite
+exposed two deterministic corrections before the later image gates could run:
+the custom `startup` health contributor clashed with the health group of the
+same name, and the audit immutability test still expected the trigger response
+through an API role that V2 now correctly denies table mutation. The branch
+renames the contributor to `startupState` and separately verifies API privilege
+denial and owner-level trigger enforcement. A green rerun remains required.
+
 ## Closed validation issues
 
 - Corrected tenant-role composite ownership and tenant-scoped inbox identity.

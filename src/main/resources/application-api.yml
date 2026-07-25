@@ -16,9 +16,9 @@ management:
     health:
       group:
         readiness:
-          include: readinessState,db,startup
+          include: readinessState,db,startupState
         startup:
-          include: startup
+          include: startupState
 
 mychandha:
   runtime:

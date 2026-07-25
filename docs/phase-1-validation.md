@@ -72,6 +72,14 @@ The workstation did not have Docker. The 15 PostgreSQL/Testcontainers tests
 compiled but were not executed. Gate A therefore still requires a complete
 Docker-backed `mvn verify` and green CI evidence before acceptance.
 
+The first draft-PR run, `30159737559`, executed the Docker-backed suite and
+failed before image construction with one assertion failure and one application
+startup error. The evidence confirmed that the V2 API role denies audit-table
+mutation before the append-only trigger is reached, and that the custom startup
+health contributor reused its health-group name. The correction tests the API
+privilege and owner-level trigger as separate controls and uses the distinct
+`startupState` contributor identifier. A green rerun is still required.
+
 ## External staging gates
 
 Staging acceptance is not complete until all of the following evidence is
