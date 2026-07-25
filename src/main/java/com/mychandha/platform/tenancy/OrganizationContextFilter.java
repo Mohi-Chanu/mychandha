@@ -9,18 +9,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
 import java.util.UUID;
-import org.slf4j.MDC;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import com.mychandha.platform.security.ApiProblemDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
+@Profile({"api", "local", "test"})
 public final class OrganizationContextFilter extends OncePerRequestFilter {
 
     public static final String HEADER = "X-Organization-Id";
@@ -52,6 +53,15 @@ public final class OrganizationContextFilter extends OncePerRequestFilter {
             return;
         }
 
+        UUID organizationId;
+        try {
+            organizationId = UUID.fromString(rawOrganizationId);
+        } catch (IllegalArgumentException exception) {
+            writeProblem(response, 400, "INVALID_ORGANIZATION_CONTEXT",
+                    "X-Organization-Id must be a UUID.");
+            return;
+        }
+
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
@@ -59,7 +69,6 @@ public final class OrganizationContextFilter extends OncePerRequestFilter {
                 return;
             }
             ExternalIdentity identity = currentActor.require(authentication);
-            UUID organizationId = UUID.fromString(rawOrganizationId);
             if (!tenantAccess.hasActiveMembership(organizationId, identity)) {
                 writeProblem(response, 403, "ORGANIZATION_ACCESS_DENIED",
                         "You do not have access to this organization.");
@@ -67,9 +76,6 @@ public final class OrganizationContextFilter extends OncePerRequestFilter {
             }
             OrganizationContext.set(organizationId, identity);
             filterChain.doFilter(request, response);
-        } catch (IllegalArgumentException exception) {
-            writeProblem(response, 400, "INVALID_ORGANIZATION_CONTEXT",
-                    "X-Organization-Id must be a UUID.");
         } finally {
             OrganizationContext.clear();
         }
@@ -80,12 +86,11 @@ public final class OrganizationContextFilter extends OncePerRequestFilter {
             int status,
             String code,
             String detail) throws IOException {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.valueOf(status), detail);
-        problem.setTitle(status == 403 ? "Access denied" : "Invalid organization context");
-        problem.setType(URI.create("https://api.mychandha.in/problems/"
-                + code.toLowerCase().replace('_', '-')));
-        problem.setProperty("code", code);
-        problem.setProperty("correlationId", MDC.get("correlationId"));
+        ProblemDetail problem = ApiProblemDetails.create(
+                HttpStatus.valueOf(status),
+                status == 403 ? "Access denied" : "Invalid organization context",
+                code,
+                detail);
         response.setStatus(status);
         response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
         objectMapper.writeValue(response.getOutputStream(), problem);

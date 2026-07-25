@@ -23,6 +23,11 @@
 - Diagnostic logs and audit records are different data products.
 - Secrets are injected as environment secrets and excluded from source control.
 - Prometheus requires the dedicated `platform.metrics` scope.
+- Application errors follow `docs/api-contract.md` and never expose rejected
+  values, stack traces, SQL, provider payloads, or personal data.
+- Telemetry follows `docs/observability-standards.md`; external identity
+  subjects, tokens, contact data, and payloads never enter logs, metric tags,
+  trace baggage, or error responses.
 
 ## Threats covered by automated checks
 
@@ -35,7 +40,8 @@
 
 ## Required before production traffic
 
-- Separate database roles for migration, API, and durable worker.
+- Deploy and verify the repository-defined migration, API, and dispatcher
+  database-role separation.
 - Edge rate-limit policy by IP, subject, organization, and endpoint class.
 - Supabase project hardening: asymmetric signing key, rotation rehearsal,
   session lifetime, MFA/step-up policy, breached-password protection, and audit

@@ -37,10 +37,12 @@ public class OutboxService {
         jdbc.sql("""
                         INSERT INTO platform.outbox_event (
                             id, organization_id, aggregate_type, aggregate_id,
-                            event_type, schema_version, payload, correlation_id
+                            event_type, schema_version, payload, correlation_id,
+                            trace_parent
                         ) VALUES (
                             :id, :organizationId, :aggregateType, :aggregateId,
-                            :eventType, :schemaVersion, CAST(:payload AS jsonb), :correlationId
+                            :eventType, :schemaVersion, CAST(:payload AS jsonb),
+                            :correlationId, :traceParent
                         )
                         """)
                 .param("id", eventId)
@@ -51,6 +53,7 @@ public class OutboxService {
                 .param("schemaVersion", event.schemaVersion())
                 .param("payload", json(event))
                 .param("correlationId", MDC.get("correlationId"))
+                .param("traceParent", MDC.get("traceparent"))
                 .update();
         return eventId;
     }

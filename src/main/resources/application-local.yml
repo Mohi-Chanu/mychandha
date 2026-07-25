@@ -1,0 +1,25 @@
+spring:
+  main:
+    web-application-type: servlet
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/mychandha}
+    username: ${DATABASE_USERNAME:mychandha_owner}
+    password: ${DATABASE_PASSWORD:change-me}
+  flyway:
+    enabled: true
+  task:
+    scheduling:
+      enabled: true
+
+management:
+  endpoint:
+    health:
+      group:
+        readiness:
+          include: readinessState,db,startup,durableDelivery
+        startup:
+          include: startup
+
+mychandha:
+  runtime:
+    profile: local

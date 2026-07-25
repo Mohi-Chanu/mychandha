@@ -9,6 +9,8 @@ import com.mychandha.platform.audit.AuditService;
 import com.mychandha.platform.idempotency.IdempotencyService;
 import com.mychandha.platform.idempotency.IdempotentCommandResult;
 import com.mychandha.platform.identity.ExternalIdentity;
+import com.mychandha.platform.observability.OutboxBacklogReader;
+import com.mychandha.platform.observability.OutboxMetrics;
 import com.mychandha.platform.tenancy.OrganizationContext;
 import com.mychandha.platform.tenancy.TenantJdbcExecutor;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -42,6 +44,18 @@ class FoundationRuntimeIntegrationTest {
     @BeforeAll
     static void migrate() throws Exception {
         POSTGRES.start();
+        try (Connection connection = ownerConnection()) {
+            connection.createStatement().execute("""
+                    CREATE ROLE mychandha_api
+                        NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
+                        NOREPLICATION NOBYPASSRLS
+                    """);
+            connection.createStatement().execute("""
+                    CREATE ROLE mychandha_dispatcher
+                        NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
+                        NOREPLICATION NOBYPASSRLS
+                    """);
+        }
         org.flywaydb.core.Flyway.configure()
                 .dataSource(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
                 .locations("classpath:db/migration")
@@ -49,14 +63,13 @@ class FoundationRuntimeIntegrationTest {
                 .migrate();
         try (Connection connection = ownerConnection()) {
             connection.createStatement().execute(
-                    "CREATE ROLE app_runtime LOGIN PASSWORD 'runtime-password'");
+                    "CREATE ROLE api_runtime LOGIN PASSWORD 'runtime-password'");
             connection.createStatement().execute(
-                    "GRANT USAGE ON SCHEMA organization, identity, audit, platform TO app_runtime");
+                    "GRANT mychandha_api TO api_runtime");
             connection.createStatement().execute(
-                    "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "
-                            + "organization, identity, audit, platform TO app_runtime");
+                    "CREATE ROLE dispatcher_runtime LOGIN PASSWORD 'dispatcher-password'");
             connection.createStatement().execute(
-                    "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA platform TO app_runtime");
+                    "GRANT mychandha_dispatcher TO dispatcher_runtime");
         }
     }
 
@@ -85,27 +98,35 @@ class FoundationRuntimeIntegrationTest {
         }
 
         DriverManagerDataSource ownerDataSource = new DriverManagerDataSource(
-                POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
+                POSTGRES.getJdbcUrl(), "dispatcher_runtime", "dispatcher-password");
         var transactionManager = new DataSourceTransactionManager(ownerDataSource);
         SimpleMeterRegistry metrics = new SimpleMeterRegistry();
         try {
+            OutboxProperties properties = new OutboxProperties(
+                    Duration.ofSeconds(1),
+                    Duration.ofMinutes(2),
+                    50,
+                    12);
+            OutboxBacklogReader backlogReader =
+                    new OutboxBacklogReader(JdbcClient.create(ownerDataSource), properties);
+            OutboxMetrics outboxMetrics = new OutboxMetrics(metrics, backlogReader);
             OutboxPublisher publisher = new OutboxPublisher(
                     JdbcClient.create(ownerDataSource),
                     new TransactionTemplate(transactionManager),
                     event -> {
                     },
-                    new OutboxProperties(
-                            Duration.ofSeconds(1),
-                            Duration.ofMinutes(2),
-                            50,
-                            12),
-                    metrics);
+                    properties,
+                    outboxMetrics);
 
             var claimed = publisher.claim();
 
             assertThat(claimed).hasSize(1);
             assertThat(claimed.getFirst().id()).isEqualTo(eventId);
             assertThat(claimed.getFirst().attempts()).isEqualTo(2);
+            assertThat(metrics.get("mychandha.outbox.stale.recovered")
+                    .counter().count()).isEqualTo(1);
+            assertThat(metrics.find("mychandha.outbox.pending").gauge()).isNotNull();
+            assertThat(metrics.find("mychandha.outbox.delivery").timer()).isNotNull();
         } finally {
             metrics.close();
         }
@@ -188,7 +209,7 @@ class FoundationRuntimeIntegrationTest {
 
     private static TenantJdbcExecutor runtimeTenantExecutor() {
         DriverManagerDataSource runtimeDataSource = new DriverManagerDataSource(
-                POSTGRES.getJdbcUrl(), "app_runtime", "runtime-password");
+                POSTGRES.getJdbcUrl(), "api_runtime", "runtime-password");
         JdbcClient jdbc = JdbcClient.create(runtimeDataSource);
         var transactionManager = new DataSourceTransactionManager(runtimeDataSource);
         return new TenantJdbcExecutor(jdbc, transactionManager);

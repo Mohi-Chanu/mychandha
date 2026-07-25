@@ -11,5 +11,7 @@ public record OutboxEnvelope(
         int schemaVersion,
         String payload,
         String correlationId,
-        int attempts) {
+        String traceParent,
+        int attempts,
+        boolean reclaimed) {
 }

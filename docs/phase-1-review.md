@@ -49,14 +49,16 @@ implementing organization, festival, contribution, or finance functionality.
 ## Verification status
 
 The repository includes executable Java 21/Maven/Testcontainers verification.
-The creation workspace did not contain Maven, Docker, or Java 21, so the full
-suite and OCI build could not execute locally. `scripts/validate-foundation.sh`
-provides a completed structural check; CI is the authoritative executable gate.
+Gate A local validation compiled all sources, passed 36 non-Docker tests and
+all configured static-analysis gates, and passed the structural validator.
+Docker is unavailable on this workstation, so the 15 PostgreSQL/Testcontainers
+tests and complete `mvn verify` still require CI or another Docker-capable host.
 
 ## Remaining Phase 1 production tasks
 
 - Provision the actual Supabase and Render environments.
-- Split migration, API, and worker database roles.
+- Run and accept the Docker-backed V2 migration, API-role, and dispatcher-role
+  evidence, then apply those roles only in an approved environment.
 - Configure edge rate limits, secret storage, alerts, backups, and log drain.
 - Run `mvn verify`, image scanning, Render blueprint validation, restore drill,
   and security review in the deployment environment.
@@ -66,6 +68,8 @@ were not performed automatically.
 
 ## Phase boundary
 
-Phase 2 may begin only after architecture/security review of this foundation.
-Its scope is organization onboarding, verification, memberships, event
-editions, localized content, publication snapshots, and QR links.
+Phase 2 design may begin only after the Phase 1 Platform Foundation Readiness
+Gate closes, staging evidence passes, and the Phase 1 exit report receives
+explicit approval. Phase 2 implementation requires its own later approval. Its
+scope is organization onboarding, verification, memberships, event editions,
+localized content, publication snapshots, and QR links.

@@ -1,6 +1,7 @@
 package com.mychandha.platform.events;
 
 import java.util.List;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
  * durable transport can replace this adapter without changing domain modules.
  */
 @Component
+@Profile({"dispatcher", "local"})
 public final class InProcessEventTransport implements EventTransport {
 
     private final List<DomainEventConsumer> consumers;

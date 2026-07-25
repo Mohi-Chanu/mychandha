@@ -3,6 +3,7 @@ package com.mychandha.platform.tenancy;
 import com.mychandha.platform.security.RequiresPermission;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/organizations/{organizationId}/platform")
+@Profile({"api", "local", "test"})
 public class OrganizationAccessController {
 
     @GetMapping("/access")

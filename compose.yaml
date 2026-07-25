@@ -3,17 +3,18 @@ services:
     image: postgres:17-alpine
     environment:
       POSTGRES_DB: mychandha
-      POSTGRES_USER: mychandha_app
+      POSTGRES_USER: mychandha_owner
       POSTGRES_PASSWORD: change-me
     ports:
       - "5432:5432"
+    volumes:
+      - mychandha-postgres-data:/var/lib/postgresql/data
+      - ./scripts/bootstrap-database-roles.sql:/docker-entrypoint-initdb.d/10-runtime-roles.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mychandha_app -d mychandha"]
+      test: ["CMD-SHELL", "pg_isready -U mychandha_owner -d mychandha"]
       interval: 5s
       timeout: 5s
       retries: 10
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  postgres-data:
+  mychandha-postgres-data:

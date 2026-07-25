@@ -15,20 +15,34 @@ Render's PostgreSQL URI is normalized to JDBC at startup. Other platforms can
 supply a JDBC URL directly, so this compatibility adapter does not leak into
 domain code.
 
+The current blueprint is a foundation artifact, not an accepted staging or
+production topology. It uses one application process and one database
+credential for API traffic, Flyway, and the durable dispatcher, and its
+`production`-only profile no longer satisfies the Gate A runtime guard. Do not
+deploy it. Gate C must align it to the repository's API, dispatcher, and
+migration profiles. The target controlled migration sequence, immutable
+artifact deployment, acceptance evidence, and approval boundaries are in
+`docs/phase-1-platform-foundation-readiness.md`.
+
 ## Health and metrics
 
 | Signal | Endpoint/metric | Alert intent |
 |---|---|---|
 | Liveness | `/actuator/health/liveness` | Process cannot make progress |
 | Readiness | `/actuator/health/readiness` | Instance should leave routing |
+| Startup | Runtime-specific startup signal | Initialization exceeded its budget or failed permanently |
 | Durable delivery | `durableDelivery` health component | Oldest pending event exceeds 5 minutes |
 | Delivery success | `mychandha.outbox.published` | Throughput and success |
-| Delivery failure | `mychandha.outbox.failed` | Retry/dead-letter pressure |
+| Delivery failure | `mychandha.outbox.failed`, `.retried`, `.dead.lettered` | Retry/dead-letter pressure |
+| Backlog | `mychandha.outbox.pending`, `.oldest.age`, `.stale.processing` | Queue age and recovery |
 | JVM/HTTP/DB | `/actuator/prometheus` | Saturation, latency and errors |
 
 Every HTTP request returns `X-Correlation-Id`. A caller value is retained only
 when it matches the safe format and length. Logs carry correlation ID and, in
 worker scope, organization ID; raw tokens and contact data are never logged.
+
+The complete health, structured-log, bounded-metric, tracing-compatibility, and
+privacy requirements are in `docs/observability-standards.md`.
 
 ## Backup and recovery
 
