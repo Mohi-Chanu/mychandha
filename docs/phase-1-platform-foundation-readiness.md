@@ -5,7 +5,8 @@ Preparation approved: 2026-07-25
 Design decisions approved: 2026-07-25
 External-resource approval: Not granted
 Gate A repository approval: Granted 2026-07-25
-Gate B/Gate C repository approval: Not granted
+Gate B repository approval: Granted 2026-07-25
+Gate C repository approval: Not granted
 Phase 2: Blocked until this gate closes
 
 ## Purpose
@@ -436,8 +437,10 @@ Phase 1 security invariants. Gate B and Gate C remain separate approval steps.
 
 ## Approval sequence
 
-1. Complete Gate A Docker-backed verification and accept its green CI evidence.
-2. Review and separately approve or reject Gate B.
+1. Complete Gate A Docker-backed verification and accept its green CI evidence
+   — completed 2026-07-25.
+2. Review and separately approve or reject Gate B — approved and implemented
+   locally 2026-07-25; CI evidence pending.
 3. After Gate B evidence, review and separately approve or reject Gate C.
 4. Review and approve the exact external resource proposal.
 5. Provision non-production resources and execute staging acceptance.

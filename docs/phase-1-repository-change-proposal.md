@@ -1,17 +1,19 @@
 # Phase 1 Repository Change Proposal
 
-Status: Gate A implemented locally; complete CI evidence pending
+Status: Gate A accepted; Gate B implemented locally with CI evidence pending
 Readiness design approved: 2026-07-25
 Gate A implementation approval: Granted 2026-07-25
-Gate B/Gate C implementation approval: Not granted
+Gate B implementation approval: Granted 2026-07-25
+Gate C implementation approval: Not granted
 External-resource approval: Not granted
 Phase 2: Out of scope
 
 ## Purpose
 
 This proposal defines the approved Phase 1 Platform Foundation Readiness
-repository changes needed before staging. Gate A is now implemented locally;
-Gate B, Gate C, and all external actions remain unapproved.
+repository changes needed before staging. Gate A is accepted and Gate B is
+implemented locally; Gate B evidence, Gate C, and all external actions remain
+open.
 
 The proposal covers only:
 
@@ -449,16 +451,15 @@ Change sets 1 and 2 were approved and implemented:
   module-boundary, and configuration evidence; and
 - local development and troubleshooting updates.
 
-Gate A still requires a complete Docker-backed Java 21 `mvn verify`, a green CI
-run, and an evidence review. Local compilation, 36 non-Docker tests, Checkstyle,
-PMD, SpotBugs, and the structural validator pass. Approval and implementation
-of Gate A do not automatically approve Gate B.
+Gate A completed Docker-backed Java 21 verification and its evidence was
+accepted. Gate B repository implementation was separately approved and is
+implemented locally; its CI and immutable-release evidence remain pending.
 
 ### Gate B: CI and immutable release
 
-After Gate A evidence is accepted, separately approve change set 3. It includes
-GitHub workflow and release-path changes that may require external GitHub
-approval before merge or execution.
+Change set 3 is approved and implemented locally. Its GitHub workflow and
+release-path changes still require separate approval before push, merge,
+package/environment configuration, publication, or execution.
 
 ### Gate C: Deployment adapter
 

@@ -14,7 +14,8 @@ jobs:
     timeout-minutes: 20
     services:
       postgres:
-        image: postgres:17-alpine
+        # postgres:17-alpine, resolved 2026-07-25
+        image: postgres:17-alpine@sha256:742f40ea20b9ff2ff31db5458d127452988a2164df9e17441e191f3b72252193
         env:
           POSTGRES_DB: mychandha
           POSTGRES_USER: mychandha_app
@@ -25,38 +26,157 @@ jobs:
           --health-cmd "pg_isready -U mychandha_app -d mychandha"
           --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Check out full history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan repository history for secrets
+        id: gitleaks
+        continue-on-error: true
+        run: >-
+          docker run --rm
+          -v "${{ github.workspace }}:/repo"
+          zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+          git /repo --redact --no-banner
+      - name: Record sanitized secret-scan evidence
+        if: always()
+        env:
+          GITLEAKS_OUTCOME: ${{ steps.gitleaks.outcome }}
+        run: |
+          mkdir -p target/security
+          {
+            echo "scanner=gitleaks"
+            echo "version=8.30.1"
+            echo "scope=full-git-history"
+            echo "commit=${GITHUB_SHA}"
+            if [ "$GITLEAKS_OUTCOME" = "success" ]; then
+              echo "result=passed"
+            else
+              echo "result=failed"
+            fi
+          } > target/security/gitleaks-evidence.txt
+      - name: Enforce secret-scan result
+        if: steps.gitleaks.outcome != 'success'
+        run: |
+          echo "Blocking Gitleaks scan did not pass." >&2
+          exit 1
+      - name: Set up Java
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:
           distribution: temurin
           java-version: "21"
           cache: maven
       - name: Verify
         run: mvn -B verify
-      - name: Build OCI image
-        run: docker build -t mychandha:${{ github.sha }} .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+      - name: Build retained OCI image
+        env:
+          OCI_ARCHIVE: target/release/mychandha.oci.tar
+          IMAGE_METADATA: target/release/image-metadata.json
+        run: |
+          mkdir -p target/release
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --output "type=oci,dest=${OCI_ARCHIVE}" \
+            --metadata-file "${IMAGE_METADATA}" \
+            .
+          image_digest=$(jq -er '."containerimage.digest"' "${IMAGE_METADATA}")
+          case "$image_digest" in
+            sha256:*) image_hash=${image_digest#sha256:} ;;
+            *) image_hash= ;;
+          esac
+          case "$image_hash" in
+            *[!0-9a-f]* | '')
+              echo "Buildx did not record a valid OCI image digest." >&2
+              exit 1
+              ;;
+          esac
+          test "${#image_hash}" -eq 64 || {
+            echo "Buildx did not record a valid OCI image digest." >&2
+            exit 1
+          }
       - name: Generate CycloneDX SBOM
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          image-ref: mychandha:${{ github.sha }}
-          format: cyclonedx
-          output: target/mychandha.cdx.json
+        run: >-
+          docker run --rm
+          -v "${{ github.workspace }}:/workspace"
+          -v trivy-cache:/root/.cache/
+          aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
+          image --input /workspace/target/release/mychandha.oci.tar
+          --format cyclonedx
+          --output /workspace/target/release/mychandha.cdx.json
       - name: Scan OCI image
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          image-ref: mychandha:${{ github.sha }}
-          format: table
-          exit-code: "1"
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          skip-setup-trivy: true
-      - uses: actions/upload-artifact@v4
+        run: >-
+          docker run --rm
+          -v "${{ github.workspace }}:/workspace"
+          -v trivy-cache:/root/.cache/
+          aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
+          image --input /workspace/target/release/mychandha.oci.tar
+          --format json
+          --output /workspace/target/release/trivy-vulnerability-report.json
+          --exit-code 1
+          --ignore-unfixed
+          --vuln-type os,library
+          --severity CRITICAL,HIGH
+      - name: Record immutable release evidence
+        run: |
+          image_digest=$(jq -er '."containerimage.digest"' target/release/image-metadata.json)
+          archive_sha=$(sha256sum target/release/mychandha.oci.tar | awk '{print $1}')
+          sbom_sha=$(sha256sum target/release/mychandha.cdx.json | awk '{print $1}')
+          trivy_sha=$(sha256sum target/release/trivy-vulnerability-report.json | awk '{print $1}')
+          gitleaks_sha=$(sha256sum target/security/gitleaks-evidence.txt | awk '{print $1}')
+          jq -n \
+            --arg commit "$GITHUB_SHA" \
+            --arg image_digest "$image_digest" \
+            --arg oci_archive_sha256 "$archive_sha" \
+            --arg sbom_sha256 "$sbom_sha" \
+            --arg trivy_report_sha256 "$trivy_sha" \
+            --arg gitleaks_evidence_sha256 "$gitleaks_sha" \
+            --arg workflow_run_id "$GITHUB_RUN_ID" \
+            '{
+              schema_version: 1,
+              commit: $commit,
+              image_digest: $image_digest,
+              oci_archive_sha256: $oci_archive_sha256,
+              sbom_sha256: $sbom_sha256,
+              trivy_report_sha256: $trivy_report_sha256,
+              gitleaks_evidence_sha256: $gitleaks_evidence_sha256,
+              workflow_run_id: $workflow_run_id,
+              platform: "linux/amd64",
+              sbom_format: "CycloneDX",
+              gitleaks_version: "8.30.1",
+              trivy_version: "0.72.0",
+              artifact_retention_days: 14
+            }' > target/release/release-evidence.json
+          cp target/security/gitleaks-evidence.txt target/release/gitleaks-evidence.txt
+          scripts/verify-release-evidence.sh \
+            target/release \
+            "$GITHUB_SHA" \
+            "$GITHUB_RUN_ID"
+      - name: Upload verification reports
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: verification-reports
           path: |
             target/surefire-reports
             target/site/jacoco
-            target/mychandha.cdx.json
+            target/security/gitleaks-evidence.txt
+            target/release/trivy-vulnerability-report.json
           if-no-files-found: ignore
+          retention-days: 14
+      - name: Upload retained OCI release candidate
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: mychandha-oci-${{ github.sha }}
+          path: |
+            target/release/mychandha.oci.tar
+            target/release/image-metadata.json
+            target/release/release-evidence.json
+            target/release/mychandha.cdx.json
+            target/release/trivy-vulnerability-report.json
+            target/release/gitleaks-evidence.txt
+          if-no-files-found: error
+          retention-days: 14

@@ -5,9 +5,10 @@ Last updated: 2026-07-25
 ## Outcome
 
 The previously accepted Phase 1 foundation and the Gate A repository checks
-are green. The latest successful GitHub Actions evidence is run `30160139310`,
-job `89684030456`, on commit
-`2e42b4ad82cb77a9e62bfdd389f25e1ef1fa4f37`. It passed:
+are green. Gate A evidence was explicitly accepted on 2026-07-25, PR `#1`
+merged, and the post-merge `main` GitHub Actions run `30161138292`, job
+`89686534126`, passed on merge commit
+`605b4fff9a026c0dbb804c97686e054b4b0370cb`. It passed:
 
 - Java 21 `mvn verify`.
 - 52 unit, architecture, security, migration, RLS, runtime-profile, and
@@ -17,10 +18,9 @@ job `89684030456`, on commit
 - CycloneDX SBOM generation and artifact upload.
 - The configured Trivy HIGH/CRITICAL vulnerability gate with zero findings.
 
-The Trivy summary showed `-` in the secrets column and defined that value as
-not scanned. The successful run therefore does not prove zero secret findings.
-An explicit blocking secret-scanning control is required before staging
-deployment.
+The Gate A Trivy summary showed `-` in the secrets column and defined that
+value as not scanned. Gate B now configures an explicit blocking, pinned
+Gitleaks full-history scan, but that new control has not yet executed in CI.
 
 The accepted local foundation commit chain ends at `284673d`:
 
@@ -82,6 +82,32 @@ renames the contributor to `startupState` and separately verifies API privilege
 denial and owner-level trigger enforcement. The corrected rerun
 `30160139310` passed all configured CI stages.
 
+Gate B repository implementation was approved on 2026-07-25 and is implemented
+locally on `codex/phase-1-gate-b`. It:
+
+- pins GitHub Actions, PostgreSQL, scanner images, the Dockerfile frontend, and
+  Docker build/runtime images to immutable revisions;
+- checks out complete history and runs blocking, redacted Gitleaks scanning;
+- exports the single CI-built `linux/amd64` image as a retained OCI archive;
+- records commit, OCI digest, archive digest, SBOM digest, vulnerability-report
+  digest, secret-scan evidence digest, and workflow run ID;
+- verifies the evidence bundle before upload;
+- retains the release candidate and sanitized evidence for 14 days; and
+- adds a protected manual workflow that accepts a successful `main` CI run,
+  re-verifies its evidence, reruns both security gates, and uses ORAS to
+  promote the exact archive without rebuilding.
+
+Gate B has not been pushed or executed. No image, package, GitHub environment,
+or other external resource was created or changed.
+
+Gate B local validation passed Actionlint `1.7.12`, POSIX shell syntax,
+checksum-verified Gitleaks `8.30.1` over all 11 existing commits with no leaks,
+positive and tamper-rejection release-evidence fixtures, the structural
+validator, and Java `21.0.12`/Maven `3.9.11` verification for all 37 non-Docker
+tests plus Checkstyle, PMD, JaCoCo reporting, and SpotBugs. The unfiltered
+Maven run reached the Testcontainers classes and failed only because this
+workstation has no Docker-compatible runtime.
+
 ## Closed validation issues
 
 - Corrected tenant-role composite ownership and tenant-scoped inbox identity.
@@ -127,15 +153,17 @@ requirement.
 - No environment has applied the V2 database roles or runtime-profile
   separation; rate limits, alerts, backups, restore drill, log drain, and
   rollback rehearsal remain open.
-- The CI-built image is not published as an immutable deployable digest, and
-  explicit secret-scanning evidence is missing.
+- Gate B CI evidence is pending. The CI-built image is not published as an
+  immutable deployable digest, and the new explicit secret-scanning gate has
+  not yet produced successful remote evidence.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-Review and explicitly accept Gate A run `30160139310` and its role-boundary
-evidence. Do not begin Gate B until that evidence is accepted and Gate B
-receives separate approval.
+Review the local Gate B implementation and validation evidence. A separate
+approval is required before committing, pushing, opening a PR, running the
+release workflow, creating a GitHub package or protected environment, or
+publishing an OCI image.
 
 Do not provision or modify Supabase, Render, PostgreSQL, GitHub, an artifact
 registry, or another external resource until the applicable later proposal
