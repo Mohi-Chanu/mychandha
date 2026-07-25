@@ -83,7 +83,7 @@ denial and owner-level trigger enforcement. The corrected rerun
 `30160139310` passed all configured CI stages.
 
 Gate B repository implementation was approved on 2026-07-25 and is implemented
-locally on `codex/phase-1-gate-b`. It:
+on `codex/phase-1-gate-b`. It:
 
 - pins GitHub Actions, PostgreSQL, scanner images, the Dockerfile frontend, and
   Docker build/runtime images to immutable revisions;
@@ -97,8 +97,14 @@ locally on `codex/phase-1-gate-b`. It:
   re-verifies its evidence, reruns both security gates, and uses ORAS to
   promote the exact archive without rebuilding.
 
-Gate B has not been pushed or executed. No image, package, GitHub environment,
-or other external resource was created or changed.
+Gate B was committed and pushed to `codex/phase-1-gate-b`, and draft PR `#2`
+was opened for CI evidence. Its first CI run, `30164823504`, passed the
+full-history Gitleaks scan, Java/PostgreSQL verification, static analysis, and
+retained OCI build. CycloneDX generation then exposed that Trivy requires the
+tarred OCI layout to be extracted before inspection. The workflow now retains
+and checksums the original archive while scanning its extracted layout. The
+corrected PR run remains the evidence gate. No image was published and no
+package, GitHub environment, or other external resource was created or changed.
 
 Gate B local validation passed Actionlint `1.7.12`, POSIX shell syntax,
 checksum-verified Gitleaks `8.30.1` over all 11 existing commits with no leaks,
@@ -160,10 +166,10 @@ requirement.
 
 ## Next action
 
-Review the local Gate B implementation and validation evidence. A separate
-approval is required before committing, pushing, opening a PR, running the
-release workflow, creating a GitHub package or protected environment, or
-publishing an OCI image.
+Obtain a successful corrected CI run on draft PR `#2`, then review and
+explicitly accept or reject the Gate B evidence. Running the release workflow,
+creating a GitHub package or protected environment, publishing an OCI image,
+Gate C, and all provisioning remain separate approval gates.
 
 Do not provision or modify Supabase, Render, PostgreSQL, GitHub, an artifact
 registry, or another external resource until the applicable later proposal

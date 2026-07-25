@@ -32,7 +32,8 @@ The gate uses separate approvals:
 3. Gate A: profiles, roles, security, contracts, tests, and developer
    experience — merged, CI verified, and accepted 2026-07-25;
 4. Gate B: CI hardening and immutable release — repository implementation
-   approved and completed locally; CI and release-path evidence pending;
+   approved, pushed, and under review in draft PR `#2`; successful CI and
+   release-path evidence pending;
 5. Gate C: deployment-adapter configuration;
 6. approve the exact non-production resource proposal;
 7. execute staging acceptance; and

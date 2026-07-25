@@ -26,12 +26,12 @@ artifact deployment, acceptance evidence, and approval boundaries are in
 
 ## Immutable CI and release evidence
 
-The Gate B CI workflow builds one `linux/amd64` OCI archive, scans that archive,
-and retains it with a checksummed evidence manifest for 14 days. The manifest
-binds the commit and workflow run to the OCI manifest digest, archive checksum,
-CycloneDX SBOM checksum, HIGH/CRITICAL Trivy report checksum, and sanitized
-full-history Gitleaks evidence checksum. Ordinary CI has read-only repository
-permissions.
+The Gate B CI workflow builds one `linux/amd64` OCI archive, extracts its OCI
+layout for Trivy inspection, and retains the original archive with a
+checksummed evidence manifest for 14 days. The manifest binds the commit and
+workflow run to the OCI manifest digest, archive checksum, CycloneDX SBOM
+checksum, HIGH/CRITICAL Trivy report checksum, and sanitized full-history
+Gitleaks evidence checksum. Ordinary CI has read-only repository permissions.
 
 The separate `Promote verified OCI image` workflow is manual and bound to the
 `staging-release` environment. It accepts a successful `main` CI run and full

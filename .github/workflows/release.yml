@@ -129,6 +129,13 @@ jobs:
         run: |
           echo "Blocking release Gitleaks scan did not pass." >&2
           exit 1
+      - name: Extract retained OCI layout for scanning
+        run: |
+          mkdir -p target/release/mychandha.oci
+          tar -xf target/release/mychandha.oci.tar \
+            -C target/release/mychandha.oci
+          test -s target/release/mychandha.oci/index.json
+          test -s target/release/mychandha.oci/oci-layout
       - name: Rerun OCI vulnerability gate
         id: release_trivy
         continue-on-error: true
@@ -137,7 +144,7 @@ jobs:
           -v "${{ github.workspace }}:/workspace"
           -v trivy-release-cache:/root/.cache/
           aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
-          image --input /workspace/target/release/mychandha.oci.tar
+          image --input /workspace/target/release/mychandha.oci
           --format json
           --output /workspace/target/release-validation/trivy-vulnerability-report.json
           --exit-code 1

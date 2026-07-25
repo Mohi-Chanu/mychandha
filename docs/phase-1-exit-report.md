@@ -22,11 +22,11 @@ behavior.
 | OCI image build | Passed | CI image build completed |
 | CycloneDX SBOM | Passed | CI verification artifact |
 | HIGH/CRITICAL vulnerability gate | Passed | Zero findings in the configured Trivy scope |
-| Explicit secret-scanning gate | Implemented locally | Blocking, pinned full-history Gitleaks; CI evidence pending |
+| Explicit secret-scanning gate | PR CI passed | Blocking, pinned full-history Gitleaks passed in PR run `30164823504`; complete Gate B CI evidence remains pending |
 | Readiness design package | Approved | `docs/phase-1-platform-foundation-readiness.md` |
-| Repository-change proposal | Gate A accepted; Gate B approved locally | Gate B CI evidence and Gate C approval remain open |
+| Repository-change proposal | Gate A accepted; Gate B draft PR open | Gate B CI evidence and Gate C approval remain open |
 | Runtime database-role separation | CI verified | V2 roles, routines, and runtime profiles passed the Docker-backed integration suite; deployment evidence remains open |
-| Immutable deployable CI artifact | Implemented locally | OCI retention and no-rebuild promotion workflows require CI evidence; nothing published |
+| Immutable deployable CI artifact | Draft PR open | OCI retention and no-rebuild promotion workflows require successful CI evidence; nothing published |
 | Non-production resources | Not started | External approval not granted |
 | Staging deployment | Not started | Depends on design, repository, and external approvals |
 | Staging security acceptance | Not started | No Supabase/Render staging environment |
@@ -83,7 +83,8 @@ Production targets remain:
   integration suite but have not been applied to a staging environment.
 - The current Render blueprint is intentionally incompatible with the Gate A
   profile guard until the separately approved Gate C alignment.
-- Gate B has not yet produced CI evidence or a retained verified OCI archive.
+- Gate B has partial CI evidence, but has not yet produced a fully verified and
+  retained OCI archive.
 - The CI-built image is not yet published as an immutable deployable digest.
 - External rate limits, alerts, backups, log drain, and restore behavior are
   unverified.
@@ -125,7 +126,7 @@ approved. Pending approvals or evidence are:
 - [x] Gate A complete `mvn verify` and configured CI checks green.
 - [x] Gate A evidence review explicitly accepted.
 - [x] Gate B repository implementation approved.
-- [x] Gate B repository changes implemented locally.
+- [x] Gate B repository changes committed, pushed, and opened as draft PR `#2`.
 - [ ] Gate B CI, retained OCI, secret-scan, and release-path evidence accepted.
 - [ ] Exact external resource proposal approved.
 - [ ] Staging deployment ready.
@@ -140,8 +141,7 @@ approved. Pending approvals or evidence are:
 
 **Proceed to Phase 2: NO**
 
-Next action: validate and review the local Gate B implementation, then
-separately approve commit/push/PR activity for CI evidence. Do not execute the
-release workflow, create or configure GitHub package/environment resources,
-begin Gate C, or provision external resources without their separate
-approvals.
+Next action: obtain a successful corrected CI run on draft PR `#2`, then review
+and explicitly accept or reject the Gate B evidence. Do not execute the release
+workflow, create or configure GitHub package/environment resources, begin Gate
+C, or provision external resources without their separate approvals.

@@ -125,3 +125,8 @@ previous decision.
   no-rebuild promotion workflow. It does not authorize a push, GitHub package
   or environment configuration, image publication, Gate C, deployment,
   external resources, or Phase 2.
+- 2026-07-25: Committing and pushing Gate B to
+  `codex/phase-1-gate-b` and opening draft PR `#2` were separately approved.
+  This does not authorize merge, release-workflow execution, GitHub package or
+  environment configuration, image publication, Gate C, deployment, external
+  resources, or Phase 2.

@@ -1,6 +1,6 @@
 # Phase 1 Repository Change Proposal
 
-Status: Gate A accepted; Gate B implemented locally with CI evidence pending
+Status: Gate A accepted; Gate B draft PR open with CI evidence pending
 Readiness design approved: 2026-07-25
 Gate A implementation approval: Granted 2026-07-25
 Gate B implementation approval: Granted 2026-07-25
@@ -12,8 +12,8 @@ Phase 2: Out of scope
 
 This proposal defines the approved Phase 1 Platform Foundation Readiness
 repository changes needed before staging. Gate A is accepted and Gate B is
-implemented locally; Gate B evidence, Gate C, and all external actions remain
-open.
+under review in draft PR `#2`; Gate B evidence, Gate C, and all external
+actions remain open.
 
 The proposal covers only:
 
@@ -453,13 +453,14 @@ Change sets 1 and 2 were approved and implemented:
 
 Gate A completed Docker-backed Java 21 verification and its evidence was
 accepted. Gate B repository implementation was separately approved and is
-implemented locally; its CI and immutable-release evidence remain pending.
+under review in draft PR `#2`; its complete CI and immutable-release evidence
+remain pending.
 
 ### Gate B: CI and immutable release
 
-Change set 3 is approved and implemented locally. Its GitHub workflow and
-release-path changes still require separate approval before push, merge,
-package/environment configuration, publication, or execution.
+Change set 3 is approved, pushed, and under review in draft PR `#2`. Merge,
+package/environment configuration, publication, and release-workflow execution
+remain separate approvals.
 
 ### Gate C: Deployment adapter
 

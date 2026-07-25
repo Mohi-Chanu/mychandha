@@ -92,9 +92,9 @@ adds:
 - immutable action, service, scanner, Dockerfile frontend, builder, and runtime
   references;
 - a blocking, redacted Gitleaks `8.30.1` scan over full Git history;
-- an OCI archive exported once by Buildx for scanning, retention, and later
-  promotion;
-- CycloneDX and HIGH/CRITICAL Trivy `0.72.0` scans against that archive;
+- an OCI archive exported once by Buildx for retention and later promotion;
+- extraction of that archive into an OCI layout for CycloneDX and
+  HIGH/CRITICAL Trivy `0.72.0` inspection;
 - a checksummed JSON evidence manifest and a fail-closed verifier;
 - 14-day retained verification and OCI artifacts; and
 - a protected manual release workflow that validates a successful `main` CI
