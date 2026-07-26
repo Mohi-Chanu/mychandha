@@ -1,9 +1,10 @@
 # Phase 1 Repository Change Proposal
 
-Status: Gate A accepted; Gate B draft PR open with CI evidence pending
+Status: Gate A and Gate B accepted; Gate C not approved
 Readiness design approved: 2026-07-25
 Gate A implementation approval: Granted 2026-07-25
 Gate B implementation approval: Granted 2026-07-25
+Gate B evidence acceptance: Granted 2026-07-26
 Gate C implementation approval: Not granted
 External-resource approval: Not granted
 Phase 2: Out of scope
@@ -11,9 +12,8 @@ Phase 2: Out of scope
 ## Purpose
 
 This proposal defines the approved Phase 1 Platform Foundation Readiness
-repository changes needed before staging. Gate A is accepted and Gate B is
-under review in draft PR `#2`; Gate B evidence, Gate C, and all external
-actions remain open.
+repository changes needed before staging. Gate A and Gate B are accepted. Gate
+C and all external actions remain open.
 
 The proposal covers only:
 
@@ -453,19 +453,24 @@ Change sets 1 and 2 were approved and implemented:
 
 Gate A completed Docker-backed Java 21 verification and its evidence was
 accepted. Gate B repository implementation was separately approved and is
-under review in draft PR `#2`; its complete CI and immutable-release evidence
-remain pending.
+accepted after PR `#2` merged and post-merge `main` run `30166358486`, job
+`89699959544`, passed on
+`e34239f34056ea1b6bf5769e5e7920a8ceedf053`.
 
 ### Gate B: CI and immutable release
 
-Change set 3 is approved, pushed, and under review in draft PR `#2`. Merge,
-package/environment configuration, publication, and release-workflow execution
+Change set 3 is merged, CI verified, and accepted. The accepted run retained the
+OCI archive, SBOM, Trivy report, and Gitleaks evidence and recorded OCI
+manifest digest
+`sha256:befc26d564687ce34ee826f7c77bf418b43d83e861b9ec9edfa6cba3057633ba`.
+Package/environment configuration, publication, and release-workflow execution
 remain separate approvals.
 
 ### Gate C: Deployment adapter
 
-After Gate B evidence is accepted, separately approve change set 4. Repository
-deployment configuration must not create or change external resources.
+Gate B evidence is accepted. Change set 4 is the next proposal and approval
+gate; implementation approval has not been granted. Repository deployment
+configuration must not create or change external resources.
 
 ### External resources
 

@@ -1,11 +1,11 @@
 # Current development status
 
-Last updated: 2026-07-25
+Last updated: 2026-07-26
 
 ## Outcome
 
-The previously accepted Phase 1 foundation and the Gate A repository checks
-are green. Gate A evidence was explicitly accepted on 2026-07-25, PR `#1`
+The previously accepted Phase 1 foundation and the Gate A and Gate B repository
+checks are green. Gate A evidence was explicitly accepted on 2026-07-25, PR `#1`
 merged, and the post-merge `main` GitHub Actions run `30161138292`, job
 `89686534126`, passed on merge commit
 `605b4fff9a026c0dbb804c97686e054b4b0370cb`. It passed:
@@ -19,8 +19,8 @@ merged, and the post-merge `main` GitHub Actions run `30161138292`, job
 - The configured Trivy HIGH/CRITICAL vulnerability gate with zero findings.
 
 The Gate A Trivy summary showed `-` in the secrets column and defined that
-value as not scanned. Gate B now configures an explicit blocking, pinned
-Gitleaks full-history scan, but that new control has not yet executed in CI.
+value as not scanned. Gate B closed that evidence gap with an explicit
+blocking, pinned Gitleaks full-history scan.
 
 The accepted local foundation commit chain ends at `284673d`:
 
@@ -68,10 +68,10 @@ Local Java 21 evidence currently shows:
 - SpotBugs reports zero findings; and
 - `scripts/validate-foundation.sh` passes.
 
-This workstation has no Docker-compatible runtime. GitHub Actions run
-`30160139310` supplied the required Docker-backed evidence: all 15 PostgreSQL/
-Testcontainers tests passed, including the V2 role, RLS, dispatcher-routine,
-and runtime-profile integration checks.
+At the time of Gate A validation, this workstation had no Docker-compatible
+runtime. GitHub Actions run `30160139310` supplied the required Docker-backed
+evidence: all 15 PostgreSQL/Testcontainers tests passed, including the V2 role,
+RLS, dispatcher-routine, and runtime-profile integration checks.
 
 Draft PR `#1` triggered Gate A CI run `30159737559`. Its Docker-backed suite
 exposed two deterministic corrections before the later image gates could run:
@@ -97,26 +97,40 @@ on `codex/phase-1-gate-b`. It:
   re-verifies its evidence, reruns both security gates, and uses ORAS to
   promote the exact archive without rebuilding.
 
-Gate B was committed and pushed to `codex/phase-1-gate-b`, and draft PR `#2`
-was opened for CI evidence. Its first CI run, `30164823504`, passed the
-full-history Gitleaks scan, Java/PostgreSQL verification, static analysis, and
-retained OCI build. CycloneDX generation then exposed that Trivy requires the
-tarred OCI layout to be extracted before inspection. The workflow now retains
-and checksums the original archive while scanning its extracted layout. The
-next run, `30165273109`, passed CycloneDX generation and the HIGH/CRITICAL
-Trivy gate, then exposed that the non-executable evidence verifier must be
-invoked through `sh`. Both CI and release verification now use that explicit
-POSIX invocation. The corrected PR run remains the evidence gate. No image was
-published and no package, GitHub environment, or other external resource was
-created or changed.
+Gate B was committed and pushed to `codex/phase-1-gate-b`. PR `#2` passed its
+corrected CI rerun and merged into `main` as
+`e34239f34056ea1b6bf5769e5e7920a8ceedf053` on 2026-07-25. The post-merge
+`main` run `30166358486`, job `89699959544`, passed on that exact commit. It
+recorded:
+
+- a redacted Gitleaks `8.30.1` scan over full Git history with no leaks;
+- Java 21 `mvn verify` with all 52 tests passing and no failures, errors, or
+  skips;
+- Checkstyle, PMD, JaCoCo, and SpotBugs;
+- a retained `linux/amd64` OCI archive with manifest digest
+  `sha256:befc26d564687ce34ee826f7c77bf418b43d83e861b9ec9edfa6cba3057633ba`;
+- CycloneDX SBOM generation and a successful Trivy `0.72.0`
+  HIGH/CRITICAL gate;
+- successful release-evidence manifest verification; and
+- successful upload of `verification-reports` and
+  `mychandha-oci-e34239f34056ea1b6bf5769e5e7920a8ceedf053`, retained through
+  2026-08-08 unless an authorized operator deletes them earlier.
+
+The user explicitly accepted Gate B evidence on 2026-07-26. No image was
+published, the manual release workflow was not executed, and no package,
+GitHub environment, deployment, or other external resource was created or
+changed.
 
 Gate B local validation passed Actionlint `1.7.12`, POSIX shell syntax,
 checksum-verified Gitleaks `8.30.1` over all 11 existing commits with no leaks,
 positive and tamper-rejection release-evidence fixtures, the structural
 validator, and Java `21.0.12`/Maven `3.9.11` verification for all 37 non-Docker
-tests plus Checkstyle, PMD, JaCoCo reporting, and SpotBugs. The unfiltered
-Maven run reached the Testcontainers classes and failed only because this
-workstation has no Docker-compatible runtime.
+tests plus Checkstyle, PMD, JaCoCo reporting, and SpotBugs.
+
+After Docker Desktop became available, local revalidation on 2026-07-26 used
+Java `21.0.12`, Maven `3.9.16`, Docker Engine `29.6.2`, and PostgreSQL `17.10`
+through Testcontainers. Full `mvn verify` passed all 52 tests with zero
+failures, errors, or skips, plus Checkstyle, PMD, JaCoCo, and SpotBugs.
 
 ## Closed validation issues
 
@@ -163,17 +177,23 @@ requirement.
 - No environment has applied the V2 database roles or runtime-profile
   separation; rate limits, alerts, backups, restore drill, log drain, and
   rollback rehearsal remain open.
-- Gate B CI evidence is pending. The CI-built image is not published as an
-  immutable deployable digest, and the new explicit secret-scanning gate has
-  not yet produced successful remote evidence.
+- The accepted CI-built OCI archive is retained only as a GitHub Actions
+  artifact; it has not been published to an approved registry as a deployable
+  digest.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-Obtain a successful corrected CI run on draft PR `#2`, then review and
-explicitly accept or reject the Gate B evidence. Running the release workflow,
-creating a GitHub package or protected environment, publishing an OCI image,
-Gate C, and all provisioning remain separate approval gates.
+Prepare the Gate C deployment-adapter proposal. It must define the exact
+repository-only changes needed to align the Render adapter with the accepted
+API, dispatcher, and migration profiles, immutable-image consumption, health
+contracts, secrets contract, and rollback behavior. Present its scope, security
+impact, tests, and deployment impact, then wait for explicit approval before
+implementation.
+
+Running the release workflow, creating a GitHub package or protected
+environment, publishing an OCI image, provisioning resources, deploying, or
+starting Phase 2 remain separate approval gates.
 
 Do not provision or modify Supabase, Render, PostgreSQL, GitHub, an artifact
 registry, or another external resource until the applicable later proposal

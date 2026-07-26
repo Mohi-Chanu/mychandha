@@ -130,3 +130,11 @@ previous decision.
   This does not authorize merge, release-workflow execution, GitHub package or
   environment configuration, image publication, Gate C, deployment, external
   resources, or Phase 2.
+- 2026-07-26: Gate B evidence was explicitly accepted after PR `#2` merged as
+  `e34239f34056ea1b6bf5769e5e7920a8ceedf053` and post-merge `main` CI run
+  `30166358486`, job `89699959544`, passed the complete Java/PostgreSQL,
+  static-analysis, full-history Gitleaks, retained OCI, CycloneDX, Trivy, and
+  evidence-verification gates. This accepts the repository implementation and
+  CI evidence only. It does not authorize release-workflow execution, package
+  or protected-environment creation, image publication, Gate C implementation,
+  deployment, external resources, or Phase 2.

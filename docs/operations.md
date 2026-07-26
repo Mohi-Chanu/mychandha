@@ -47,6 +47,14 @@ readable by users with repository Actions access and expire after 14 days;
 authorized repository operators may delete them earlier under incident or
 cleanup procedures.
 
+Gate B's accepted post-merge evidence is `main` run `30166358486`, job
+`89699959544`, on commit
+`e34239f34056ea1b6bf5769e5e7920a8ceedf053`. Its retained OCI manifest digest
+is `sha256:befc26d564687ce34ee826f7c77bf418b43d83e861b9ec9edfa6cba3057633ba`.
+The associated OCI and verification artifacts expire on 2026-08-08 unless
+deleted earlier by an authorized operator. Acceptance of this CI evidence does
+not authorize promotion or deployment.
+
 ## Health and metrics
 
 | Signal | Endpoint/metric | Alert intent |
