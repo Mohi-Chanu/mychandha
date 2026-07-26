@@ -297,9 +297,9 @@ publication, provisioning, migration, or deployment.
 
 ## CC-001 state
 
-- Repository implementation: approved for Gate C.
-- Commit/push/pull request: not approved by the Gate C implementation approval.
+- Repository implementation: approved, merged through PR `#4`, and CI verified.
+- Evidence-record commit/push/pull request: pending separate approval.
 - Image publication and GitHub environment changes: not approved.
 - External resources and staging execution: not approved.
-- Next approval after local evidence review: repository publication for CI,
-  if explicitly granted.
+- Next approval: explicit Gate C evidence acceptance and evidence-record
+  publication, if granted.

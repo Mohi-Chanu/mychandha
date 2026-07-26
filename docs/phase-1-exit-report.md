@@ -18,13 +18,13 @@ behavior.
 | Area | Status | Evidence or blocker |
 |---|---|---|
 | Foundation source | Passed | Implemented on `main` |
-| Automated tests and static analysis | Passed | Gate B post-merge `main` run `30166358486` |
-| OCI image build | Passed | Retained OCI archive from run `30166358486` |
-| CycloneDX SBOM | Passed | Gate B verification artifact |
-| HIGH/CRITICAL vulnerability gate | Passed | Zero findings in the Gate B Trivy scope |
-| Explicit secret-scanning gate | Passed and accepted | Blocking, pinned full-history Gitleaks passed in post-merge `main` run `30166358486` |
+| Automated tests and static analysis | Passed | Gate C post-merge `main` run `30204430920` |
+| OCI image build | Passed | Retained OCI archive from run `30204430920` |
+| CycloneDX SBOM | Passed | Gate C verification artifact |
+| HIGH/CRITICAL vulnerability gate | Passed | Zero findings in the Gate C Trivy scope |
+| Explicit secret-scanning gate | Passed; Gate C acceptance pending | Blocking, pinned full-history Gitleaks passed in post-merge `main` run `30204430920` |
 | Readiness design package | Approved | `docs/phase-1-platform-foundation-readiness.md` |
-| Repository-change proposal | Gate A and Gate B accepted | Gate C approved and implemented locally under `MCDC-001`, `EP-001`, and `CC-001`; publication and CI acceptance remain open |
+| Repository-change proposal | Gate A and Gate B accepted | Gate C merged under `MCDC-001`, `EP-001`, and `CC-001`; PR and post-merge CI passed; explicit evidence acceptance remains open |
 | Runtime database-role separation | CI verified | V2 roles, routines, and runtime profiles passed the Docker-backed integration suite; deployment evidence remains open |
 | Immutable CI artifact | Passed and accepted | Verified OCI archive retained from `main` run `30166358486`; nothing published |
 | Non-production resources | Not started | External approval not granted |
@@ -58,11 +58,16 @@ CycloneDX generation, the Trivy HIGH/CRITICAL gate, evidence verification, and
 artifact upload. The retained OCI manifest digest is
 `sha256:befc26d564687ce34ee826f7c77bf418b43d83e861b9ec9edfa6cba3057633ba`.
 
-Gate C local evidence is `docs/phase-1-gate-c-evidence.md`. Java 21
-`mvn verify` passes all 52 tests with PostgreSQL 17.10 through Testcontainers,
-plus Checkstyle, PMD, JaCoCo, and SpotBugs. The adapter, materialization, and
-tamper-rejection fixtures and the integrated foundation validator pass.
-Publication and CI evidence for the Gate C working tree remain pending.
+Gate C evidence is `docs/phase-1-gate-c-evidence.md`. Java 21 `mvn verify`
+passes all 52 tests with PostgreSQL through Testcontainers, plus Checkstyle,
+PMD, JaCoCo, and SpotBugs. The adapter, materialization, tamper-rejection
+fixtures, and integrated foundation validator passed locally. PR `#4` CI run
+`30203978892` passed, and post-merge `main` run `30204430920`, job
+`89799925991`, passed on
+`818c9b2d1d991bed67c51b6f3a9978998ab8c7b2`. The retained `main` OCI manifest
+digest is
+`sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11`.
+Explicit acceptance of this Gate C evidence remains pending.
 
 ## Security
 
@@ -96,7 +101,7 @@ Production targets remain:
   integration suite but have not been applied to a staging environment.
 - The Render adapter is a non-live example with placeholders; exact provider
   conformance, materialization, and staging behavior remain unverified.
-- The accepted CI-built OCI archive expires on 2026-08-08 unless retained
+- The latest Gate C CI-built OCI archive expires on 2026-08-09 unless retained
   through a later approved promotion or evidence policy.
 - The CI-built image is not yet published to an approved registry as an
   immutable deployable digest.
@@ -121,11 +126,11 @@ later external-resource and execution approvals.
 
 ## Pending approvals
 
-The readiness design, Gate A, Gate B repository implementation/CI evidence, and
-Gate C local repository implementation are approved. Pending approvals or
-evidence are:
+The readiness design, Gate A, Gate B repository implementation/CI evidence,
+and Gate C repository implementation are approved. Gate C is merged and its
+PR/post-merge CI is verified. Pending approvals or evidence are:
 
-- Gate C commit, push, draft pull request, CI evidence, merge, and acceptance;
+- Gate C evidence acceptance and evidence-record publication;
 - GitHub package creation, protected-environment configuration, or
   release-workflow execution;
 - exact non-production resources and operational plans; and
@@ -147,8 +152,9 @@ evidence are:
       repository release-path evidence accepted.
 - [x] Gate C repository implementation approved.
 - [x] Gate C implemented and fully validated locally.
-- [ ] Gate C committed, pushed, and opened as a draft pull request.
-- [ ] Gate C pull-request and post-merge `main` CI evidence accepted.
+- [x] Gate C committed, pushed, opened as draft PR `#4`, and merged.
+- [x] Gate C pull-request and post-merge `main` CI passed.
+- [ ] Gate C CI evidence explicitly accepted and its evidence record merged.
 - [ ] Exact external resource proposal approved.
 - [ ] Staging deployment ready.
 - [ ] Identity and tenant-isolation acceptance passed.
@@ -162,9 +168,9 @@ evidence are:
 
 **Proceed to Phase 2: NO**
 
-Next action: review `docs/phase-1-gate-c-evidence.md` and the local
-implementation, then explicitly approve or reject committing, pushing
-`codex/phase-1-gate-c`, and opening a draft pull request for CI evidence. Do
-not merge, execute the release workflow, create or configure GitHub
-package/environment resources, publish an image, or provision external
-resources without their separate approvals.
+Next action: review `docs/phase-1-gate-c-evidence.md`, explicitly accept or
+reject the Gate C CI evidence, and approve or reject committing and publishing
+the evidence-only branch `codex/phase-1-gate-c-evidence`. Do not execute the
+release workflow, create or configure GitHub package/environment resources,
+publish an image, or provision external resources without their separate
+approvals.

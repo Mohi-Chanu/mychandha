@@ -159,3 +159,12 @@ previous decision.
   pull request, merge, workflow execution, package/image publication,
   external-resource changes, migration, deployment, staging acceptance, or
   Phase 2.
+- 2026-07-26: Committing and pushing Gate C to
+  `codex/phase-1-gate-c` and opening draft PR `#4` were separately approved.
+  The user subsequently merged PR `#4` after pull-request CI run
+  `30203978892` passed, confirmed post-merge `main` run `30204430920` was
+  green, and directed preparation of the next evidence step. This authorizes
+  the evidence-record preparation only. Explicit Gate C evidence acceptance,
+  evidence-record publication, release execution, package/image publication,
+  external-resource changes, migration, deployment, staging acceptance,
+  Phase 1 closure, and Phase 2 remain separate.

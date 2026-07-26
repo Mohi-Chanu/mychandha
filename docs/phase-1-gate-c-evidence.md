@@ -1,7 +1,7 @@
 # Phase 1 Gate C evidence package
 
-Status: Local implementation evidence complete; repository publication and CI
-evidence pending
+Status: Pull-request and post-merge CI evidence verified; explicit Gate C
+acceptance and evidence-record publication pending
 Checklist: `EP-001`
 Deployment contract: `MCDC-001` version `1`
 Change control: `CC-001`
@@ -12,22 +12,32 @@ Prepared: 2026-07-26
 | Field | Evidence |
 |---|---|
 | Gate | Phase 1 Gate C — deployment adapter |
-| Repository | MyChandha |
-| Branch | `codex/phase-1-gate-c-proposal` |
+| Repository | `Mohi-Chanu/mychandha` |
+| Implementation branch | `codex/phase-1-gate-c` |
+| Evidence branch | `codex/phase-1-gate-c-evidence` (local; publication pending) |
 | Baseline commit | `bbffe16fe270a7e8d36a2db6889da5b435349d6e` |
-| Implementation commit | Pending; working tree is intentionally uncommitted |
-| Pull request/merge | Pending separate approval |
-| Gate C CI run/job | Pending separate publication and CI |
-| Environment class | Local development/verification |
+| Implementation commit | `3b3ba3462759b6713aebe0e5677ba296bb0b2ed0` |
+| Pull request | `#4`, merged 2026-07-26 |
+| Pull-request merge-test commit | `c04df76aabebbf1e688824ba739888454641591f` |
+| `main` merge commit | `818c9b2d1d991bed67c51b6f3a9978998ab8c7b2` |
+| Pull-request CI | Run `30203978892`, job `89798724750`, attempt `1` |
+| Post-merge `main` CI | Run `30204430920`, job `89799925991`, attempt `1` |
+| Environment class | Local verification and GitHub-hosted CI; no provider environment |
 | External resources | None created or changed |
-| Evidence retention | Current local working tree; CI retention pending |
+| Evidence-package recorder | Codex-assisted repository record, pending user review |
+| Explicit Gate C acceptor | Pending |
 
-The user explicitly approved Gate C repository implementation according to the
-refined proposal. That approval did not authorize commit, push, pull request,
-merge, workflow execution, image publication, provider changes, migration, or
-deployment.
+The user approved the refined Gate C repository implementation, then separately
+approved its commit, push, branch, and draft pull request. The user merged PR
+`#4` after its CI passed and directed preparation of the next evidence step
+after the post-merge `main` run was green.
 
-## Implemented scope
+Those approvals did not authorize image publication, release-workflow
+execution, GitHub package or protected-environment changes, provider
+provisioning, migration, deployment, staging execution, Phase 1 closure, or
+Phase 2.
+
+## Approved and implemented scope
 
 - [x] Removed the unsafe auto-discovered root `render.yaml`.
 - [x] Added a deliberately non-live Render staging example.
@@ -38,13 +48,18 @@ deployment.
 - [x] Added the Render conformance and deployment runbook.
 - [x] Added structural validation and positive/tamper-rejection fixtures.
 - [x] Integrated adapter validation into foundation validation.
+- [x] Added the canonical deployment contract, environment capability matrix,
+      provider-adapter abstraction, evidence checklist, and change-control rule.
 - [x] Aligned authoritative repository documentation.
-- [x] Preserved the Gate C non-goals.
+- [x] Preserved all Gate C non-goals.
 
-No Java source, SQL migration, API behavior, Dockerfile, OCI build, or external
-resource was changed.
+No Java source, SQL migration, API behavior, Dockerfile, dependency, CI/release
+workflow, or external resource was changed by Gate C.
 
 ## Local source and validation evidence
+
+The approved local validation completed before implementation commit
+`3b3ba3462759b6713aebe0e5677ba296bb0b2ed0`.
 
 | Check | Result |
 |---|---|
@@ -56,11 +71,12 @@ resource was changed.
 | `sh scripts/test-validate-render-adapter.sh` | Passed |
 | `sh scripts/validate-foundation.sh` | Passed |
 | `mvn verify` | Passed |
-| Tests | 52; zero failures, errors, or skips |
+| Tests | 52 across 15 suites; zero failures, errors, or skips |
 | Checkstyle | Zero violations |
 | PMD | Passed |
 | JaCoCo | Report generated |
 | SpotBugs | Zero findings |
+| Shell syntax | Passed |
 | Documentation local-link/whitespace checks | Passed |
 | `git diff --check` | Passed |
 
@@ -78,11 +94,30 @@ Tamper-rejection fixtures prove rejection of:
 - missing dispatcher topology; and
 - a simulated live root Blueprint.
 
-## Adapter contract evidence
+The approved validation plan assigns the adapter and tamper suite to local
+evidence. Gate C did not modify CI to add a separate adapter-validation step;
+the pull-request and post-merge runs retained every Gate B CI gate.
+
+## Evidence-record validation
+
+The evidence-only branch was revalidated locally on 2026-07-26:
+
+- Java `21.0.12`, Maven `3.9.16`, Docker Engine `29.6.2`, and PostgreSQL
+  `17.10` through Testcontainers;
+- `mvn verify` passed all 52 tests with zero failures, errors, or skips;
+- Checkstyle reported zero violations, PMD passed, JaCoCo generated its report,
+  and SpotBugs reported zero findings;
+- shell syntax, the adapter contract, all positive/tamper fixtures, and
+  `scripts/validate-foundation.sh` passed;
+- all local links and trailing-whitespace checks passed across 29 Markdown
+  files; and
+- `git diff --check` passed.
+
+## Adapter-contract evidence
 
 | Requirement | Evidence | Status |
 |---|---|---|
-| Canonical contract | `docs/deployment-contract.md` (`MCDC-001` v1) | Passed locally |
+| Canonical contract | `docs/deployment-contract.md` (`MCDC-001` v1) | Passed |
 | Adapter abstraction | Architecture and canonical contract | Passed by review |
 | Environment capability matrix | Canonical contract | Present |
 | Render mapping | `deploy/render/render.staging.yaml.example` | Passed structurally |
@@ -95,77 +130,174 @@ Tamper-rejection fixtures prove rejection of:
 | Preview prevention | Non-live filename plus `previews.generation: off` | Passed structurally |
 | Root Blueprint prevention | Root file absent and validator rejects it | Passed |
 
-## Artifact and supply-chain evidence
+## Pull-request CI evidence
 
-The Gate C change does not modify application dependencies, the Dockerfile, or
-the CI/release workflow. Local `mvn verify` passed.
+PR `#4` tested the approved implementation branch at head commit
+`3b3ba3462759b6713aebe0e5677ba296bb0b2ed0`. GitHub evaluated synthetic merge
+commit `c04df76aabebbf1e688824ba739888454641591f`.
 
-Gate C pull-request evidence remains pending and must include:
+| Field | Evidence |
+|---|---|
+| Workflow/run | `CI` run `30203978892`, run number `19`, attempt `1` |
+| Event | `pull_request` |
+| Job | `verify`, job `89798724750` |
+| Time | 2026-07-26 13:24:37Z through 13:27:17Z |
+| Result | Success |
+| Tests | 52 across 15 suites; zero failures, errors, or skips |
+| Static analysis | Checkstyle zero; PMD passed; JaCoCo retained; SpotBugs zero |
+| Secret scan | Gitleaks `8.30.1`, full Git history, passed |
+| OCI platform/digest | `linux/amd64`; `sha256:7c7b72c200e51eb91e7855d928a390749cb7b44d9204dc22d4e415f7eb6aff67` |
+| SBOM | CycloneDX `1.7`, 142 components |
+| Vulnerability scan | Trivy `0.72.0`, zero HIGH/CRITICAL findings |
+| Evidence verification | Release-evidence manifest and recorded checksums passed |
 
-- full-history Gitleaks;
-- Java/PostgreSQL verification and static analysis;
-- one `linux/amd64` OCI build;
-- CycloneDX SBOM;
-- Trivy HIGH/CRITICAL result;
-- release-evidence manifest verification; and
-- artifact/checksum retention.
+The conditional `Enforce secret-scan result` step was skipped because it runs
+only when the preceding Gitleaks step fails. The scan step succeeded and the
+sanitized evidence records `result=passed`.
 
-The previously accepted Gate B OCI evidence is baseline evidence only. It is
-not presented as an artifact built from the uncommitted Gate C working tree.
+## Post-merge `main` CI evidence
 
-## Database, deployment, and acceptance status
+PR `#4` merged into `main` as
+`818c9b2d1d991bed67c51b6f3a9978998ab8c7b2` at
+2026-07-26 13:37:48Z. The authoritative post-merge run is:
 
-The following `EP-001` items are pending rather than passed:
+| Field | Evidence |
+|---|---|
+| Workflow/run | `CI` run `30204430920`, run number `20`, attempt `1` |
+| Event | `push` to `main` |
+| Job | `verify`, job `89799925991` |
+| Time | 2026-07-26 13:37:51Z through 13:40:57Z |
+| Result | Success |
+| Java | Temurin Java 21 |
+| Build | Maven `verify`; `BUILD SUCCESS` |
+| Tests | 52 across 15 suites; zero failures, errors, or skips |
+| Checkstyle | Zero violations |
+| PMD | Version `7.17.0`; passed as part of `mvn verify` |
+| JaCoCo | Report generated and retained |
+| SpotBugs | `BugInstance size is 0`; `Error size is 0` |
+| Secret scan | Gitleaks `8.30.1`, full Git history, `result=passed` |
+| OCI platform | `linux/amd64` |
+| OCI index media type | `application/vnd.oci.image.index.v1+json` |
+| OCI manifest media type | `application/vnd.oci.image.manifest.v1+json` |
+| OCI manifest digest | `sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11` |
+| SBOM | CycloneDX `1.7`, 142 components |
+| Vulnerability scan | Trivy `0.72.0`, zero HIGH/CRITICAL findings |
+| Evidence verification | Manifest commit/run/digest and all recorded file hashes independently matched |
 
-- database role bootstrap against a selected environment;
-- migration runner, TLS, and network-path validation;
-- Flyway execution and deployed role/grant evidence;
-- registry reference and no-rebuild publication;
-- Render service creation or configuration;
-- API readiness and dispatcher process evidence in staging;
+The `main` digest is the only Gate C candidate eligible for a later approved
+no-rebuild promotion. The pull-request digest is evidence for the PR gate, not
+the deployment identity.
+
+## Retained artifact index
+
+GitHub Actions generated the following `main` artifacts. Repository users with
+Actions access can read them. The configured retention is 14 days; GitHub
+records expiry on 2026-08-09, and an authorized repository operator may delete
+them earlier.
+
+| Artifact | GitHub artifact ID | GitHub artifact digest | Expiry |
+|---|---:|---|---|
+| `verification-reports` | `8632653712` | `sha256:8f59a209e27506d7099d1a85173970edf177fbf20f69c08d05694061354f973a` | 2026-08-09 13:40:48Z |
+| `mychandha-oci-818c9b2d1d991bed67c51b6f3a9978998ab8c7b2` | `8632654380` | `sha256:4807e3f271f77bfd8480b8aa9a7e93d7abbcae45316d456757c5bc8b67ead65e` | 2026-08-09 13:40:49Z |
+
+The retained OCI artifact contains this sanitized checksummed index:
+
+| File | Media type | SHA-256 | Sensitivity |
+|---|---|---|---|
+| `mychandha.oci.tar` | `application/vnd.oci.image.layout.v1.tar` | `4a22c9569814b375e46f4f4d913bdcc1c5292e7a6eda88038156890e2f2f5943` | Internal build artifact |
+| `image-metadata.json` | `application/json` | `75578ea90188f3d3bd2049ba4e45aa03b17efb0a9f231bc0532514abd9116ff0` | Sanitized internal metadata |
+| `release-evidence.json` | `application/json` | `49b38081daf069fed75d5d3f202f0d82a14eced5936bce7021cc049bda763226` | Sanitized evidence |
+| `mychandha.cdx.json` | `application/vnd.cyclonedx+json` | `c0bd17038fa485247c5e4ea203ecc3107eadc622303632002f0032079dc8a4d8` | Internal dependency inventory |
+| `trivy-vulnerability-report.json` | `application/json` | `788b5be1b62091924ea84c60a20e040b2d4c6b1a75a938c7b1aecd8d3ff29d75` | Sanitized security evidence |
+| `gitleaks-evidence.txt` | `text/plain` | `4a3e296dec2ad3ce0c66e10dd34465976dcea40c7fea7cce55b269301ada1459` | Sanitized security evidence |
+
+No credentials, tokens, personal data, provider identifiers, or customer data
+were found in the retained evidence inspected for this record.
+
+## EP-001 disposition
+
+### Passed for the repository and CI gate
+
+- [x] Gate, evidence version, repository, branches, full commits, PR, workflow,
+      run, job, attempt, timestamps, and retention recorded.
+- [x] Approved repository scope, non-goals, and `CC-001` boundary recorded.
+- [x] Clean source state and local/CI toolchain evidence recorded.
+- [x] Unit, architecture, security, contract, integration, negative, and
+      tamper-rejection results recorded.
+- [x] Static analysis and coverage generation passed.
+- [x] OCI name, platform, media type, digest, checksum, and source binding
+      recorded.
+- [x] SBOM, vulnerability scan, secret scan, and manifest verification passed.
+- [x] `MCDC-001` version and adapter revision are identified.
+- [x] Material deviations: none.
+- [x] Unapproved external actions confirmed not performed.
+
+### Not applicable to the repository-only Gate C execution
+
+The following items were not executed because external-resource and staging
+execution approval has not been granted:
+
+- database bootstrap, migration execution, deployed schema/grant, TLS, and
+  network-path evidence;
+- registry publication and no-rebuild promotion;
+- provider service creation or configuration;
+- deployed API readiness and dispatcher process-state evidence;
 - JWT, tenant, audit, idempotency, inbox, outbox, and log-safety staging
   acceptance;
-- metrics, alerts, log retention, backups, restore, rollback, and forward-fix
-  rehearsals;
-- external cost, ownership, retention, and cleanup evidence; and
-- Phase 1 closure.
+- routing, metrics, alerts, logs, backups, restore, rollback, forward-fix,
+  RPO/RTO, cost, and cleanup evidence.
 
-These items are not applicable to the repository-only local execution step
-because their external-resource and staging-execution approvals have not been
-granted. They become required at the applicable later `CC-001` steps.
+These are deferred, not waived. They become blocking at the applicable
+external-resource and staging-execution gates.
 
 ## Security and residual risks
 
-- No secret value or external identifier was added.
-- Migration credentials are structurally prohibited from both long-lived
-  service blocks.
-- API and dispatcher credential classes are mutually isolated.
-- Mutable-image and source-build paths are rejected.
-- The exact migration runner/network mechanism remains a blocking external
-  decision.
+- No secret value or external provider identifier was added.
+- Migration credentials remain structurally prohibited from long-lived
+  services.
+- API and dispatcher credential classes remain mutually isolated.
+- Mutable-image and source-build paths remain rejected.
+- The accepted `main` OCI archive is not published and expires on 2026-08-09
+  unless a separately approved action retains or promotes it.
+- The exact migration runner and network mechanism remain blocking decisions.
 - Dispatcher backlog collection, alerting, and log routing remain blocking
-  external capability decisions.
+  provider-capability decisions.
 - Plans, costs, owners, backups, retention, and cleanup remain unselected.
 - The non-live example must never be renamed or applied with placeholders.
 
 ## Acceptance record
 
-- [x] Approved Gate C repository scope implemented locally.
+- [x] Approved Gate C repository scope implemented.
 - [x] Local validation completed without weakening existing gates.
+- [x] Implementation committed and pushed.
+- [x] Draft PR `#4` opened and pull-request CI passed.
+- [x] PR `#4` merged and post-merge `main` CI passed.
+- [x] Artifact and evidence-manifest integrity independently verified.
 - [x] Material deviations: none.
 - [x] Unapproved external actions confirmed not performed.
-- [ ] Implementation commit recorded.
-- [ ] Draft pull request and Gate C CI evidence recorded.
-- [ ] Gate C CI evidence explicitly accepted.
+- [ ] Gate C CI evidence explicitly accepted by the user.
+- [ ] Evidence branch committed, pushed, reviewed, and merged.
 - [ ] Exact external-resource proposal approved.
 - [ ] Staging execution approved and completed.
 
 ## Exact next gate
 
-Review this local implementation and evidence. If accepted, the next
-independent approval is to commit the Gate C changes, push the approved branch,
-and open a draft pull request for CI evidence.
+Review this evidence package. If it is accepted, the next independent
+repository action is approval to commit these evidence-only changes, push
+`codex/phase-1-gate-c-evidence`, and open a draft evidence pull request.
 
-That publication approval would not authorize merge, release-workflow
-execution, image publication, external-resource changes, migration, or
-deployment.
+After that record is merged and its `main` CI is green, Gate C can be recorded
+as accepted. The next design gate will be the exact non-production
+external-resource proposal required by `CC-001`, including:
+
+- Supabase, Render, PostgreSQL, and registry resources;
+- region, plans, estimated cost, owners, operators, retention, and cleanup;
+- immutable-image publication and access policy;
+- migration-runner identity and network path;
+- secrets storage and rotation;
+- TLS, rate limits, metrics, alerts, log routing, and backups; and
+- restore, rollback, forward-fix, RPO/RTO, and hard-stop criteria.
+
+Evidence acceptance does not authorize that proposal's implementation,
+resource provisioning, release execution, publication, migration, deployment,
+staging acceptance, Phase 1 closure, or Phase 2.

@@ -46,9 +46,9 @@ The gate uses separate approvals:
    experience — merged, CI verified, and accepted 2026-07-25;
 4. Gate B: CI hardening and immutable release — repository implementation
    merged, post-merge CI verified, and accepted 2026-07-26;
-5. Gate C: deployment-adapter configuration — implementation approved and
-   completed locally; repository publication, CI evidence, and explicit
-   acceptance remain open;
+5. Gate C: deployment-adapter configuration — merged through PR `#4`;
+   pull-request and post-merge `main` CI passed; evidence-record publication
+   and explicit acceptance remain open;
 6. approve the exact non-production resource proposal;
 7. execute staging acceptance; and
 8. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.

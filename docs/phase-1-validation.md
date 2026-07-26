@@ -149,6 +149,32 @@ Engine `29.6.2`, and PostgreSQL `17.10` through Testcontainers. Full
 Checkstyle reported zero violations, PMD passed, JaCoCo generated its report,
 and SpotBugs reported zero findings.
 
+## Gate C verified CI evidence
+
+Gate C implementation commit
+`3b3ba3462759b6713aebe0e5677ba296bb0b2ed0` passed PR `#4` CI run
+`30203978892`, job `89798724750`. PR `#4` then merged as
+`818c9b2d1d991bed67c51b6f3a9978998ab8c7b2`, and post-merge `main` run
+`30204430920`, job `89799925991`, passed on that exact commit.
+
+The post-merge run recorded:
+
+- Java 21 `mvn verify` with 52 tests across 15 suites and zero failures,
+  errors, or skips;
+- zero Checkstyle violations, PMD completion, a retained JaCoCo report, and
+  zero SpotBugs bug/error instances;
+- Gitleaks `8.30.1` over full Git history with `result=passed`;
+- one retained `linux/amd64` OCI archive with manifest digest
+  `sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11`;
+- CycloneDX `1.7` generation with 142 components;
+- Trivy `0.72.0` with zero HIGH/CRITICAL findings; and
+- successful source/run/digest/checksum evidence-manifest verification.
+
+The artifacts expire on 2026-08-09 unless an authorized repository operator
+deletes them earlier. Full checksums and `EP-001` disposition are in
+`docs/phase-1-gate-c-evidence.md`. Gate C evidence acceptance and publication
+of the evidence record remain pending.
+
 ## External staging gates
 
 Staging acceptance is not complete until all of the following evidence is
