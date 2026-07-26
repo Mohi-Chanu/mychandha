@@ -8,7 +8,9 @@ Gate A repository approval: Granted 2026-07-25
 Gate B repository approval: Granted 2026-07-25
 Gate B evidence accepted: 2026-07-26
 Gate C repository approval: Granted 2026-07-26
-Gate C publication/CI acceptance: Not granted
+Gate C implementation merge/CI: Passed 2026-07-26
+Gate C evidence acceptance: Granted 2026-07-26
+Gate C evidence-record merge: Pending
 Phase 2: Blocked until this gate closes
 
 ## Purpose
@@ -72,7 +74,7 @@ resource proposal is reviewed.
 
 | Capability | Approved baseline | Readiness decision | Current state |
 |---|---|---|---|
-| Application runtime | Cloud-neutral OCI image; Render is the initial adapter | Use the existing image and Render adapter; do not add another compute provider | Blueprint exists; no environment provisioned |
+| Application runtime | Cloud-neutral OCI image; Render is the initial adapter | Use the existing image and Render adapter; do not add another compute provider | Validated non-live adapter example exists; no environment provisioned |
 | Database | PostgreSQL with Flyway | Use a non-production managed PostgreSQL instance with TLS, backups, and non-owner runtime roles | V2 and role tests are implemented; no environment has applied them |
 | Identity | Pluggable managed OIDC; Supabase Auth first | Use a dedicated non-production Supabase project and validate the configured issuer/JWKS/audience contract | Adapter and automated tests exist; no project selected |
 | Durable delivery | PostgreSQL outbox/inbox | Retain the existing dispatcher; do not add Redis, Kafka, or a generic worker tier | Implemented in-process |
@@ -145,7 +147,9 @@ The recommended minimal target is:
 
 This is separation of execution profiles for an existing component, not a new
 generic worker platform or networked service. Gate A implements this design in
-the repository; deployment and external role creation remain unapproved.
+the repository, and Gate C maps it through the provider-neutral deployment
+contract and non-live Render adapter. Deployment and external role creation
+remain unapproved.
 
 Keeping the combined process and shared credential is not acceptable for gate
 closure because it would either over-privilege the API or prevent the
@@ -441,9 +445,9 @@ The repository-change proposal covers:
 
 Gate A implements the runtime, migration, security-routine, contract, test, and
 developer-experience subset while preserving the existing product behavior and
-Phase 1 security invariants. Gate B is accepted. Gate C is implemented locally;
-repository publication and CI evidence acceptance remain separate approval
-steps.
+Phase 1 security invariants. Gate B is accepted. Gate C merged through PR `#4`,
+and both its pull-request and post-merge `main` CI passed. Explicit evidence
+acceptance and publication of the evidence-only record remain separate.
 
 ## Approval sequence
 
@@ -452,13 +456,14 @@ steps.
 2. Review and separately approve or reject Gate B — merged as
    `e34239f34056ea1b6bf5769e5e7920a8ceedf053`, post-merge `main` CI run
    `30166358486` passed, and evidence was accepted 2026-07-26.
-3. Review, refine, approve, and implement Gate C locally — completed
-   2026-07-26; local evidence is
-   `docs/phase-1-gate-c-evidence.md`.
-4. Approve repository publication, obtain green CI evidence, and explicitly
-   accept or reject Gate C.
-5. Review and approve the exact external resource proposal.
-6. Provision non-production resources and execute staging acceptance.
-7. Review the Phase 1 exit report and explicitly close or reject Phase 1.
-8. If Phase 1 closes, request a separate approval to prepare the Phase 2
+3. Review, refine, approve, implement, and merge Gate C — completed
+   2026-07-26 through PR `#4`.
+4. Verify pull-request and post-merge `main` CI — completed; evidence is
+   recorded in `docs/phase-1-gate-c-evidence.md`.
+5. Explicitly accept Gate C evidence — completed 2026-07-26; publish and merge
+   its evidence record.
+6. Review and approve the exact external resource proposal.
+7. Provision non-production resources and execute staging acceptance.
+8. Review the Phase 1 exit report and explicitly close or reject Phase 1.
+9. If Phase 1 closes, request a separate approval to prepare the Phase 2
    design.

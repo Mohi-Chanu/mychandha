@@ -172,8 +172,9 @@ requirement.
 
 ## Gate C repository implementation
 
-Gate C implementation was explicitly approved on 2026-07-26 and is complete
-in the local working tree. It:
+Gate C implementation was explicitly approved on 2026-07-26, merged through
+PR `#4`, and is present on `main` as
+`818c9b2d1d991bed67c51b6f3a9978998ab8c7b2`. It:
 
 - removes the unsafe auto-discovered root `render.yaml`;
 - adds a deliberately non-live, image-backed API/dispatcher example under
@@ -185,7 +186,7 @@ in the local working tree. It:
 - adds the Render deployment runbook and provider conformance table;
 - adds structural adapter validation and tamper-rejection fixtures;
 - integrates adapter validation into the foundation validator; and
-- records local evidence in `docs/phase-1-gate-c-evidence.md`.
+- records Gate C evidence in `docs/phase-1-gate-c-evidence.md`.
 
 The implementation conforms to `MCDC-001`, uses `EP-001`, and follows
 `CC-001`. It adds no Redis, Key Value, Render Workflows, Kafka, generic worker
@@ -194,6 +195,19 @@ platform, database, application code, SQL migration, or external resource.
 Local Java 21/Docker verification passes all 52 tests plus Checkstyle, PMD,
 JaCoCo, SpotBugs, the foundation validator, and the adapter positive and
 tamper-rejection suite.
+
+PR CI run `30203978892`, job `89798724750`, passed before merge. Post-merge
+`main` run `30204430920`, job `89799925991`, then passed on the exact merge
+commit. It recorded all 52 tests passing, zero Checkstyle and SpotBugs
+findings, PMD and JaCoCo completion, full-history Gitleaks success, one
+`linux/amd64` OCI archive, CycloneDX `1.7`, zero Trivy HIGH/CRITICAL findings,
+and verified release-evidence hashes. The authoritative `main` OCI manifest
+digest is
+`sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11`.
+
+The evidence is recorded in `docs/phase-1-gate-c-evidence.md` and was
+explicitly accepted by the user on 2026-07-26. Publication and merge of the
+evidence-only record remain open.
 
 ## What is not done
 
@@ -205,16 +219,19 @@ tamper-rejection suite.
 - The accepted CI-built OCI archive is retained only as a GitHub Actions
   artifact; it has not been published to an approved registry as a deployable
   digest.
-- Gate C is not committed, pushed, opened as a pull request, CI-accepted, or
+- The Gate C evidence-only repository record has not yet been reviewed and
   merged.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-Review the local Gate C implementation and
-`docs/phase-1-gate-c-evidence.md`. If accepted, explicitly approve or reject
-committing the changes, pushing `codex/phase-1-gate-c`, and opening a draft
-pull request for CI evidence.
+Commit and push the accepted evidence-only changes on
+`codex/phase-1-gate-c-evidence` and open the approved draft evidence pull
+request. Review and merge remain separate actions.
+
+After that record merges and `main` CI is green, the next design gate is the
+exact non-production external-resource proposal. Preparing or accepting the
+evidence record does not authorize any resource or execution action.
 
 Running the release workflow, creating a GitHub package or protected
 environment, publishing an OCI image, provisioning resources, deploying, or
