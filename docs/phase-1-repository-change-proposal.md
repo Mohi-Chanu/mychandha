@@ -1,11 +1,11 @@
 # Phase 1 Repository Change Proposal
 
-Status: Gate A and Gate B accepted; Gate C not approved
+Status: Gate A and Gate B accepted; Gate C implemented locally, publication and CI pending
 Readiness design approved: 2026-07-25
 Gate A implementation approval: Granted 2026-07-25
 Gate B implementation approval: Granted 2026-07-25
 Gate B evidence acceptance: Granted 2026-07-26
-Gate C implementation approval: Not granted
+Gate C implementation approval: Granted 2026-07-26
 External-resource approval: Not granted
 Phase 2: Out of scope
 
@@ -468,9 +468,13 @@ remain separate approvals.
 
 ### Gate C: Deployment adapter
 
-Gate B evidence is accepted. Change set 4 is the next proposal and approval
-gate; implementation approval has not been granted. Repository deployment
-configuration must not create or change external resources.
+Gate B evidence is accepted. The detailed change-set 4 proposal is
+`docs/phase-1-gate-c-proposal.md`. It was refined, approved, and implemented
+locally. Repository publication and CI acceptance remain open. Repository
+deployment configuration must not create or change external resources. Its
+canonical provider-neutral deployment requirements are `MCDC-001` in
+`docs/deployment-contract.md`; evidence uses `EP-001`, and approval progression
+follows `CC-001`.
 
 ### External resources
 

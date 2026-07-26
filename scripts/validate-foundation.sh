@@ -4,10 +4,17 @@ set -eu
 required_files="
 pom.xml
 Dockerfile
-render.yaml
+deploy/render/render.staging.yaml.example
 .github/workflows/ci.yml
 .github/workflows/release.yml
 scripts/verify-release-evidence.sh
+scripts/validate-render-adapter.sh
+scripts/test-validate-render-adapter.sh
+docs/change-control.md
+docs/deployment-contract.md
+docs/evidence-package.md
+docs/render-deployment-runbook.md
+docs/phase-1-gate-c-evidence.md
 src/main/resources/db/migration/V1__platform_foundation.sql
 src/main/resources/db/migration/V2__runtime_role_isolation.sql
 src/main/resources/application-api.yml
@@ -77,5 +84,10 @@ fi
 grep -q "Idempotency-Key" docs/architecture.md
 grep -q "Supabase" docs/architecture.md
 grep -q "Render" docs/operations.md
+grep -q "MCDC-001" docs/deployment-contract.md
+grep -q "EP-001" docs/evidence-package.md
+grep -q "CC-001" docs/change-control.md
+sh scripts/validate-render-adapter.sh
+sh scripts/test-validate-render-adapter.sh
 
 echo "Phase 1 structural validation passed."

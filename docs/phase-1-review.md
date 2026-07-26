@@ -28,7 +28,7 @@ implementing organization, festival, contribution, or finance functionality.
   decision.
 - The initial durable dispatcher is PostgreSQL-backed. Kafka remains deferred.
 - The OCI image is cloud-neutral. Render-specific behavior is confined to
-  `render.yaml` and database-URL normalization.
+  the deployment adapter/runbook and database-URL normalization.
 - RLS supplements, rather than replaces, application authorization.
 
 ## Edge cases addressed

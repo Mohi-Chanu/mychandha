@@ -4,6 +4,19 @@ The roadmap is incremental, but the target remains the complete enterprise GA
 baseline. A phase boundary controls risk and review; it does not make later
 baseline capabilities optional.
 
+## Change-control rule for every gate
+
+Every gate listed here, and every future gate added to this roadmap, follows
+`CC-001` in `docs/change-control.md`. Each detailed proposal must include
+scope, non-goals, design, migration, security, test, deployment, rollback,
+evidence, and approval boundaries. Evidence uses `EP-001` in
+`docs/evidence-package.md`. Deployment gates conform to `MCDC-001` in
+`docs/deployment-contract.md`.
+
+Proposal preparation, implementation, GitHub changes, external-resource
+changes, execution, evidence acceptance, closure, and the next phase remain
+separate approvals unless an approval explicitly combines named actions.
+
 ## Phase 1 — Platform foundation
 
 Implemented:
@@ -33,8 +46,9 @@ The gate uses separate approvals:
    experience — merged, CI verified, and accepted 2026-07-25;
 4. Gate B: CI hardening and immutable release — repository implementation
    merged, post-merge CI verified, and accepted 2026-07-26;
-5. Gate C: deployment-adapter configuration — next approval gate; proposal
-   preparation is next and implementation is not approved;
+5. Gate C: deployment-adapter configuration — implementation approved and
+   completed locally; repository publication, CI evidence, and explicit
+   acceptance remain open;
 6. approve the exact non-production resource proposal;
 7. execute staging acceptance; and
 8. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.
@@ -77,6 +91,8 @@ Not started. Approved scope boundary:
 Before implementation, produce and obtain approval for the domain model,
 authorization matrix, migrations/RLS policies, API contracts, audit events,
 localization model, test plan, rollout plan, and rollback approach.
+The Phase 2 proposal and every subordinate gate must include its `CC-001`
+compliance record and use the standardized evidence package.
 
 ## Later baseline domains
 
@@ -91,4 +107,4 @@ These remain part of the enterprise product baseline but are outside Phase 2:
   remaining GA readiness.
 
 Each major domain requires a new explicit approval after its design and
-dependencies are reviewed.
+dependencies are reviewed under `CC-001`.

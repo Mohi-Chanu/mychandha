@@ -2,27 +2,33 @@
 
 ## Deployment
 
-`Dockerfile` produces a non-root OCI image. `render.yaml` is the initial Render
-blueprint and supplies:
+`Dockerfile` produces a non-root OCI image. Gate C removes the unsafe,
+auto-discovered root `render.yaml` and replaces it with the deliberately
+non-live `deploy/render/render.staging.yaml.example`.
 
-- one web service;
-- one managed PostgreSQL database;
-- readiness checks;
-- production profile;
-- database and Supabase configuration through environment variables.
+The example maps:
 
-Render's PostgreSQL URI is normalized to JDBC at startup. Other platforms can
-supply a JDBC URL directly, so this compatibility adapter does not leak into
+- one image-backed API web service using `production,api`;
+- one image-backed durable-dispatcher service using
+  `production,dispatcher`;
+- separate unsupplied database credential classes;
+- the same immutable OCI digest placeholder for both services; and
+- API readiness at `/actuator/health/readiness`.
+
+It defines no database or other external resource. Do not rename, sync,
+materialize, or deploy it until the exact provider resources and staging
+execution are separately approved. The controlled migration boundary and
+provider conformance requirements are in
+`docs/render-deployment-runbook.md`.
+
+Render PostgreSQL URIs are normalized to JDBC at startup. Other platforms can
+supply JDBC URLs directly, so this compatibility behavior does not leak into
 domain code.
 
-The current blueprint is a foundation artifact, not an accepted staging or
-production topology. It uses one application process and one database
-credential for API traffic, Flyway, and the durable dispatcher, and its
-`production`-only profile no longer satisfies the Gate A runtime guard. Do not
-deploy it. Gate C must align it to the repository's API, dispatcher, and
-migration profiles. The target controlled migration sequence, immutable
-artifact deployment, acceptance evidence, and approval boundaries are in
-`docs/phase-1-platform-foundation-readiness.md`.
+The provider-neutral deployment authority is `MCDC-001` in
+`docs/deployment-contract.md`. Render configuration is an adapter mapping and
+must record its capability conformance and `EP-001` evidence without changing
+the canonical process, secret, health, rollout, or rollback requirements.
 
 ## Immutable CI and release evidence
 
@@ -54,6 +60,10 @@ is `sha256:befc26d564687ce34ee826f7c77bf418b43d83e861b9ec9edfa6cba3057633ba`.
 The associated OCI and verification artifacts expire on 2026-08-08 unless
 deleted earlier by an authorized operator. Acceptance of this CI evidence does
 not authorize promotion or deployment.
+
+Future gate and deployment evidence must follow the reusable checklist in
+`docs/evidence-package.md`. Approval progression follows `CC-001` in
+`docs/change-control.md`.
 
 ## Health and metrics
 

@@ -23,13 +23,41 @@ flowchart TD
 
 The OCI artifact now supports separate `api`, `dispatcher`, and `migration`
 profiles. The `local` profile may compose API and dispatcher behavior only for
-developer convenience. Render is the first deployment adapter, but its current
-blueprint has not yet been aligned in Gate C.
+developer convenience. Render is the first deployment adapter. Gate C now
+provides a validated, non-live mapping for API and dispatcher processes;
+materialization, migration execution, and provider resources remain
+unapproved.
 
 The approved readiness target separates API, dispatcher, and migration
 execution profiles while retaining one modular-monolith artifact. The decision
 history is in `docs/adr/`, and capability/dependency rules are in
 `docs/module-boundaries.md`.
+
+## Deployment adapter boundary
+
+`docs/deployment-contract.md` is the canonical provider-neutral deployment
+specification. It defines logical processes, artifact identity, privilege and
+secret isolation, health evidence, rollout order, rollback, and environment
+capabilities. Provider configuration is an adapter to that contract, not an
+application or domain dependency.
+
+```mermaid
+flowchart LR
+    Contract["Canonical contract<br/>MCDC-001"] --> Render["Render adapter"]
+    Contract --> Future["Future provider adapter"]
+    Render --> RenderResources["Render configuration<br/>and evidence"]
+    Future --> FutureResources["Provider configuration<br/>and evidence"]
+```
+
+The initial Render adapter may choose Render service types and provider
+configuration only to implement the canonical capabilities. It must not change
+the OCI artifact, merge API/dispatcher/migration credentials, add an
+infrastructure dependency, weaken health or evidence requirements, or leak a
+Render type into domain/application modules.
+
+Changing deployment providers therefore requires an adapter conformance review
+under `CC-001`, not a redesign of product or domain behavior. The standard
+evidence output is `EP-001` in `docs/evidence-package.md`.
 
 ## Request security sequence
 

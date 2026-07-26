@@ -1,0 +1,6 @@
+previews:
+  generation: off
+services
+  - type: web
+    name: REPLACE_AFTER_EXTERNAL_APPROVAL_API_SERVICE
+    runtime: image
