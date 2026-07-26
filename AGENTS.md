@@ -12,6 +12,10 @@ These instructions apply to the entire repository.
 - Work incrementally. Before starting a new phase or major module, present the
   proposed scope, design, migrations, security impact, tests, and deployment
   impact, then wait for explicit approval.
+- Apply `CC-001` in `docs/change-control.md` to every future gate and major
+  change. Proposal, implementation, GitHub, external-resource, execution,
+  evidence-acceptance, and closure approvals remain separate unless an
+  approval explicitly combines named actions.
 - Do not provision or modify GitHub, Supabase, Render, payment, messaging,
   database, DNS, or other external resources without explicit approval.
 - Never commit credentials, tokens, service-role keys, production identifiers,
@@ -46,6 +50,9 @@ These instructions apply to the entire repository.
 - Use minor currency units plus ISO currency codes for money. MyChandha
   orchestrates payments and does not custody organizer funds.
 - Keep external configuration in environment variables or secret stores.
+- Treat `docs/deployment-contract.md` as the provider-neutral deployment
+  authority. Render is an adapter to that contract and must not become an
+  application or domain dependency.
 
 ## Engineering workflow
 
@@ -64,8 +71,9 @@ These instructions apply to the entire repository.
    SBOM, and keep the Trivy HIGH/CRITICAL threshold unchanged.
 8. Update `docs/current-status.md` and any affected decision or operations
    document in the same change.
-9. Report what changed, verification evidence, residual risks, and the next
-   approval gate.
+9. Build gate evidence using `EP-001` in `docs/evidence-package.md`.
+10. Report what changed, verification evidence, residual risks, and the next
+    approval gate.
 
 ## Quality and security rules
 
@@ -90,7 +98,8 @@ These instructions apply to the entire repository.
 When documents disagree, use this order and surface the conflict:
 
 1. Approved product requirements and `docs/product-decisions.md`
-2. `docs/architecture.md` and `docs/security.md`
+2. `docs/architecture.md`, `docs/security.md`, and
+   `docs/deployment-contract.md`
 3. `docs/current-status.md` and phase documents
 4. Implementation and tests
 

@@ -138,3 +138,24 @@ previous decision.
   CI evidence only. It does not authorize release-workflow execution, package
   or protected-environment creation, image publication, Gate C implementation,
   deployment, external resources, or Phase 2.
+- 2026-07-26: Preparation of the Gate C deployment-adapter proposal was
+  approved. The proposal may define only the repository mapping and later
+  operational contract for the existing API, durable dispatcher, and migration
+  profiles. It does not approve implementation, a generic worker platform,
+  Redis/Key Value, Render Workflows, external resources, image publication,
+  deployment, or Phase 2.
+- 2026-07-26: Gate C proposal review required a canonical provider-neutral
+  deployment contract, an explicit deployment-adapter abstraction, an
+  environment capability matrix, Gate C non-goals, standardized evidence, and
+  reusable change control. These are recorded as `MCDC-001`, `EP-001`, and
+  `CC-001`. Every future gate must follow `CC-001`; deployment providers remain
+  adapters and do not become domain dependencies. This refinement does not
+  grant Gate C implementation or external-change approval.
+- 2026-07-26: Gate C repository implementation was explicitly approved
+  according to the refined proposal. The approval covers removal of the unsafe
+  root Blueprint, a non-live Render adapter example, provider conformance
+  runbook, structural validation, tamper-rejection fixtures, `EP-001` local
+  evidence, and documentation alignment. It does not authorize commit, push,
+  pull request, merge, workflow execution, package/image publication,
+  external-resource changes, migration, deployment, staging acceptance, or
+  Phase 2.

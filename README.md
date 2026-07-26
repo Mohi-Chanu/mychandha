@@ -13,7 +13,8 @@ contains no festival, contribution, payment, or finance product workflows yet.
 - Transaction helpers for tenant-scoped operations and event publication.
 - Correlation IDs, structured logs, Actuator health, Prometheus metrics, and
   redacted error responses.
-- OCI image, local PostgreSQL Compose profile, and Render deployment blueprint.
+- OCI image, local PostgreSQL Compose profile, and a validated non-live Render
+  adapter example that remains blocked from materialization or deployment.
 - Unit, architecture, security, migration, RLS, and durable-delivery tests.
 - Read-only CI verification, full-history secret scanning, retained OCI
   evidence, and a separately protected immutable-promotion workflow under
@@ -24,13 +25,19 @@ See [Phase 1 scope](docs/phase-1-review.md), [architecture](docs/architecture.md
 [local development](docs/local-development.md). Phase 1 closure is controlled
 by the [Platform Foundation Readiness package](docs/phase-1-platform-foundation-readiness.md),
 [repository-change proposal](docs/phase-1-repository-change-proposal.md), and
-[Phase 1 exit report](docs/phase-1-exit-report.md).
+[Phase 1 exit report](docs/phase-1-exit-report.md). The prepared
+[Gate C proposal](docs/phase-1-gate-c-proposal.md) has been implemented
+locally; repository publication, CI acceptance, and all external changes remain
+separate approvals.
 
 Engineering standards are recorded in the [ADR index](docs/adr/README.md),
 [module boundaries](docs/module-boundaries.md),
 [observability standards](docs/observability-standards.md),
 [API contract](docs/api-contract.md), and
 [developer-experience guidelines](docs/developer-experience.md).
+Cross-gate governance is defined by [CC-001](docs/change-control.md), the
+[canonical deployment contract](docs/deployment-contract.md), and the
+[standard evidence package](docs/evidence-package.md).
 
 For continued Codex Desktop work, begin with [repository instructions](AGENTS.md),
 [current status](docs/current-status.md), [product decisions](docs/product-decisions.md),

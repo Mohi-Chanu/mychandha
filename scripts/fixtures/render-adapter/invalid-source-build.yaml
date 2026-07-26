@@ -1,0 +1,18 @@
+previews:
+  generation: off
+services:
+  - type: web
+    name: REPLACE_AFTER_EXTERNAL_APPROVAL_API_SERVICE
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health/readiness
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production,api
+  - type: worker
+    name: REPLACE_AFTER_EXTERNAL_APPROVAL_DISPATCHER_SERVICE
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production,dispatcher

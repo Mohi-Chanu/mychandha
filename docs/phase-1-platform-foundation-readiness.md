@@ -7,7 +7,8 @@ External-resource approval: Not granted
 Gate A repository approval: Granted 2026-07-25
 Gate B repository approval: Granted 2026-07-25
 Gate B evidence accepted: 2026-07-26
-Gate C repository approval: Not granted
+Gate C repository approval: Granted 2026-07-26
+Gate C publication/CI acceptance: Not granted
 Phase 2: Blocked until this gate closes
 
 ## Purpose
@@ -419,6 +420,12 @@ The accepted decisions and engineering standards are recorded in
 `docs/adr/`, `docs/module-boundaries.md`, `docs/observability-standards.md`,
 `docs/api-contract.md`, and `docs/developer-experience.md`.
 
+Deployment readiness is additionally governed by the provider-neutral
+`MCDC-001` specification and environment capability matrix in
+`docs/deployment-contract.md`. Gate evidence uses `EP-001` in
+`docs/evidence-package.md`, and approval progression follows `CC-001` in
+`docs/change-control.md`.
+
 ## Expected repository-change impact
 
 The repository-change proposal covers:
@@ -434,8 +441,9 @@ The repository-change proposal covers:
 
 Gate A implements the runtime, migration, security-routine, contract, test, and
 developer-experience subset while preserving the existing product behavior and
-Phase 1 security invariants. Gate B is accepted. Gate C remains a separate
-approval step.
+Phase 1 security invariants. Gate B is accepted. Gate C is implemented locally;
+repository publication and CI evidence acceptance remain separate approval
+steps.
 
 ## Approval sequence
 
@@ -444,10 +452,13 @@ approval step.
 2. Review and separately approve or reject Gate B — merged as
    `e34239f34056ea1b6bf5769e5e7920a8ceedf053`, post-merge `main` CI run
    `30166358486` passed, and evidence was accepted 2026-07-26.
-3. Review and separately approve or reject Gate C — next gate; implementation
-   approval not granted.
-4. Review and approve the exact external resource proposal.
-5. Provision non-production resources and execute staging acceptance.
-6. Review the Phase 1 exit report and explicitly close or reject Phase 1.
-7. If Phase 1 closes, request a separate approval to prepare the Phase 2
+3. Review, refine, approve, and implement Gate C locally — completed
+   2026-07-26; local evidence is
+   `docs/phase-1-gate-c-evidence.md`.
+4. Approve repository publication, obtain green CI evidence, and explicitly
+   accept or reject Gate C.
+5. Review and approve the exact external resource proposal.
+6. Provision non-production resources and execute staging acceptance.
+7. Review the Phase 1 exit report and explicitly close or reject Phase 1.
+8. If Phase 1 closes, request a separate approval to prepare the Phase 2
    design.

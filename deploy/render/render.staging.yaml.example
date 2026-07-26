@@ -1,0 +1,44 @@
+# NON-LIVE EXAMPLE ONLY.
+# Do not rename, sync, or apply this file until CC-001 external-resource and
+# staging-execution approvals provide every REPLACE_AFTER_EXTERNAL_APPROVAL
+# value and the resulting adapter passes validation.
+previews:
+  generation: off
+
+services:
+  - type: web
+    name: REPLACE_AFTER_EXTERNAL_APPROVAL_API_SERVICE
+    runtime: image
+    image:
+      url: REPLACE_AFTER_EXTERNAL_APPROVAL/IMAGE@sha256:REPLACE_WITH_64_HEX_DIGEST
+    healthCheckPath: /actuator/health/readiness
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production,api
+      - key: API_DATABASE_URL
+        sync: false
+      - key: API_DATABASE_USERNAME
+        sync: false
+      - key: API_DATABASE_PASSWORD
+        sync: false
+      - key: SUPABASE_JWT_ISSUER
+        sync: false
+      - key: SUPABASE_JWKS_URI
+        sync: false
+      - key: SUPABASE_JWT_AUDIENCE
+        value: authenticated
+
+  - type: worker
+    name: REPLACE_AFTER_EXTERNAL_APPROVAL_DISPATCHER_SERVICE
+    runtime: image
+    image:
+      url: REPLACE_AFTER_EXTERNAL_APPROVAL/IMAGE@sha256:REPLACE_WITH_64_HEX_DIGEST
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production,dispatcher
+      - key: DISPATCHER_DATABASE_URL
+        sync: false
+      - key: DISPATCHER_DATABASE_USERNAME
+        sync: false
+      - key: DISPATCHER_DATABASE_PASSWORD
+        sync: false

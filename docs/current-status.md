@@ -170,6 +170,31 @@ out of scope. The existing durable outbox dispatcher remains in scope because
 it is implemented and its recovery behavior is an existing acceptance
 requirement.
 
+## Gate C repository implementation
+
+Gate C implementation was explicitly approved on 2026-07-26 and is complete
+in the local working tree. It:
+
+- removes the unsafe auto-discovered root `render.yaml`;
+- adds a deliberately non-live, image-backed API/dispatcher example under
+  `deploy/render/`;
+- maps `production,api` and `production,dispatcher` to separate credential
+  allowlists and the same immutable digest placeholder;
+- leaves the protected migration runner and network path as blocking decisions
+  for the exact external-resource proposal;
+- adds the Render deployment runbook and provider conformance table;
+- adds structural adapter validation and tamper-rejection fixtures;
+- integrates adapter validation into the foundation validator; and
+- records local evidence in `docs/phase-1-gate-c-evidence.md`.
+
+The implementation conforms to `MCDC-001`, uses `EP-001`, and follows
+`CC-001`. It adds no Redis, Key Value, Render Workflows, Kafka, generic worker
+platform, database, application code, SQL migration, or external resource.
+
+Local Java 21/Docker verification passes all 52 tests plus Checkstyle, PMD,
+JaCoCo, SpotBugs, the foundation validator, and the adapter positive and
+tamper-rejection suite.
+
 ## What is not done
 
 - No Supabase or Render environment has been provisioned or changed.
@@ -180,16 +205,16 @@ requirement.
 - The accepted CI-built OCI archive is retained only as a GitHub Actions
   artifact; it has not been published to an approved registry as a deployable
   digest.
+- Gate C is not committed, pushed, opened as a pull request, CI-accepted, or
+  merged.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-Prepare the Gate C deployment-adapter proposal. It must define the exact
-repository-only changes needed to align the Render adapter with the accepted
-API, dispatcher, and migration profiles, immutable-image consumption, health
-contracts, secrets contract, and rollback behavior. Present its scope, security
-impact, tests, and deployment impact, then wait for explicit approval before
-implementation.
+Review the local Gate C implementation and
+`docs/phase-1-gate-c-evidence.md`. If accepted, explicitly approve or reject
+committing the changes, pushing `codex/phase-1-gate-c`, and opening a draft
+pull request for CI evidence.
 
 Running the release workflow, creating a GitHub package or protected
 environment, publishing an OCI image, provisioning resources, deploying, or
