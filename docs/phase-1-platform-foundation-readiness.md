@@ -9,7 +9,8 @@ Gate B repository approval: Granted 2026-07-25
 Gate B evidence accepted: 2026-07-26
 Gate C repository approval: Granted 2026-07-26
 Gate C implementation merge/CI: Passed 2026-07-26
-Gate C evidence acceptance/publication: Pending
+Gate C evidence acceptance: Granted 2026-07-26
+Gate C evidence-record merge: Pending
 Phase 2: Blocked until this gate closes
 
 ## Purpose
@@ -459,7 +460,8 @@ acceptance and publication of the evidence-only record remain separate.
    2026-07-26 through PR `#4`.
 4. Verify pull-request and post-merge `main` CI — completed; evidence is
    recorded in `docs/phase-1-gate-c-evidence.md`.
-5. Explicitly accept or reject Gate C and publish its evidence record.
+5. Explicitly accept Gate C evidence — completed 2026-07-26; publish and merge
+   its evidence record.
 6. Review and approve the exact external resource proposal.
 7. Provision non-production resources and execute staging acceptance.
 8. Review the Phase 1 exit report and explicitly close or reject Phase 1.

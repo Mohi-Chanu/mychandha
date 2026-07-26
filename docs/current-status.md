@@ -205,8 +205,9 @@ and verified release-evidence hashes. The authoritative `main` OCI manifest
 digest is
 `sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11`.
 
-The evidence is recorded in `docs/phase-1-gate-c-evidence.md`. Explicit Gate C
-evidence acceptance and publication of that evidence record remain open.
+The evidence is recorded in `docs/phase-1-gate-c-evidence.md` and was
+explicitly accepted by the user on 2026-07-26. Publication and merge of the
+evidence-only record remain open.
 
 ## What is not done
 
@@ -218,16 +219,15 @@ evidence acceptance and publication of that evidence record remain open.
 - The accepted CI-built OCI archive is retained only as a GitHub Actions
   artifact; it has not been published to an approved registry as a deployable
   digest.
-- Gate C CI evidence has not yet been explicitly accepted, and the
-  evidence-only repository record has not been committed, pushed, reviewed, or
+- The Gate C evidence-only repository record has not yet been reviewed and
   merged.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-Review `docs/phase-1-gate-c-evidence.md`. If accepted, explicitly approve or
-reject committing the evidence-only changes, pushing
-`codex/phase-1-gate-c-evidence`, and opening a draft evidence pull request.
+Commit and push the accepted evidence-only changes on
+`codex/phase-1-gate-c-evidence` and open the approved draft evidence pull
+request. Review and merge remain separate actions.
 
 After that record merges and `main` CI is green, the next design gate is the
 exact non-production external-resource proposal. Preparing or accepting the

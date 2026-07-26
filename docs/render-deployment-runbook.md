@@ -298,8 +298,7 @@ publication, provisioning, migration, or deployment.
 ## CC-001 state
 
 - Repository implementation: approved, merged through PR `#4`, and CI verified.
-- Evidence-record commit/push/pull request: pending separate approval.
+- Evidence-record commit/push/draft pull request: approved.
 - Image publication and GitHub environment changes: not approved.
 - External resources and staging execution: not approved.
-- Next approval: explicit Gate C evidence acceptance and evidence-record
-  publication, if granted.
+- Next approval: evidence-record pull-request merge after review and green CI.

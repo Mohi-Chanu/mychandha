@@ -1,6 +1,6 @@
 # Phase 1 Repository Change Proposal
 
-Status: Gate A and Gate B accepted; Gate C merged and CI verified, evidence acceptance pending
+Status: Gate A, Gate B, and Gate C CI evidence accepted; Gate C evidence-record merge pending
 Readiness design approved: 2026-07-25
 Gate A implementation approval: Granted 2026-07-25
 Gate B implementation approval: Granted 2026-07-25
@@ -13,7 +13,7 @@ Phase 2: Out of scope
 
 This proposal defines the approved Phase 1 Platform Foundation Readiness
 repository changes needed before staging. Gate A and Gate B are accepted. Gate
-Gate C evidence acceptance and all external actions remain open.
+Gate C evidence-record merge and all external actions remain open.
 
 The proposal covers only:
 
@@ -471,11 +471,12 @@ remain separate approvals.
 Gate B evidence is accepted. The detailed change-set 4 proposal is
 `docs/phase-1-gate-c-proposal.md`. It was refined, approved, and implemented
 through PR `#4`. Pull-request CI run `30203978892` and post-merge `main` run
-`30204430920` passed. Explicit acceptance and publication of the evidence
-record remain open. Repository deployment configuration must not create or
-change external resources. Its canonical provider-neutral deployment
-requirements are `MCDC-001` in `docs/deployment-contract.md`; evidence uses
-`EP-001`, and approval progression follows `CC-001`.
+`30204430920` passed, and the user explicitly accepted the evidence on
+2026-07-26. Review and merge of the evidence record remain open. Repository
+deployment configuration must not create or change external resources. Its
+canonical provider-neutral deployment requirements are `MCDC-001` in
+`docs/deployment-contract.md`; evidence uses `EP-001`, and approval progression
+follows `CC-001`.
 
 ### External resources
 

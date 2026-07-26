@@ -67,8 +67,9 @@ Gate C's latest verified post-merge evidence is `main` run `30204430920`, job
 is `sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11`.
 The associated OCI and verification artifacts expire on 2026-08-09 unless
 deleted earlier by an authorized operator. The evidence is recorded in
-`docs/phase-1-gate-c-evidence.md`; explicit Gate C acceptance remains pending.
-Verification and later acceptance do not authorize promotion or deployment.
+`docs/phase-1-gate-c-evidence.md` and was explicitly accepted on 2026-07-26.
+Evidence-record merge remains pending. Verification and acceptance do not
+authorize promotion or deployment.
 
 Future gate and deployment evidence must follow the reusable checklist in
 `docs/evidence-package.md`. Approval progression follows `CC-001` in

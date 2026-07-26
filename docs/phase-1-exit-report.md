@@ -22,9 +22,9 @@ behavior.
 | OCI image build | Passed | Retained OCI archive from run `30204430920` |
 | CycloneDX SBOM | Passed | Gate C verification artifact |
 | HIGH/CRITICAL vulnerability gate | Passed | Zero findings in the Gate C Trivy scope |
-| Explicit secret-scanning gate | Passed; Gate C acceptance pending | Blocking, pinned full-history Gitleaks passed in post-merge `main` run `30204430920` |
+| Explicit secret-scanning gate | Passed and accepted | Blocking, pinned full-history Gitleaks passed in post-merge `main` run `30204430920` |
 | Readiness design package | Approved | `docs/phase-1-platform-foundation-readiness.md` |
-| Repository-change proposal | Gate A and Gate B accepted | Gate C merged under `MCDC-001`, `EP-001`, and `CC-001`; PR and post-merge CI passed; explicit evidence acceptance remains open |
+| Repository-change proposal | Gate A, Gate B, and Gate C evidence accepted | Gate C merged under `MCDC-001`, `EP-001`, and `CC-001`; evidence-record merge remains open |
 | Runtime database-role separation | CI verified | V2 roles, routines, and runtime profiles passed the Docker-backed integration suite; deployment evidence remains open |
 | Immutable CI artifact | Passed and accepted | Verified OCI archive retained from `main` run `30166358486`; nothing published |
 | Non-production resources | Not started | External approval not granted |
@@ -67,7 +67,8 @@ fixtures, and integrated foundation validator passed locally. PR `#4` CI run
 `818c9b2d1d991bed67c51b6f3a9978998ab8c7b2`. The retained `main` OCI manifest
 digest is
 `sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11`.
-Explicit acceptance of this Gate C evidence remains pending.
+The user explicitly accepted this Gate C evidence on 2026-07-26. Publication
+and merge of the evidence-only repository record remain open.
 
 ## Security
 
@@ -127,10 +128,11 @@ later external-resource and execution approvals.
 ## Pending approvals
 
 The readiness design, Gate A, Gate B repository implementation/CI evidence,
-and Gate C repository implementation are approved. Gate C is merged and its
-PR/post-merge CI is verified. Pending approvals or evidence are:
+and Gate C repository implementation/CI evidence are approved. Gate C is
+merged, its PR/post-merge CI is verified, and its evidence is explicitly
+accepted. Pending approvals or evidence are:
 
-- Gate C evidence acceptance and evidence-record publication;
+- Gate C evidence-record review, merge, and resulting `main` CI;
 - GitHub package creation, protected-environment configuration, or
   release-workflow execution;
 - exact non-production resources and operational plans; and
@@ -154,7 +156,8 @@ PR/post-merge CI is verified. Pending approvals or evidence are:
 - [x] Gate C implemented and fully validated locally.
 - [x] Gate C committed, pushed, opened as draft PR `#4`, and merged.
 - [x] Gate C pull-request and post-merge `main` CI passed.
-- [ ] Gate C CI evidence explicitly accepted and its evidence record merged.
+- [x] Gate C CI evidence explicitly accepted.
+- [ ] Gate C evidence record merged and resulting `main` CI green.
 - [ ] Exact external resource proposal approved.
 - [ ] Staging deployment ready.
 - [ ] Identity and tenant-isolation acceptance passed.
@@ -168,9 +171,8 @@ PR/post-merge CI is verified. Pending approvals or evidence are:
 
 **Proceed to Phase 2: NO**
 
-Next action: review `docs/phase-1-gate-c-evidence.md`, explicitly accept or
-reject the Gate C CI evidence, and approve or reject committing and publishing
-the evidence-only branch `codex/phase-1-gate-c-evidence`. Do not execute the
-release workflow, create or configure GitHub package/environment resources,
-publish an image, or provision external resources without their separate
-approvals.
+Next action: publish the approved evidence-only branch
+`codex/phase-1-gate-c-evidence` as a draft pull request. Review and merge remain
+separate actions. Do not execute the release workflow, create or configure
+GitHub package/environment resources, publish an image, or provision external
+resources without their separate approvals.

@@ -28,9 +28,9 @@ by the [Platform Foundation Readiness package](docs/phase-1-platform-foundation-
 [Phase 1 exit report](docs/phase-1-exit-report.md). The prepared
 [Gate C proposal](docs/phase-1-gate-c-proposal.md) has been implemented and
 merged through PR `#4`; pull-request and post-merge CI passed. The
-[Gate C evidence package](docs/phase-1-gate-c-evidence.md) awaits explicit
-acceptance and publication of its evidence record. All external changes remain
-separate approvals.
+[Gate C evidence package](docs/phase-1-gate-c-evidence.md) was explicitly
+accepted on 2026-07-26; publication and merge of its evidence record remain
+open. All external changes remain separate approvals.
 
 Engineering standards are recorded in the [ADR index](docs/adr/README.md),
 [module boundaries](docs/module-boundaries.md),

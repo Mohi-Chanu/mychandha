@@ -168,3 +168,10 @@ previous decision.
   evidence-record publication, release execution, package/image publication,
   external-resource changes, migration, deployment, staging acceptance,
   Phase 1 closure, and Phase 2 remain separate.
+- 2026-07-26: The Gate C CI evidence was explicitly accepted after PR `#4`
+  merged as `818c9b2d1d991bed67c51b6f3a9978998ab8c7b2` and post-merge
+  `main` run `30204430920`, job `89799925991`, passed. Committing and pushing
+  `codex/phase-1-gate-c-evidence` and opening a draft evidence pull request
+  were approved in the same instruction. Evidence-record merge, release
+  execution, image publication, external resources, migration, deployment,
+  staging acceptance, Phase 1 closure, and Phase 2 remain separate.

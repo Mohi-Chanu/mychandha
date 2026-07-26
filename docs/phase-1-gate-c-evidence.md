@@ -1,7 +1,7 @@
 # Phase 1 Gate C evidence package
 
-Status: Pull-request and post-merge CI evidence verified; explicit Gate C
-acceptance and evidence-record publication pending
+Status: Gate C CI evidence explicitly accepted; evidence-record pull request
+and merge pending
 Checklist: `EP-001`
 Deployment contract: `MCDC-001` version `1`
 Change control: `CC-001`
@@ -25,7 +25,7 @@ Prepared: 2026-07-26
 | Environment class | Local verification and GitHub-hosted CI; no provider environment |
 | External resources | None created or changed |
 | Evidence-package recorder | Codex-assisted repository record, pending user review |
-| Explicit Gate C acceptor | Pending |
+| Explicit Gate C acceptor | `Mohi-Chanu` user approval, 2026-07-26 |
 
 The user approved the refined Gate C repository implementation, then separately
 approved its commit, push, branch, and draft pull request. The user merged PR
@@ -36,6 +36,11 @@ Those approvals did not authorize image publication, release-workflow
 execution, GitHub package or protected-environment changes, provider
 provisioning, migration, deployment, staging execution, Phase 1 closure, or
 Phase 2.
+
+On 2026-07-26, the user explicitly accepted the Gate C CI evidence and
+approved committing and pushing this evidence-only branch and opening a draft
+evidence pull request. That approval does not include merging the evidence pull
+request.
 
 ## Approved and implemented scope
 
@@ -275,20 +280,21 @@ external-resource and staging-execution gates.
 - [x] Artifact and evidence-manifest integrity independently verified.
 - [x] Material deviations: none.
 - [x] Unapproved external actions confirmed not performed.
-- [ ] Gate C CI evidence explicitly accepted by the user.
-- [ ] Evidence branch committed, pushed, reviewed, and merged.
+- [x] Gate C CI evidence explicitly accepted by the user on 2026-07-26.
+- [x] Evidence branch commit and push approved.
+- [ ] Draft evidence pull request reviewed and merged.
 - [ ] Exact external-resource proposal approved.
 - [ ] Staging execution approved and completed.
 
 ## Exact next gate
 
-Review this evidence package. If it is accepted, the next independent
-repository action is approval to commit these evidence-only changes, push
-`codex/phase-1-gate-c-evidence`, and open a draft evidence pull request.
+Gate C evidence is accepted. The current authorized repository action is to
+publish `codex/phase-1-gate-c-evidence` and open a draft evidence pull request.
+Merging that pull request remains a separate approval.
 
-After that record is merged and its `main` CI is green, Gate C can be recorded
-as accepted. The next design gate will be the exact non-production
-external-resource proposal required by `CC-001`, including:
+After the evidence record is merged and its `main` CI is green, the next design
+gate will be the exact non-production external-resource proposal required by
+`CC-001`, including:
 
 - Supabase, Render, PostgreSQL, and registry resources;
 - region, plans, estimated cost, owners, operators, retention, and cleanup;

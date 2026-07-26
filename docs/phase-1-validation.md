@@ -172,8 +172,9 @@ The post-merge run recorded:
 
 The artifacts expire on 2026-08-09 unless an authorized repository operator
 deletes them earlier. Full checksums and `EP-001` disposition are in
-`docs/phase-1-gate-c-evidence.md`. Gate C evidence acceptance and publication
-of the evidence record remain pending.
+`docs/phase-1-gate-c-evidence.md`. The user explicitly accepted the Gate C
+evidence on 2026-07-26. Publication and merge of the evidence record remain
+pending.
 
 ## External staging gates
 
