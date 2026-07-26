@@ -57,8 +57,8 @@ artifact upload, and the configured HIGH/CRITICAL Trivy vulnerability gate
 with zero findings.
 
 The Gate A Trivy summary reported the secrets column as `-`, defined by the
-report as not scanned. Gate B implements the required blocking full-history
-Gitleaks control; successful Gate B CI evidence remains pending.
+report as not scanned. Gate B closes that gap with the accepted blocking
+full-history Gitleaks evidence below.
 
 ## Gate A local implementation evidence
 
@@ -113,12 +113,41 @@ Local validation on 2026-07-25 recorded:
   non-Docker tests, Checkstyle, PMD, JaCoCo report generation, and SpotBugs
   with zero findings; and
 - the unfiltered `mvn verify` reached the Testcontainers suites and failed only
-  because this workstation has no Docker-compatible runtime.
+  because a Docker-compatible runtime was not yet available on this
+  workstation.
 
-Docker-backed PostgreSQL tests, OCI construction, Gitleaks/Trivy execution,
-artifact upload/download, and promotion-path evidence require the later
-approved GitHub CI/PR step. The release workflow has not run and no registry
-package or environment exists.
+## Gate B accepted CI evidence
+
+PR `#2` merged Gate B into `main` as
+`e34239f34056ea1b6bf5769e5e7920a8ceedf053`. The post-merge `main` GitHub
+Actions run `30166358486`, job `89699959544`, passed on that exact commit on
+2026-07-25. The user explicitly accepted this evidence on 2026-07-26.
+
+The run recorded:
+
+- Gitleaks `8.30.1` over full Git history with redaction enabled and no leaks;
+- Java 21 `mvn verify` with all 52 tests passing and zero failures, errors, or
+  skips;
+- Checkstyle, PMD, JaCoCo, and SpotBugs;
+- successful construction of the retained `linux/amd64` OCI archive;
+- OCI manifest digest
+  `sha256:befc26d564687ce34ee826f7c77bf418b43d83e861b9ec9edfa6cba3057633ba`;
+- CycloneDX generation and a successful Trivy `0.72.0` HIGH/CRITICAL gate;
+- successful fail-closed evidence-manifest verification; and
+- retained `verification-reports` and
+  `mychandha-oci-e34239f34056ea1b6bf5769e5e7920a8ceedf053` artifacts, with
+  GitHub-recorded expiry on 2026-08-08 unless deleted earlier by an authorized
+  operator.
+
+The manual promotion workflow has not run. No registry package, protected
+environment, published image, deployment, or other external resource was
+created. Those actions remain separately gated.
+
+Local revalidation on 2026-07-26 used Java `21.0.12`, Maven `3.9.16`, Docker
+Engine `29.6.2`, and PostgreSQL `17.10` through Testcontainers. Full
+`mvn verify` passed all 52 tests with zero failures, errors, or skips.
+Checkstyle reported zero violations, PMD passed, JaCoCo generated its report,
+and SpotBugs reported zero findings.
 
 ## External staging gates
 

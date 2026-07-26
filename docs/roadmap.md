@@ -32,9 +32,9 @@ The gate uses separate approvals:
 3. Gate A: profiles, roles, security, contracts, tests, and developer
    experience — merged, CI verified, and accepted 2026-07-25;
 4. Gate B: CI hardening and immutable release — repository implementation
-   approved, pushed, and under review in draft PR `#2`; successful CI and
-   release-path evidence pending;
-5. Gate C: deployment-adapter configuration;
+   merged, post-merge CI verified, and accepted 2026-07-26;
+5. Gate C: deployment-adapter configuration — next approval gate; proposal
+   preparation is next and implementation is not approved;
 6. approve the exact non-production resource proposal;
 7. execute staging acceptance; and
 8. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.

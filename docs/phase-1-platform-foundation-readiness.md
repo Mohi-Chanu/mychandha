@@ -6,6 +6,7 @@ Design decisions approved: 2026-07-25
 External-resource approval: Not granted
 Gate A repository approval: Granted 2026-07-25
 Gate B repository approval: Granted 2026-07-25
+Gate B evidence accepted: 2026-07-26
 Gate C repository approval: Not granted
 Phase 2: Blocked until this gate closes
 
@@ -74,7 +75,7 @@ resource proposal is reviewed.
 | Database | PostgreSQL with Flyway | Use a non-production managed PostgreSQL instance with TLS, backups, and non-owner runtime roles | V2 and role tests are implemented; no environment has applied them |
 | Identity | Pluggable managed OIDC; Supabase Auth first | Use a dedicated non-production Supabase project and validate the configured issuer/JWKS/audience contract | Adapter and automated tests exist; no project selected |
 | Durable delivery | PostgreSQL outbox/inbox | Retain the existing dispatcher; do not add Redis, Kafka, or a generic worker tier | Implemented in-process |
-| Artifact provenance | OCI image, CycloneDX SBOM, Trivy gate | Deploy an immutable digest produced by the accepted CI run | CI builds locally but does not publish a deployable digest |
+| Artifact provenance | OCI image, CycloneDX SBOM, Trivy gate | Deploy an immutable digest produced by the accepted CI run | Gate B `main` CI retains a verified OCI archive; no registry image is published |
 | Observability | Actuator health, protected Prometheus, structured logs | Configure staging health, metrics access, alert routing, and log retention | Application signals exist; external routing is not configured |
 | Secrets | Environment secrets or an approved secret store | Record ownership, access, and rotation before any value is created | Environment contract exists; governance is not recorded |
 
@@ -433,15 +434,18 @@ The repository-change proposal covers:
 
 Gate A implements the runtime, migration, security-routine, contract, test, and
 developer-experience subset while preserving the existing product behavior and
-Phase 1 security invariants. Gate B and Gate C remain separate approval steps.
+Phase 1 security invariants. Gate B is accepted. Gate C remains a separate
+approval step.
 
 ## Approval sequence
 
 1. Complete Gate A Docker-backed verification and accept its green CI evidence
    — completed 2026-07-25.
-2. Review and separately approve or reject Gate B — approved, pushed, and
-   opened as draft PR `#2` on 2026-07-25; successful CI evidence pending.
-3. After Gate B evidence, review and separately approve or reject Gate C.
+2. Review and separately approve or reject Gate B — merged as
+   `e34239f34056ea1b6bf5769e5e7920a8ceedf053`, post-merge `main` CI run
+   `30166358486` passed, and evidence was accepted 2026-07-26.
+3. Review and separately approve or reject Gate C — next gate; implementation
+   approval not granted.
 4. Review and approve the exact external resource proposal.
 5. Provision non-production resources and execute staging acceptance.
 6. Review the Phase 1 exit report and explicitly close or reject Phase 1.
