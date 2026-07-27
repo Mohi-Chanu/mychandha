@@ -1,0 +1,30 @@
+# delete it no later than one hour after its one-off job is terminal
+previews:
+  generation: off
+services:
+  - type: worker
+    name: mychandha-staging-bootstrap-base
+    runtime: image
+    plan: starter
+    region: singapore
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
+    dockerCommand: /app/ops/run-idle.sh
+    image:
+      url: ghcr.io/mohi-chanu/mychandha:latest
+    envVars:
+      - key: BOOTSTRAP_DATABASE_HOST
+        sync: false
+  - type: worker
+    name: mychandha-staging-migration-base
+    runtime: image
+    plan: starter
+    region: singapore
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
+    dockerCommand: /app/ops/run-idle.sh
+    image:
+      url: ghcr.io/mohi-chanu/mychandha:latest
+    envVars:
+      - key: MIGRATION_DATABASE_URL
+        sync: false

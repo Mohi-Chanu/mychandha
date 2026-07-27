@@ -4,7 +4,7 @@
 
 | Boundary | Control |
 |---|---|
-| Internet to API | Render edge TLS, bearer authentication, rate limits at edge, safe headers |
+| Internet to API | Render edge TLS and DDoS protection, application rate limits, bearer authentication, safe headers |
 | Supabase to API | JWKS signature, exact issuer, required audience, token time validation |
 | User to organization | Active membership, permission check, path/header consistency |
 | Application to database | Transaction-local tenant binding and PostgreSQL RLS |
@@ -42,7 +42,8 @@
 
 - Deploy and verify the repository-defined migration, API, and dispatcher
   database-role separation.
-- Edge rate-limit policy by IP, subject, organization, and endpoint class.
+- Application-layer rate-limit policy by IP, subject, organization, and
+  endpoint class; provider DDoS protection alone is insufficient.
 - Supabase project hardening: asymmetric signing key, rotation rehearsal,
   session lifetime, MFA/step-up policy, breached-password protection, and audit
   export.
@@ -50,3 +51,25 @@
 - SAST, dependency, container, IaC, and secret scanning in the deployment
   environment.
 - Independent penetration test before GA.
+
+## Gate D application rate-limit control
+
+The approved single-instance staging API uses bounded in-process token buckets
+for client address, authenticated subject, authorized organization, protected
+metrics, and process safety. Keys are process-local HMAC digests; raw
+addresses, subjects, and organization IDs are not retained in bucket keys or
+metric labels. Metrics use only fixed `scope`, `endpoint_class`, and `outcome`
+values.
+
+The servlet container does not interpret forwarded headers. The rate-limit
+adapter starts from the socket peer address and accepts only the terminal
+`X-Forwarded-For` hop when that peer is inside an explicitly configured trusted
+proxy CIDR. Production API startup requires both rate limiting and this
+forwarded-address boundary. Render's actual overwrite behavior remains a live
+Gate D hard stop.
+
+Rejection returns RFC 9457 status `429`, stable code
+`RATE_LIMIT_EXCEEDED`, the safe correlation ID, and `Retry-After`. Cache
+capacity exhaustion fails readiness and rejects new keys rather than silently
+disabling the control. Scaling beyond one API instance requires a new
+distributed-control proposal under `CC-001`.

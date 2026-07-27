@@ -5,8 +5,8 @@ adapter_file="${1:-deploy/render/render.staging.yaml.example}"
 root_blueprint="${RENDER_ADAPTER_ROOT_BLUEPRINT:-render.yaml}"
 image_placeholder="REPLACE_AFTER_EXTERNAL_APPROVAL/IMAGE@sha256:REPLACE_WITH_64_HEX_DIGEST"
 expected_image="${RENDER_ADAPTER_EXPECTED_IMAGE:-$image_placeholder}"
-expected_api_name="${RENDER_ADAPTER_EXPECTED_API_SERVICE_NAME:-REPLACE_AFTER_EXTERNAL_APPROVAL_API_SERVICE}"
-expected_dispatcher_name="${RENDER_ADAPTER_EXPECTED_DISPATCHER_SERVICE_NAME:-REPLACE_AFTER_EXTERNAL_APPROVAL_DISPATCHER_SERVICE}"
+expected_api_name="${RENDER_ADAPTER_EXPECTED_API_SERVICE_NAME:-mychandha-staging-api}"
+expected_dispatcher_name="${RENDER_ADAPTER_EXPECTED_DISPATCHER_SERVICE_NAME:-mychandha-staging-dispatcher}"
 
 fail() {
   echo "Render adapter validation failed: $1" >&2
@@ -81,6 +81,14 @@ test "$(count_lines '^  - type: worker$' "$adapter_file")" -eq 1 \
   || fail "exactly one worker service is required"
 test "$(count_lines '^    runtime: image$' "$adapter_file")" -eq 2 \
   || fail "both services must use runtime: image"
+test "$(count_lines '^    plan: starter$' "$adapter_file")" -eq 2 \
+  || fail "both services must use the Starter plan"
+test "$(count_lines '^    region: singapore$' "$adapter_file")" -eq 2 \
+  || fail "both services must use the Singapore region"
+test "$(count_lines '^    numInstances: 1$' "$adapter_file")" -eq 2 \
+  || fail "both services must use exactly one instance"
+test "$(count_lines '^    maxShutdownDelaySeconds: 30$' "$adapter_file")" -eq 2 \
+  || fail "both services must use the accepted shutdown delay"
 if [ "$expected_image" != "$image_placeholder" ]; then
   image_digest="${expected_image##*@sha256:}"
   test "$image_digest" != "$expected_image" \
@@ -111,7 +119,7 @@ test "$(count_lines '^        value: production,dispatcher$' "$adapter_file")" -
   || fail "dispatcher profile mapping is missing or duplicated"
 
 if grep -Eq \
-  '^[[:space:]]*(repo|branch|plan|region|numInstances|scaling|envVarGroups|fromDatabase|registryCredential|fromRegistryCreds|ipAllowList|dockerfilePath|dockerContext|dockerCommand|buildCommand|startCommand|autoDeploy|autoDeployTrigger|preDeployCommand|initialDeployHook|databases|domains|disk):|^[[:space:]]*runtime: docker$|^[[:space:]]*- type: (pserv|cron|keyvalue|redis)$' \
+  '^[[:space:]]*(repo|branch|scaling|envVarGroups|fromDatabase|registryCredential|fromRegistryCreds|ipAllowList|dockerfilePath|dockerContext|dockerCommand|buildCommand|startCommand|autoDeploy|autoDeployTrigger|preDeployCommand|initialDeployHook|databases|domains|disk):|^[[:space:]]*runtime: docker$|^[[:space:]]*- type: (pserv|cron|keyvalue|redis)$' \
   "$adapter_file"; then
   fail "source deployment or an unapproved provider resource is present"
 fi
@@ -124,8 +132,8 @@ api_block="$(service_block web "$adapter_file")"
 dispatcher_block="$(service_block worker "$adapter_file")"
 
 test "$(printf '%s\n' "$api_block" \
-  | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 7 \
-  || fail "API environment allowlist must contain exactly seven keys"
+  | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 10 \
+  || fail "API environment allowlist must contain exactly ten keys"
 test "$(printf '%s\n' "$dispatcher_block" \
   | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 4 \
   || fail "dispatcher environment allowlist must contain exactly four keys"
@@ -143,6 +151,7 @@ for key in \
   API_DATABASE_PASSWORD \
   SUPABASE_JWT_ISSUER \
   SUPABASE_JWKS_URI \
+  RATE_LIMIT_TRUSTED_PROXY_CIDRS \
   DISPATCHER_DATABASE_URL \
   DISPATCHER_DATABASE_USERNAME \
   DISPATCHER_DATABASE_PASSWORD
@@ -154,6 +163,12 @@ test "$(count_lines '^      - key: SUPABASE_JWT_AUDIENCE$' "$adapter_file")" -eq
   || fail "Supabase audience key must occur exactly once"
 test "$(count_lines '^        value: authenticated$' "$adapter_file")" -eq 1 \
   || fail "Supabase audience must use the accepted value"
+test "$(count_lines '^      - key: RATE_LIMIT_ENABLED$' "$adapter_file")" -eq 1 \
+  || fail "rate limiting must be explicitly enabled"
+test "$(count_lines '^      - key: RATE_LIMIT_TRUST_FORWARDED$' "$adapter_file")" -eq 1 \
+  || fail "trusted forwarded-address parsing must be explicitly enabled"
+test "$(count_lines '^        value: \"true\"$' "$adapter_file")" -eq 2 \
+  || fail "both accepted rate-limit boolean settings must be true"
 
 if grep -Eq \
   '(^|[[:space:]])(password|token|secret|credential):[[:space:]]*[^#[:space:]]' \

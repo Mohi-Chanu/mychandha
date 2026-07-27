@@ -1,7 +1,6 @@
 # Phase 1 Gate C evidence package
 
-Status: Gate C CI evidence explicitly accepted; evidence-record pull request
-and merge pending
+Status: Closed — evidence accepted, evidence record merged, and `main` CI green
 Checklist: `EP-001`
 Deployment contract: `MCDC-001` version `1`
 Change control: `CC-001`
@@ -14,7 +13,7 @@ Prepared: 2026-07-26
 | Gate | Phase 1 Gate C — deployment adapter |
 | Repository | `Mohi-Chanu/mychandha` |
 | Implementation branch | `codex/phase-1-gate-c` |
-| Evidence branch | `codex/phase-1-gate-c-evidence` (local; publication pending) |
+| Evidence branch | `codex/phase-1-gate-c-evidence` |
 | Baseline commit | `bbffe16fe270a7e8d36a2db6889da5b435349d6e` |
 | Implementation commit | `3b3ba3462759b6713aebe0e5677ba296bb0b2ed0` |
 | Pull request | `#4`, merged 2026-07-26 |
@@ -22,9 +21,14 @@ Prepared: 2026-07-26
 | `main` merge commit | `818c9b2d1d991bed67c51b6f3a9978998ab8c7b2` |
 | Pull-request CI | Run `30203978892`, job `89798724750`, attempt `1` |
 | Post-merge `main` CI | Run `30204430920`, job `89799925991`, attempt `1` |
+| Evidence commit | `5a13801dcf1c62a570c59dab14b40a9b26405a3d` |
+| Evidence pull request | `#5`, merged 2026-07-26 |
+| Evidence pull-request CI | Run `30206614101`, job `89805704044`, attempt `1` |
+| Evidence merge commit | `6cf89fa62464c9e2f16ca1df29a47748edebf6eb` |
+| Evidence post-merge `main` CI | Run `30207094828`, job `89806953729`, attempt `1` |
 | Environment class | Local verification and GitHub-hosted CI; no provider environment |
 | External resources | None created or changed |
-| Evidence-package recorder | Codex-assisted repository record, pending user review |
+| Evidence-package recorder | Codex-assisted repository record, reviewed and merged by `Mohi-Chanu` |
 | Explicit Gate C acceptor | `Mohi-Chanu` user approval, 2026-07-26 |
 
 The user approved the refined Gate C repository implementation, then separately
@@ -39,8 +43,17 @@ Phase 2.
 
 On 2026-07-26, the user explicitly accepted the Gate C CI evidence and
 approved committing and pushing this evidence-only branch and opening a draft
-evidence pull request. That approval does not include merging the evidence pull
-request.
+evidence pull request. The user subsequently merged evidence PR `#5` after its
+CI passed and confirmed the resulting `main` CI was successful.
+
+The evidence-record PR CI and post-merge `main` CI repeated the configured
+Java/PostgreSQL, static-analysis, full-history Gitleaks, OCI, CycloneDX, Trivy,
+and evidence-verification gates. The final record run passed 52 tests with zero
+failures, errors, or skips and zero HIGH/CRITICAL vulnerabilities. Its OCI
+manifest digest is
+`sha256:bedff6884128fba53d1111563048af927443f20d6e43e53d1f3bd83f7e599400`.
+This closes the Gate C repository evidence record without authorizing any
+external action.
 
 ## Approved and implemented scope
 
@@ -267,8 +280,27 @@ external-resource and staging-execution gates.
 - The exact migration runner and network mechanism remain blocking decisions.
 - Dispatcher backlog collection, alerting, and log routing remain blocking
   provider-capability decisions.
-- Plans, costs, owners, backups, retention, and cleanup remain unselected.
+- Plans, costs, owners, backups, retention, and cleanup are proposed in Gate D
+  but remain unapproved and unconfigured.
 - The non-live example must never be renamed or applied with placeholders.
+
+## CC-001 compliance
+
+- Current lifecycle step: Gate C closure complete.
+- Granted approvals: proposal/refinement, repository implementation,
+  commit/push/draft PR, user-performed implementation merge, CI evidence
+  acceptance, evidence commit/push/draft PR, and user-performed evidence merge.
+- Not granted: image publication, GitHub environment changes, provider
+  resources, migration, deployment, staging execution, Phase 1 closure, or
+  Phase 2.
+- Repository boundary: Gate C adapter, validator, runbook, evidence package,
+  and aligned repository documentation.
+- External boundary: no external provider resource was created or modified.
+- Material deviations: none.
+- Evidence-package location and status: this `EP-001` package is accepted,
+  merged, and verified by successful post-merge `main` CI.
+- Next approval required: review and explicit acceptance or refinement of
+  `docs/phase-1-staging-resource-proposal.md`.
 
 ## Acceptance record
 
@@ -282,19 +314,16 @@ external-resource and staging-execution gates.
 - [x] Unapproved external actions confirmed not performed.
 - [x] Gate C CI evidence explicitly accepted by the user on 2026-07-26.
 - [x] Evidence branch commit and push approved.
-- [ ] Draft evidence pull request reviewed and merged.
+- [x] Draft evidence PR `#5` reviewed and merged.
+- [x] Evidence post-merge `main` CI run `30207094828` passed.
 - [ ] Exact external-resource proposal approved.
 - [ ] Staging execution approved and completed.
 
 ## Exact next gate
 
-Gate C evidence is accepted. The current authorized repository action is to
-publish `codex/phase-1-gate-c-evidence` and open a draft evidence pull request.
-Merging that pull request remains a separate approval.
-
-After the evidence record is merged and its `main` CI is green, the next design
-gate will be the exact non-production external-resource proposal required by
-`CC-001`, including:
+Gate C is closed. The exact next gate is Phase 1 Gate D — staging resource and
+execution readiness. Its proposal is
+`docs/phase-1-staging-resource-proposal.md` and includes:
 
 - Supabase, Render, PostgreSQL, and registry resources;
 - region, plans, estimated cost, owners, operators, retention, and cleanup;
@@ -304,6 +333,7 @@ gate will be the exact non-production external-resource proposal required by
 - TLS, rate limits, metrics, alerts, log routing, and backups; and
 - restore, rollback, forward-fix, RPO/RTO, and hard-stop criteria.
 
-Evidence acceptance does not authorize that proposal's implementation,
-resource provisioning, release execution, publication, migration, deployment,
-staging acceptance, Phase 1 closure, or Phase 2.
+Preparing the proposal does not authorize its implementation, resource
+provisioning, release execution, publication, migration, deployment, staging
+acceptance, Phase 1 closure, or Phase 2. The next required approval is explicit
+review and acceptance or refinement of the Gate D proposal decisions.

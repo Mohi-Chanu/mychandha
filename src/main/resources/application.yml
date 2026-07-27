@@ -22,7 +22,9 @@ spring:
 server:
   port: ${PORT:8080}
   shutdown: graceful
-  forward-headers-strategy: framework
+  # Keep the socket peer address intact. The rate-limit adapter applies the
+  # explicit trusted-proxy boundary before accepting X-Forwarded-For.
+  forward-headers-strategy: none
   error:
     include-message: never
     include-stacktrace: never
@@ -55,6 +57,27 @@ mychandha:
     lock-timeout: ${OUTBOX_LOCK_TIMEOUT:PT2M}
     batch-size: ${OUTBOX_BATCH_SIZE:50}
     max-attempts: ${OUTBOX_MAX_ATTEMPTS:12}
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    cache-maximum-size: ${RATE_LIMIT_CACHE_MAXIMUM_SIZE:10000}
+    cache-expire-after-access: ${RATE_LIMIT_CACHE_EXPIRE_AFTER_ACCESS:PT10M}
+    trust-forwarded: ${RATE_LIMIT_TRUST_FORWARDED:false}
+    trusted-proxy-cidrs: ${RATE_LIMIT_TRUSTED_PROXY_CIDRS:}
+    client-address:
+      capacity: ${RATE_LIMIT_CLIENT_CAPACITY:120}
+      refill-period: ${RATE_LIMIT_CLIENT_REFILL_PERIOD:PT1M}
+    subject:
+      capacity: ${RATE_LIMIT_SUBJECT_CAPACITY:60}
+      refill-period: ${RATE_LIMIT_SUBJECT_REFILL_PERIOD:PT1M}
+    organization:
+      capacity: ${RATE_LIMIT_ORGANIZATION_CAPACITY:300}
+      refill-period: ${RATE_LIMIT_ORGANIZATION_REFILL_PERIOD:PT1M}
+    metrics:
+      capacity: ${RATE_LIMIT_METRICS_CAPACITY:30}
+      refill-period: ${RATE_LIMIT_METRICS_REFILL_PERIOD:PT1M}
+    process:
+      capacity: ${RATE_LIMIT_PROCESS_CAPACITY:2000}
+      refill-period: ${RATE_LIMIT_PROCESS_REFILL_PERIOD:PT1M}
 
 logging:
   pattern:

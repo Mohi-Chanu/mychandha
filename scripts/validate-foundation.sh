@@ -5,22 +5,40 @@ required_files="
 pom.xml
 Dockerfile
 deploy/render/render.staging.yaml.example
+deploy/render/render.staging-jobs.yaml.example
 .github/workflows/ci.yml
 .github/workflows/release.yml
+.github/workflows/staging-deploy.yml
 scripts/verify-release-evidence.sh
 scripts/validate-render-adapter.sh
 scripts/test-validate-render-adapter.sh
+scripts/validate-render-job-adapter.sh
+scripts/test-validate-render-job-adapter.sh
+scripts/validate-staging-workflow.sh
+scripts/test-validate-staging-workflow.sh
+scripts/test-staging-job-contracts.sh
+scripts/validate-staging-evidence.sh
+scripts/test-validate-staging-evidence.sh
+scripts/run-render-staging-operation.sh
+scripts/run-staging-acceptance.sh
+scripts/run-staging-bootstrap.sh
+scripts/run-staging-migration.sh
 docs/change-control.md
 docs/deployment-contract.md
 docs/evidence-package.md
 docs/render-deployment-runbook.md
 docs/phase-1-gate-c-evidence.md
+docs/phase-1-gate-d-evidence.md
 src/main/resources/db/migration/V1__platform_foundation.sql
 src/main/resources/db/migration/V2__runtime_role_isolation.sql
 src/main/resources/application-api.yml
 src/main/resources/application-dispatcher.yml
 src/main/resources/application-migration.yml
 src/main/java/com/mychandha/platform/security/SecurityConfiguration.java
+src/main/java/com/mychandha/platform/security/ratelimit/ClientAddressRateLimitFilter.java
+src/main/java/com/mychandha/platform/security/ratelimit/SubjectRateLimitFilter.java
+src/main/java/com/mychandha/platform/security/ratelimit/OrganizationRateLimitFilter.java
+src/main/java/com/mychandha/platform/security/ratelimit/ProductionRateLimitValidator.java
 src/main/java/com/mychandha/platform/tenancy/OrganizationContextFilter.java
 src/main/java/com/mychandha/platform/audit/AuditService.java
 src/main/java/com/mychandha/platform/events/OutboxPublisher.java
@@ -37,12 +55,25 @@ grep -q "ENABLE ROW LEVEL SECURITY" src/main/resources/db/migration/V1__platform
 grep -q "FORCE ROW LEVEL SECURITY" src/main/resources/db/migration/V1__platform_foundation.sql
 grep -q "UNIQUE (organization_id, source, external_event_id)" src/main/resources/db/migration/V1__platform_foundation.sql
 grep -q "lock-timeout" src/main/resources/application.yml
+grep -q "forward-headers-strategy: none" src/main/resources/application.yml
+grep -q "cache-maximum-size:.*10000" src/main/resources/application.yml
+grep -q "trust-forwarded:.*false" src/main/resources/application.yml
 grep -q "enabled: false" src/main/resources/application-api.yml
 grep -q "enabled: false" src/main/resources/application-dispatcher.yml
 grep -q "enabled: true" src/main/resources/application-migration.yml
 grep -q "SECURITY DEFINER" src/main/resources/db/migration/V2__runtime_role_isolation.sql
 grep -q "REVOKE ALL ON FUNCTION platform.claim_outbox_events" src/main/resources/db/migration/V2__runtime_role_isolation.sql
 grep -q "platform.claim_outbox_events" src/main/java/com/mychandha/platform/events/OutboxPublisher.java
+grep -q "bucket4j_jdk17-caffeine" pom.xml
+grep -q "postgresql17-client" Dockerfile
+grep -q "run-staging-bootstrap.sh" Dockerfile
+grep -q "run-staging-migration.sh" Dockerfile
+grep -q "addFilterAfter(clientAddressRateLimitFilter, CorrelationIdFilter.class)" \
+  src/main/java/com/mychandha/platform/security/SecurityConfiguration.java
+grep -q "addFilterAfter(subjectRateLimitFilter, BearerTokenAuthenticationFilter.class)" \
+  src/main/java/com/mychandha/platform/security/SecurityConfiguration.java
+grep -q "addFilterAfter(organizationRateLimitFilter, OrganizationContextFilter.class)" \
+  src/main/java/com/mychandha/platform/security/SecurityConfiguration.java
 if grep -q "FOR UPDATE SKIP LOCKED" src/main/java/com/mychandha/platform/events/OutboxPublisher.java; then
   echo "Direct cross-tenant outbox claim SQL remains in Java" >&2
   exit 1
@@ -89,5 +120,11 @@ grep -q "EP-001" docs/evidence-package.md
 grep -q "CC-001" docs/change-control.md
 sh scripts/validate-render-adapter.sh
 sh scripts/test-validate-render-adapter.sh
+sh scripts/validate-render-job-adapter.sh
+sh scripts/test-validate-render-job-adapter.sh
+sh scripts/validate-staging-workflow.sh
+sh scripts/test-validate-staging-workflow.sh
+sh scripts/test-staging-job-contracts.sh
+sh scripts/test-validate-staging-evidence.sh
 
 echo "Phase 1 structural validation passed."

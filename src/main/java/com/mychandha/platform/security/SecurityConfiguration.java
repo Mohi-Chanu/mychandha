@@ -1,7 +1,14 @@
 package com.mychandha.platform.security;
 
 import com.mychandha.platform.identity.IdentityProviderProperties;
+import com.mychandha.platform.security.ratelimit.ClientAddressRateLimitFilter;
+import com.mychandha.platform.security.ratelimit.OrganizationRateLimitFilter;
+import com.mychandha.platform.security.ratelimit.RateLimitProperties;
+import com.mychandha.platform.security.ratelimit.SubjectRateLimitFilter;
+import com.mychandha.platform.tenancy.OrganizationContextFilter;
 import java.util.List;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,14 +29,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
-import com.mychandha.platform.tenancy.OrganizationContextFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.util.StringUtils;
 
 @Configuration
 @EnableMethodSecurity
+@EnableConfigurationProperties(RateLimitProperties.class)
 @Profile({"api", "local", "test"})
 public class SecurityConfiguration {
 
@@ -37,7 +42,10 @@ public class SecurityConfiguration {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             CorrelationIdFilter correlationIdFilter,
+            ClientAddressRateLimitFilter clientAddressRateLimitFilter,
+            SubjectRateLimitFilter subjectRateLimitFilter,
             OrganizationContextFilter organizationContextFilter,
+            OrganizationRateLimitFilter organizationRateLimitFilter,
             RestAuthenticationEntryPoint authenticationEntryPoint,
             RestAccessDeniedHandler accessDeniedHandler) throws Exception {
         return http
@@ -60,17 +68,42 @@ public class SecurityConfiguration {
                         .frameOptions(frame -> frame.deny())
                         .referrerPolicy(referrer -> referrer.policy(
                                 org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
-                .addFilterBefore(correlationIdFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(organizationContextFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterBefore(correlationIdFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(clientAddressRateLimitFilter, CorrelationIdFilter.class)
+                .addFilterAfter(subjectRateLimitFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(organizationContextFilter, SubjectRateLimitFilter.class)
+                .addFilterAfter(organizationRateLimitFilter, OrganizationContextFilter.class)
                 .build();
+    }
+
+    @Bean
+    FilterRegistrationBean<CorrelationIdFilter> correlationIdRegistration(
+            CorrelationIdFilter filter) {
+        return disabledRegistration(filter);
+    }
+
+    @Bean
+    FilterRegistrationBean<ClientAddressRateLimitFilter> clientAddressRateLimitRegistration(
+            ClientAddressRateLimitFilter filter) {
+        return disabledRegistration(filter);
+    }
+
+    @Bean
+    FilterRegistrationBean<SubjectRateLimitFilter> subjectRateLimitRegistration(
+            SubjectRateLimitFilter filter) {
+        return disabledRegistration(filter);
     }
 
     @Bean
     FilterRegistrationBean<OrganizationContextFilter> organizationContextRegistration(
             OrganizationContextFilter filter) {
-        FilterRegistrationBean<OrganizationContextFilter> registration = new FilterRegistrationBean<>(filter);
-        registration.setEnabled(false);
-        return registration;
+        return disabledRegistration(filter);
+    }
+
+    @Bean
+    FilterRegistrationBean<OrganizationRateLimitFilter> organizationRateLimitRegistration(
+            OrganizationRateLimitFilter filter) {
+        return disabledRegistration(filter);
     }
 
     @Bean
@@ -101,5 +134,12 @@ public class SecurityConfiguration {
                                     .toList();
             return new JwtAuthenticationToken(jwt, authorities, jwt.getSubject());
         };
+    }
+
+    private <T extends jakarta.servlet.Filter> FilterRegistrationBean<T> disabledRegistration(
+            T filter) {
+        FilterRegistrationBean<T> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
     }
 }

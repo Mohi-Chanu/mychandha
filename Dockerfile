@@ -9,10 +9,16 @@ RUN --mount=type=cache,target=/root/.m2 mvn -B package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine@sha256:3f08b13888f595cc49edabea7250ba69499ba25602b267da591720769400e08c
 RUN apk upgrade --no-cache \
+    && apk add --no-cache postgresql17-client \
     && addgroup -S mychandha \
     && adduser -S mychandha -G mychandha
 WORKDIR /app
 COPY --from=build /workspace/target/mychandha-platform-*.jar app.jar
+COPY --chmod=0555 scripts/run-staging-bootstrap.sh /app/ops/run-bootstrap.sh
+COPY --chmod=0555 scripts/run-staging-migration.sh /app/ops/run-migration.sh
+COPY --chmod=0555 scripts/run-render-job-base-idle.sh /app/ops/run-idle.sh
+COPY --chmod=0444 scripts/bootstrap-staging-database.sql /app/ops/bootstrap-staging-database.sql
+COPY --chmod=0444 scripts/bootstrap-database-roles.sql /app/ops/bootstrap-database-roles.sql
 USER mychandha
 EXPOSE 8080
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-Djava.security.egd=file:/dev/urandom", "-jar", "/app/app.jar"]

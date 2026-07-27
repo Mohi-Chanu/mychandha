@@ -11,7 +11,8 @@ Every gate listed here, and every future gate added to this roadmap, follows
 scope, non-goals, design, migration, security, test, deployment, rollback,
 evidence, and approval boundaries. Evidence uses `EP-001` in
 `docs/evidence-package.md`. Deployment gates conform to `MCDC-001` in
-`docs/deployment-contract.md`.
+`docs/deployment-contract.md`. Stable governance identifiers and their
+canonical records are indexed in `docs/governance/README.md`.
 
 Proposal preparation, implementation, GitHub changes, external-resource
 changes, execution, evidence acceptance, closure, and the next phase remain
@@ -48,10 +49,14 @@ The gate uses separate approvals:
    merged, post-merge CI verified, and accepted 2026-07-26;
 5. Gate C: deployment-adapter configuration — merged through PR `#4`;
    pull-request and post-merge `main` CI passed; evidence explicitly accepted
-   2026-07-26; evidence-record review and merge remain open;
-6. approve the exact non-production resource proposal;
-7. execute staging acceptance; and
-8. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.
+   2026-07-26; evidence PR `#5` merged and resulting `main` CI passed;
+6. Gate D staging-resource and execution-readiness decisions — accepted
+   2026-07-26 in `docs/phase-1-staging-resource-proposal.md`;
+7. bounded repository prerequisites in
+   `docs/phase-1-gate-d-repository-proposal.md` — implementation approved
+   2026-07-27; local implementation and validation in progress;
+8. separately approve external resources and execute staging acceptance; and
+9. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.
 
 Repository-change approval does not authorize external changes. External
 resource approval does not authorize Phase 2.

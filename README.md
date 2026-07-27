@@ -29,8 +29,18 @@ by the [Platform Foundation Readiness package](docs/phase-1-platform-foundation-
 [Gate C proposal](docs/phase-1-gate-c-proposal.md) has been implemented and
 merged through PR `#4`; pull-request and post-merge CI passed. The
 [Gate C evidence package](docs/phase-1-gate-c-evidence.md) was explicitly
-accepted on 2026-07-26; publication and merge of its evidence record remain
-open. All external changes remain separate approvals.
+accepted on 2026-07-26, merged through PR `#5`, and verified by successful
+post-merge `main` CI. The
+[staging resource proposal](docs/phase-1-staging-resource-proposal.md) and its
+Gate D decisions were accepted on 2026-07-26. The bounded
+[Gate D repository proposal](docs/phase-1-gate-d-repository-proposal.md) is
+approved for local implementation as of 2026-07-27. The implementation is
+complete in the local working tree; its local results and pending execution
+checklist are [Gate D evidence](docs/phase-1-gate-d-evidence.md). The local OCI
+build remains blocked by the workstation's Avast/Docker TLS interception path.
+The user accepted that local limitation on 2026-07-27 without waiving the
+authoritative CI gates. This approval does not authorize a commit, publication,
+provider change, migration, deployment, or staging execution.
 
 Engineering standards are recorded in the [ADR index](docs/adr/README.md),
 [module boundaries](docs/module-boundaries.md),
@@ -39,7 +49,9 @@ Engineering standards are recorded in the [ADR index](docs/adr/README.md),
 [developer-experience guidelines](docs/developer-experience.md).
 Cross-gate governance is defined by [CC-001](docs/change-control.md), the
 [canonical deployment contract](docs/deployment-contract.md), and the
-[standard evidence package](docs/evidence-package.md).
+[standard evidence package](docs/evidence-package.md). Stable ADR, decision,
+control, and operational-budget identifiers are collected in the
+[governance decision index](docs/governance/README.md).
 
 For continued Codex Desktop work, begin with [repository instructions](AGENTS.md),
 [current status](docs/current-status.md), [product decisions](docs/product-decisions.md),

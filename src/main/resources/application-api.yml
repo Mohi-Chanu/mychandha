@@ -16,7 +16,7 @@ management:
     health:
       group:
         readiness:
-          include: readinessState,db,startupState
+          include: readinessState,db,startupState,rateLimit
         startup:
           include: startupState
 
