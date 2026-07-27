@@ -4,6 +4,10 @@ services:
   - type: web
     name: approved-api-fixture
     runtime: image
+    plan: starter
+    region: singapore
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
     image:
       url: registry.example.invalid/mychandha@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     healthCheckPath: /actuator/health/readiness
@@ -22,9 +26,19 @@ services:
         sync: false
       - key: SUPABASE_JWT_AUDIENCE
         value: authenticated
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: RATE_LIMIT_TRUST_FORWARDED
+        value: "true"
+      - key: RATE_LIMIT_TRUSTED_PROXY_CIDRS
+        sync: false
   - type: worker
     name: approved-dispatcher-fixture
     runtime: image
+    plan: starter
+    region: singapore
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
     image:
       url: registry.example.invalid/mychandha@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     envVars:

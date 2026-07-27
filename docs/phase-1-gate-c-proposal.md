@@ -1,7 +1,6 @@
 # Phase 1 Gate C deployment-adapter proposal
 
-Status: Implementation merged and CI evidence accepted; evidence-record review
-and merge pending
+Status: Closed — implementation and evidence records merged; `main` CI green
 Prepared: 2026-07-26
 
 ## Approval boundary
@@ -473,42 +472,38 @@ by this proposal.
 ## Exact next gate and recommendation
 
 Gate C implementation is merged, its pull-request and post-merge `main` CI
-passed, and the evidence was explicitly accepted on 2026-07-26. The next gate
-is **evidence-record review and merge**.
+passed, and the evidence was explicitly accepted on 2026-07-26. Evidence PR
+`#5` then merged as `6cf89fa62464c9e2f16ca1df29a47748edebf6eb`,
+and post-merge `main` CI run `30207094828` passed. Gate C is closed.
 
 Recommended action:
 
-1. publish the approved evidence-only branch
-   `codex/phase-1-gate-c-evidence` as a draft pull request;
-2. review and separately approve or reject its merge;
-3. verify the resulting `main` CI;
-4. record the Gate C evidence package as fully published;
-5. then prepare the exact external-resource proposal, including the migration
-   runner/network decision, provider inventory, plans, costs, owners, secrets,
-   backup/log/alert controls, retention, and cleanup; and
-6. only after that separate approval, provision and execute staging
-   acceptance.
+1. review and approve, reject, or refine
+   `docs/phase-1-staging-resource-proposal.md`;
+2. separately approve its bounded repository prerequisites;
+3. separately approve external-resource changes; and
+4. separately approve and execute staging acceptance.
 
 Phase 2 remains blocked until staging acceptance passes, the Phase 1 exit
 report is complete, and Phase 1 is explicitly closed.
 
 ## CC-001 compliance
 
-- Current lifecycle step: accepted evidence-record publication.
+- Current lifecycle step: Gate C closure complete.
 - Granted approval: Gate C proposal/refinement, bounded implementation,
   implementation commit/push/draft PR, user-performed merge, post-merge
-  evidence preparation, explicit evidence acceptance, and evidence-record
-  commit/push/draft PR.
-- Not granted: evidence-record merge, image publication, external-resource
-  changes, migration, deployment, staging execution, Phase 1 closure, or
-  Phase 2.
+  evidence preparation, explicit evidence acceptance, evidence-record
+  commit/push/draft PR, user-performed evidence merge, and resulting green
+  `main` CI.
+- Not granted: image publication, external-resource changes, migration,
+  deployment, staging execution, Phase 1 closure, or Phase 2.
 - Repository boundary: the approved Gate C adapter, runbook, validator,
   fixtures, evidence record, and aligned documentation.
 - External boundary: no external system may be changed.
 - Material deviations: none; the refinements make existing cloud-neutral,
   evidence, and approval requirements explicit.
 - Evidence status: local, pull-request, and post-merge `main` evidence is in
-  `docs/phase-1-gate-c-evidence.md` and explicitly accepted; evidence-record
-  review and merge are pending.
-- Next approval required: review and explicit merge approval for the draft
-  evidence pull request after its CI passes.
+  `docs/phase-1-gate-c-evidence.md`, explicitly accepted, merged, and verified
+  by successful post-merge `main` CI.
+- Next approval required: review and explicit acceptance or refinement of
+  `docs/phase-1-staging-resource-proposal.md`.

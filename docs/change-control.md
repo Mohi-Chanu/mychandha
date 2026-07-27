@@ -108,6 +108,18 @@ Every future gate proposal and closure record must contain a section named
 Roadmap entries may reference this rule once for a sequence of subordinate
 gates, but each detailed gate document must reference it directly.
 
+### Stable decision identifiers
+
+Reusable architecture, gate, control, evidence, deployment, and
+operational-budget records are indexed in `docs/governance/README.md`.
+
+- Gate documents reference the permanent identifier instead of copying the
+  complete decision.
+- An identifier is never reused.
+- A superseding record retains and links the prior history.
+- Changing an accepted decision's security, cost, provider, migration,
+  deployment, recovery, or evidence meaning is material and follows this rule.
+
 ### Exceptions
 
 There is no implicit emergency or convenience exception. An exception requires

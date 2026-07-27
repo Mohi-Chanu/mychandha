@@ -3,6 +3,9 @@
 Architecture Decision Records preserve significant technical decisions,
 context, alternatives, and consequences.
 
+The cross-governance identifier index is
+[`docs/governance/README.md`](../governance/README.md).
+
 ## Status values
 
 - `Proposed`: under review; not authoritative.

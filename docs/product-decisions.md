@@ -175,3 +175,39 @@ previous decision.
   were approved in the same instruction. Evidence-record merge, release
   execution, image publication, external resources, migration, deployment,
   staging acceptance, Phase 1 closure, and Phase 2 remain separate.
+- 2026-07-26: The user merged Gate C evidence PR `#5` and confirmed both its
+  pull-request CI and resulting `main` CI were successful. The merge commit is
+  `6cf89fa62464c9e2f16ca1df29a47748edebf6eb`; post-merge run
+  `30207094828`, job `89806953729`, passed. The user directed progression to
+  the next step, which authorizes preparation of the Gate D staging-resource
+  proposal only.
+- 2026-07-26: Gate D proposal preparation retains one Supabase project for
+  Auth and PostgreSQL, the required API and durable dispatcher executions,
+  GHCR, and the Render adapter. Redis, Kafka, Render Key Value/Workflows,
+  generic workers, an additional database, and third-party observability are
+  not proposed. All Gate D decisions, repository prerequisites, publication,
+  GitHub/provider changes, migration, deployment, and acceptance remain
+  unapproved.
+- 2026-07-26: Gate D proposal review requested permanent decision IDs,
+  categorized hard stops, a release-scoped governed operational budget,
+  positive exit criteria, an assumption register, explicit application-layer
+  rate-limit criteria, and a central governance index. These are editorial
+  governance refinements and do not approve the Gate D decisions,
+  implementation, external changes, spending, migration, deployment, or
+  staging execution.
+- 2026-07-26: The Gate D staging-resource proposal decisions were explicitly
+  accepted as documented. This accepts `DR-001` migration environment
+  isolation, `DR-002` application-layer rate limiting, `DR-003` digest-only
+  rollback, `R1-OPB-001`, the minimal Singapore staging resource envelope,
+  ownership, retention, and cleanup boundaries. It authorizes preparation of
+  the bounded Gate D repository implementation proposal only. Repository
+  implementation, commit, push, pull request, GitHub/provider changes,
+  spending, publication, credential creation, migration, deployment,
+  acceptance, cleanup, Phase 1 closure, and Phase 2 remain separately gated.
+- 2026-07-27: The bounded Phase 1 Gate D repository proposal was explicitly
+  approved for local implementation. The approval covers only the source,
+  tests, workflow contract, non-live Render adapters, operational scripts, and
+  documentation listed in that proposal. It does not authorize a commit,
+  push, pull request, merge, GitHub environment or package change, credential,
+  provider resource, spending, bootstrap, migration, deployment, acceptance
+  run, restore, rollback, cleanup, Phase 1 closure, or Phase 2 work.

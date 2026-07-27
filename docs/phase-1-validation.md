@@ -173,8 +173,13 @@ The post-merge run recorded:
 The artifacts expire on 2026-08-09 unless an authorized repository operator
 deletes them earlier. Full checksums and `EP-001` disposition are in
 `docs/phase-1-gate-c-evidence.md`. The user explicitly accepted the Gate C
-evidence on 2026-07-26. Publication and merge of the evidence record remain
-pending.
+evidence on 2026-07-26. Evidence PR `#5` CI run `30206614101`, job
+`89805704044`, passed; the PR merged as
+`6cf89fa62464c9e2f16ca1df29a47748edebf6eb`; and post-merge `main` CI run
+`30207094828`, job `89806953729`, passed. The final record run again passed all
+52 tests, full-history Gitleaks, and zero HIGH/CRITICAL Trivy findings. Its OCI
+manifest digest is
+`sha256:bedff6884128fba53d1111563048af927443f20d6e43e53d1f3bd83f7e599400`.
 
 ## External staging gates
 
@@ -191,3 +196,23 @@ recorded:
 
 No Supabase or Render resources were provisioned during the local validation
 pass.
+
+## Gate D repository validation
+
+The bounded Gate D repository implementation was approved on 2026-07-27.
+Java `21.0.12`/Maven `3.9.16` verification passes 67 tests with Docker Engine
+`29.6.2` and PostgreSQL `17.10`, plus Checkstyle, PMD, JaCoCo, and SpotBugs.
+The foundation, application-rate-limit, isolated job, non-live adapter,
+protected-workflow, acceptance-contract, evidence-sanitization, Actionlint,
+Markdown-link, and source/history Gitleaks checks pass.
+
+The local OCI build stopped securely when Avast HTTPS inspection supplied an
+untrusted generated certificate to the pinned Alpine container while `apk`
+requested its signed package index. The image, CycloneDX, and Trivy gates have
+therefore not completed locally and must be rerun after the local Docker trust
+path is corrected or in the separately approved CI evidence run. The user
+accepted this local-machine limitation on 2026-07-27; this does not waive or
+pre-accept the corresponding CI gates.
+
+No result in this section is staging evidence. The pending execution package
+is `docs/phase-1-gate-d-evidence.md`, and no external action is authorized.

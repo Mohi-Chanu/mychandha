@@ -1,0 +1,52 @@
+# delete it no later than one hour after its one-off job is terminal
+previews:
+  generation: off
+services:
+  - type: worker
+    name: mychandha-staging-bootstrap-base
+    runtime: image
+    plan: starter
+    region: singapore
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
+    dockerCommand: /app/ops/run-idle.sh
+    image:
+      url: registry.example.invalid/mychandha@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    envVars:
+      - key: BOOTSTRAP_DATABASE_HOST
+        sync: false
+      - key: BOOTSTRAP_DATABASE_PORT
+        value: "5432"
+      - key: BOOTSTRAP_DATABASE_NAME
+        sync: false
+      - key: BOOTSTRAP_DATABASE_USERNAME
+        sync: false
+      - key: BOOTSTRAP_DATABASE_PASSWORD
+        sync: false
+      - key: BOOTSTRAP_DATABASE_SSLMODE
+        value: verify-full
+      - key: MYCHANDHA_STAGING_API_PASSWORD
+        sync: false
+      - key: MYCHANDHA_STAGING_DISPATCHER_PASSWORD
+        sync: false
+      - key: MYCHANDHA_STAGING_MIGRATION_PASSWORD
+        sync: false
+  - type: worker
+    name: mychandha-staging-migration-base
+    runtime: image
+    plan: starter
+    region: singapore
+    numInstances: 1
+    maxShutdownDelaySeconds: 30
+    dockerCommand: /app/ops/run-idle.sh
+    image:
+      url: registry.example.invalid/mychandha@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production,migration
+      - key: MIGRATION_DATABASE_URL
+        sync: false
+      - key: MIGRATION_DATABASE_USERNAME
+        sync: false
+      - key: MIGRATION_DATABASE_PASSWORD
+        sync: false

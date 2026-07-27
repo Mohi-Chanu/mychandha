@@ -68,8 +68,28 @@ is `sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11`.
 The associated OCI and verification artifacts expire on 2026-08-09 unless
 deleted earlier by an authorized operator. The evidence is recorded in
 `docs/phase-1-gate-c-evidence.md` and was explicitly accepted on 2026-07-26.
-Evidence-record merge remains pending. Verification and acceptance do not
-authorize promotion or deployment.
+Evidence PR `#5` merged as
+`6cf89fa62464c9e2f16ca1df29a47748edebf6eb`, and post-merge `main` CI run
+`30207094828`, job `89806953729`, passed. Its OCI manifest digest is
+`sha256:bedff6884128fba53d1111563048af927443f20d6e43e53d1f3bd83f7e599400`.
+Gate C closure does not authorize promotion or deployment.
+
+## Gate D repository operations
+
+Gate D local implementation packages the PostgreSQL 17 client and approved
+bootstrap/migration wrappers in the same non-root OCI image. The separate
+non-live job adapter defines temporary bootstrap and migration bases with
+disjoint secret allowlists; neither is a long-running application worker.
+
+`.github/workflows/staging-deploy.yml` is manual and operation-specific.
+`bootstrap`, `migrate`, `deploy`, `acceptance`, `rollback`, and `cleanup` each
+require a distinct protected-environment approval. Preflight binds the request
+to a successful post-merge `main` CI run, revalidates its retained release
+evidence, and requires the exact published digest reference. Adding the
+workflow does not create its GitHub environment or authorize a dispatch.
+
+The execution checklist is `docs/phase-1-gate-d-evidence.md`. All provider,
+database, deployment, recovery, cost, and cleanup results remain pending.
 
 Future gate and deployment evidence must follow the reusable checklist in
 `docs/evidence-package.md`. Approval progression follows `CC-001` in

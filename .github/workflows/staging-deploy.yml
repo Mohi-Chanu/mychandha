@@ -1,0 +1,302 @@
+name: Gate D staging operation
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Separately approved Gate D operation
+        required: true
+        type: choice
+        options:
+          - bootstrap
+          - migrate
+          - deploy
+          - acceptance
+          - rollback
+          - cleanup
+      verified_run_id:
+        description: Successful post-merge main CI run
+        required: true
+        type: string
+      commit_sha:
+        description: Full commit SHA verified by the CI run
+        required: true
+        type: string
+      image_ref:
+        description: Exact ghcr.io image reference with sha256 manifest digest
+        required: true
+        type: string
+      api_service_id:
+        description: Approved API service ID when required
+        required: false
+        type: string
+      dispatcher_service_id:
+        description: Approved dispatcher service ID when required
+        required: false
+        type: string
+      api_rollback_deploy_id:
+        description: Accepted API rollback deploy ID
+        required: false
+        type: string
+      dispatcher_rollback_deploy_id:
+        description: Accepted dispatcher rollback deploy ID
+        required: false
+        type: string
+      cleanup_service_id:
+        description: Orphan temporary job-base service ID only
+        required: false
+        type: string
+      confirmation:
+        description: GATE-D-<operation>-<full commit SHA>
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gate-d-${{ inputs.operation }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Validate immutable inputs and approval phrase
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+          IMAGE_REF: ${{ inputs.image_ref }}
+          OPERATION: ${{ inputs.operation }}
+          VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+        run: |
+          case "$COMMIT_SHA" in
+            *[!0-9a-f]*) exit 64 ;;
+          esac
+          test "${#COMMIT_SHA}" -eq 40
+          test "$CONFIRMATION" = "GATE-D-${OPERATION}-${COMMIT_SHA}"
+          case "$VERIFIED_RUN_ID" in
+            '' | *[!0-9]*) exit 64 ;;
+          esac
+          digest="${IMAGE_REF##*@sha256:}"
+          test "$digest" != "$IMAGE_REF"
+          test "${#digest}" -eq 64
+          case "$digest" in
+            *[!0-9a-f]*) exit 64 ;;
+          esac
+      - name: Verify accepted main CI run
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          GH_TOKEN: ${{ github.token }}
+          VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+        run: |
+          run_json=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${VERIFIED_RUN_ID}")
+          test "$(jq -r '.head_sha' <<< "$run_json")" = "$COMMIT_SHA"
+          test "$(jq -r '.conclusion' <<< "$run_json")" = "success"
+          test "$(jq -r '.name' <<< "$run_json")" = "CI"
+          test "$(jq -r '.head_branch' <<< "$run_json")" = "main"
+      - name: Check out the verified commit
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.commit_sha }}
+          persist-credentials: false
+      - name: Download retained OCI release candidate
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: mychandha-oci-${{ inputs.commit_sha }}
+          path: target/release
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.verified_run_id }}
+      - name: Verify retained evidence and exact registry digest
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          IMAGE_REF: ${{ inputs.image_ref }}
+          VERIFIED_RUN_ID: ${{ inputs.verified_run_id }}
+        run: |
+          verified_digest=$(
+            sh scripts/verify-release-evidence.sh \
+              target/release \
+              "$COMMIT_SHA" \
+              "$VERIFIED_RUN_ID"
+          )
+          expected_ref="ghcr.io/${GITHUB_REPOSITORY,,}@${verified_digest}"
+          test "$IMAGE_REF" = "$expected_ref" || {
+            echo "image_ref does not match the verified CI artifact digest." >&2
+            exit 1
+          }
+
+  bootstrap:
+    if: inputs.operation == 'bootstrap'
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment: staging-deploy
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.commit_sha }}
+          persist-credentials: false
+      - name: Run protected bootstrap one-off job
+        env:
+          BOOTSTRAP_DATABASE_HOST: ${{ secrets.BOOTSTRAP_DATABASE_HOST }}
+          BOOTSTRAP_DATABASE_NAME: ${{ secrets.BOOTSTRAP_DATABASE_NAME }}
+          BOOTSTRAP_DATABASE_PASSWORD: ${{ secrets.BOOTSTRAP_DATABASE_PASSWORD }}
+          BOOTSTRAP_DATABASE_USERNAME: ${{ secrets.BOOTSTRAP_DATABASE_USERNAME }}
+          EVIDENCE_COMMIT_SHA: ${{ inputs.commit_sha }}
+          EVIDENCE_IMAGE_REF: ${{ inputs.image_ref }}
+          MYCHANDHA_STAGING_API_PASSWORD: ${{ secrets.MYCHANDHA_STAGING_API_PASSWORD }}
+          MYCHANDHA_STAGING_DISPATCHER_PASSWORD: ${{ secrets.MYCHANDHA_STAGING_DISPATCHER_PASSWORD }}
+          MYCHANDHA_STAGING_MIGRATION_PASSWORD: ${{ secrets.MYCHANDHA_STAGING_MIGRATION_PASSWORD }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_ENVIRONMENT_ID: ${{ secrets.RENDER_ENVIRONMENT_ID }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
+          STAGING_OPERATION: bootstrap
+        run: sh scripts/run-render-staging-operation.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gate-d-bootstrap-${{ inputs.commit_sha }}
+          path: target/staging-evidence/sanitized
+          retention-days: 14
+
+  migrate:
+    if: inputs.operation == 'migrate'
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment: staging-deploy
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.commit_sha }}
+          persist-credentials: false
+      - name: Run protected Flyway one-off job
+        env:
+          EVIDENCE_COMMIT_SHA: ${{ inputs.commit_sha }}
+          EVIDENCE_IMAGE_REF: ${{ inputs.image_ref }}
+          MIGRATION_DATABASE_PASSWORD: ${{ secrets.MIGRATION_DATABASE_PASSWORD }}
+          MIGRATION_DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+          MIGRATION_DATABASE_USERNAME: ${{ secrets.MIGRATION_DATABASE_USERNAME }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_ENVIRONMENT_ID: ${{ secrets.RENDER_ENVIRONMENT_ID }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
+          STAGING_OPERATION: migrate
+        run: sh scripts/run-render-staging-operation.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gate-d-migrate-${{ inputs.commit_sha }}
+          path: target/staging-evidence/sanitized
+          retention-days: 14
+
+  deploy:
+    if: inputs.operation == 'deploy'
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: staging-deploy
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.commit_sha }}
+          persist-credentials: false
+      - name: Deploy exact image to API and dispatcher
+        env:
+          API_SERVICE_ID: ${{ inputs.api_service_id }}
+          DISPATCHER_SERVICE_ID: ${{ inputs.dispatcher_service_id }}
+          EVIDENCE_COMMIT_SHA: ${{ inputs.commit_sha }}
+          EVIDENCE_IMAGE_REF: ${{ inputs.image_ref }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          STAGING_OPERATION: deploy
+        run: sh scripts/run-render-staging-operation.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gate-d-deploy-${{ inputs.commit_sha }}
+          path: target/staging-evidence/sanitized
+          retention-days: 14
+
+  acceptance:
+    if: inputs.operation == 'acceptance'
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: staging-deploy
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.commit_sha }}
+          persist-credentials: false
+      - name: Run non-destructive staging acceptance probes
+        env:
+          EVIDENCE_COMMIT_SHA: ${{ inputs.commit_sha }}
+          EVIDENCE_IMAGE_REF: ${{ inputs.image_ref }}
+          STAGING_API_BASE_URL: ${{ vars.STAGING_API_BASE_URL }}
+          STAGING_CROSS_TENANT_ORGANIZATION_ID: ${{ secrets.STAGING_CROSS_TENANT_ORGANIZATION_ID }}
+          STAGING_EXPIRED_TOKEN: ${{ secrets.STAGING_EXPIRED_TOKEN }}
+          STAGING_INVALID_AUDIENCE_TOKEN: ${{ secrets.STAGING_INVALID_AUDIENCE_TOKEN }}
+          STAGING_INVALID_ISSUER_TOKEN: ${{ secrets.STAGING_INVALID_ISSUER_TOKEN }}
+          STAGING_INVALID_SIGNATURE_TOKEN: ${{ secrets.STAGING_INVALID_SIGNATURE_TOKEN }}
+          STAGING_INACTIVE_ORGANIZATION_ID: ${{ secrets.STAGING_INACTIVE_ORGANIZATION_ID }}
+          STAGING_METRICS_TOKEN: ${{ secrets.STAGING_METRICS_TOKEN }}
+          STAGING_MISSING_SUBJECT_TOKEN: ${{ secrets.STAGING_MISSING_SUBJECT_TOKEN }}
+          STAGING_ORGANIZATION_ID: ${{ secrets.STAGING_ORGANIZATION_ID }}
+          STAGING_VALID_TOKEN: ${{ secrets.STAGING_VALID_TOKEN }}
+        run: sh scripts/run-staging-acceptance.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gate-d-acceptance-${{ inputs.commit_sha }}
+          path: target/staging-evidence/sanitized
+          retention-days: 14
+
+  rollback:
+    if: inputs.operation == 'rollback'
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: staging-deploy
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.commit_sha }}
+          persist-credentials: false
+      - name: Roll back to accepted compatible deploys
+        env:
+          API_ROLLBACK_DEPLOY_ID: ${{ inputs.api_rollback_deploy_id }}
+          API_SERVICE_ID: ${{ inputs.api_service_id }}
+          DISPATCHER_ROLLBACK_DEPLOY_ID: ${{ inputs.dispatcher_rollback_deploy_id }}
+          DISPATCHER_SERVICE_ID: ${{ inputs.dispatcher_service_id }}
+          EVIDENCE_COMMIT_SHA: ${{ inputs.commit_sha }}
+          EVIDENCE_IMAGE_REF: ${{ inputs.image_ref }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          STAGING_OPERATION: rollback
+        run: sh scripts/run-render-staging-operation.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gate-d-rollback-${{ inputs.commit_sha }}
+          path: target/staging-evidence/sanitized
+          retention-days: 14
+
+  cleanup:
+    if: inputs.operation == 'cleanup'
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: staging-deploy
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.commit_sha }}
+          persist-credentials: false
+      - name: Delete an orphan temporary job base only
+        env:
+          CLEANUP_SERVICE_ID: ${{ inputs.cleanup_service_id }}
+          EVIDENCE_COMMIT_SHA: ${{ inputs.commit_sha }}
+          EVIDENCE_IMAGE_REF: ${{ inputs.image_ref }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          STAGING_OPERATION: cleanup
+        run: sh scripts/run-render-staging-operation.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gate-d-cleanup-${{ inputs.commit_sha }}
+          path: target/staging-evidence/sanitized
+          retention-days: 14

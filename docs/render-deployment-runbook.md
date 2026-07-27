@@ -16,6 +16,11 @@ The non-live mapping is:
 
 `deploy/render/render.staging.yaml.example`
 
+Privileged, temporary bootstrap/migration bases are kept in the separate
+non-live mapping:
+
+`deploy/render/render.staging-jobs.yaml.example`
+
 The root `render.yaml` was intentionally removed so Render cannot
 auto-discover and sync unresolved or unapproved infrastructure. Do not rename,
 copy, materialize, or apply the example until the exact external-resource
@@ -31,7 +36,7 @@ credential, domain, owner, or production identifier.
 |---|---|---|---|---|
 | `core-api` | Image-backed web service | `production,api` | Accepted immutable OCI digest | HTTPS API |
 | `outbox-dispatcher` | Image-backed background worker | `production,dispatcher` | Same accepted immutable OCI digest | None |
-| `schema-migration` | Protected short-lived release runner; exact mechanism remains open | `production,migration` | Same accepted immutable OCI digest | None |
+| `schema-migration` | Protected one-off job from an isolated temporary base | `production,migration` | Same accepted immutable OCI digest | None |
 
 The Render `worker` service type hosts only the already implemented durable
 PostgreSQL-outbox dispatcher. It does not add Redis, Render Key Value, Render
@@ -52,8 +57,8 @@ resource.
 | API readiness | Render `healthCheckPath` | `/actuator/health/readiness` | Supported structurally | Live behavior requires staging |
 | No dispatcher ingress | Background-worker service type | Dispatcher service block | Supported structurally | Live verification requires staging |
 | Separate API/dispatcher secrets | Service-specific unsupplied environment entries | Adapter validator | Supported structurally | Secret store and owners open |
-| Migration-only credential | Protected short-lived runner that is not based on API/dispatcher configuration | External proposal and migration execution evidence | Open and blocking | Runner and network mechanism open |
-| Database role bootstrap | Approved owner/bootstrap execution before Flyway | Bootstrap script and external evidence | Open and blocking | Provider role capability and operator open |
+| Migration-only credential | One-off job from `mychandha-staging-migration-base` with a disjoint allowlist | Job adapter validator and later execution evidence | Supported structurally | Network and live provider evidence remain open |
+| Database role bootstrap | One-off job from `mychandha-staging-bootstrap-base` using the packaged bootstrap authority | Job adapter validator and later execution evidence | Supported structurally | Statement logging and live provider evidence remain open |
 | TLS and restricted database path | Provider/network configuration | External conformance and acceptance evidence | Open and blocking | Plan/network capability open |
 | Dispatcher backlog evidence | Provider process state plus safe existing backlog/metric boundary | External monitoring design and acceptance | Open and blocking | Metrics/log/alert plan open |
 | Log routing and retention | Render/provider log controls or approved drain | External proposal and test event | Open and blocking | Plan, destination, and retention open |
@@ -115,6 +120,9 @@ Required:
 - `SUPABASE_JWT_ISSUER`
 - `SUPABASE_JWKS_URI`
 - `SUPABASE_JWT_AUDIENCE=authenticated`
+- `RATE_LIMIT_ENABLED=true`
+- `RATE_LIMIT_TRUST_FORWARDED=true`
+- `RATE_LIMIT_TRUSTED_PROXY_CIDRS`
 
 The URL, username, password, issuer, and JWKS URI remain unsupplied in the
 repository example. The API service must not receive dispatcher or migration
@@ -150,24 +158,30 @@ Common non-secret JVM or pool tuning can be added only after the selected plans
 are approved. Environment groups must not be used if they create collisions or
 blur the process allowlists.
 
-## Migration hard stop
+## Protected bootstrap and migration execution
 
 Do not use a Render one-off job based on the API or dispatcher. Render one-off
-jobs inherit all environment variables from their base service, so that model
-cannot provide the approved migration-secret boundary.
+jobs inherit all environment variables from their base service, so Gate D uses
+separate temporary bootstrap and migration bases with disjoint allowlists.
 
 Do not use an API or dispatcher `preDeployCommand` requiring the migration
 credential. Do not run migration from a developer laptop or keep a migration
 service running.
 
-The external-resource proposal must select a protected release runner that:
+The repository-defined protected release runner:
 
-- pulls the same accepted digest as the runtime services;
-- receives only the migration credential;
+- must pull the same accepted digest as the runtime services;
+- receives only the migration credential for migration;
 - reaches PostgreSQL through approved TLS and network controls;
 - runs the `production,migration` profile and exits;
 - fails closed on bootstrap, Flyway, or startup failure; and
 - produces sanitized `EP-001` execution evidence.
+
+The bootstrap base receives only the bootstrap connection credential and the
+three one-time environment role passwords. The migration base receives only
+the migration connection credential. Both use the safe idle command as their
+ordinary process, are created only for a separately approved operation, and
+must be deleted no later than one hour after the job reaches a terminal state.
 
 If a GitHub-hosted runner cannot reach the selected database without weakening
 network policy, it is not acceptable. A private or provider-local alternative
@@ -288,6 +302,12 @@ From the repository root:
 ```text
 sh scripts/validate-render-adapter.sh
 sh scripts/test-validate-render-adapter.sh
+sh scripts/validate-render-job-adapter.sh
+sh scripts/test-validate-render-job-adapter.sh
+sh scripts/validate-staging-workflow.sh
+sh scripts/test-validate-staging-workflow.sh
+sh scripts/test-staging-job-contracts.sh
+sh scripts/test-validate-staging-evidence.sh
 sh scripts/validate-foundation.sh
 mvn verify
 ```
@@ -298,7 +318,11 @@ publication, provisioning, migration, or deployment.
 ## CC-001 state
 
 - Repository implementation: approved, merged through PR `#4`, and CI verified.
-- Evidence-record commit/push/draft pull request: approved.
+- Evidence record: accepted, merged through PR `#5`, and `main` CI verified.
+- Gate D staging-resource decisions: accepted 2026-07-26.
+- Gate D repository implementation: approved 2026-07-27; local validation in
+  progress.
 - Image publication and GitHub environment changes: not approved.
 - External resources and staging execution: not approved.
-- Next approval: evidence-record pull-request merge after review and green CI.
+- Next approval after local validation: commit, push, and draft pull request
+  for CI evidence.

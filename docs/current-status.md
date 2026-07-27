@@ -206,32 +206,81 @@ digest is
 `sha256:48a4f9b0f44703344bb9dcdc524c59f7fc6c355e4e3b5ae7ba018f87ea28cd11`.
 
 The evidence is recorded in `docs/phase-1-gate-c-evidence.md` and was
-explicitly accepted by the user on 2026-07-26. Publication and merge of the
-evidence-only record remain open.
+explicitly accepted by the user on 2026-07-26. Evidence PR `#5` passed CI run
+`30206614101`, job `89805704044`, and merged as
+`6cf89fa62464c9e2f16ca1df29a47748edebf6eb`. Post-merge `main` CI run
+`30207094828`, job `89806953729`, passed on that exact commit with 52 tests,
+zero HIGH/CRITICAL vulnerabilities, a passing full-history Gitleaks scan, and
+OCI manifest digest
+`sha256:bedff6884128fba53d1111563048af927443f20d6e43e53d1f3bd83f7e599400`.
+The Gate C repository record is therefore complete.
+
+The Gate D staging-resource proposal in
+`docs/phase-1-staging-resource-proposal.md` was accepted on 2026-07-26. Its
+accepted reusable decisions are `DR-001` migration isolation, `DR-002`
+application rate limiting, `DR-003` OCI rollback, and governed budget
+`R1-OPB-001`. The bounded implementation in
+`docs/phase-1-gate-d-repository-proposal.md` was explicitly approved on
+2026-07-27 for local repository work only. The canonical decision index is
+`docs/governance/README.md`.
+
+## Gate D repository implementation
+
+Gate D repository implementation is complete in the local working tree. Its
+approved scope adds:
+
+- isolated, short-lived Render bootstrap and migration job-base contracts;
+- staging wrappers for credential-safe PostgreSQL role bootstrap and the
+  existing Flyway migration profile;
+- an in-process, bounded Bucket4j/Caffeine API rate limiter by client address,
+  authenticated subject, authorized organization, metrics subject, endpoint
+  class, and process;
+- a strict trusted-proxy client-address boundary and RFC 9457 `429` responses;
+- a protected, manual, operation-specific staging workflow that binds every
+  operation to an accepted `main` CI run and exact OCI digest;
+- positive and tamper-rejection validation for runtime/job adapters, workflow
+  boundaries, staging job wrappers, and sanitized evidence; and
+- the Gate D `EP-001` evidence template, with every external execution item
+  still pending.
+
+No live staging operation has been dispatched. Java `21.0.12`/Maven `3.9.16`
+offline verification passes all 67 tests against Docker Engine `29.6.2` and
+PostgreSQL `17.10`, with zero Checkstyle or SpotBugs findings and successful
+PMD/JaCoCo completion. The foundation, adapter, workflow, job-contract,
+evidence-sanitization, Markdown-link, Actionlint, and Gitleaks checks pass.
+
+The local `linux/amd64` OCI build remains incomplete because Avast HTTPS
+inspection presents a generated certificate inside Linux containers that the
+pinned Alpine runtime does not trust. The build correctly stopped before
+`apk` fetched an index. No TLS or scanner control was weakened. Consequently,
+the Gate D OCI, CycloneDX, and Trivy results remain for later local
+revalidation or the separately approved CI evidence run. The user explicitly
+accepted this local-machine limitation on 2026-07-27 without accepting missing
+CI evidence or weakening any gate.
 
 ## What is not done
 
 - No Supabase or Render environment has been provisioned or changed.
 - Staging deployment and acceptance tests have not run.
 - No environment has applied the V2 database roles or runtime-profile
-  separation; rate limits, alerts, backups, restore drill, log drain, and
-  rollback rehearsal remain open.
+  separation; rate limits, alerts, backups, restore drill, log
+  routing/retention, and rollback rehearsal remain open.
 - The accepted CI-built OCI archive is retained only as a GitHub Actions
   artifact; it has not been published to an approved registry as a deployable
   digest.
-- The Gate C evidence-only repository record has not yet been reviewed and
-  merged.
+- Gate D repository validation, commit, push, PR, merge, and CI evidence are
+  not complete.
+- The repository implements the accepted `DR-001` and `DR-002` mechanisms
+  locally, but they have not been CI-verified, published, configured, or
+  exercised in staging. `DR-003` rollback evidence is also still pending.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-Commit and push the accepted evidence-only changes on
-`codex/phase-1-gate-c-evidence` and open the approved draft evidence pull
-request. Review and merge remain separate actions.
-
-After that record merges and `main` CI is green, the next design gate is the
-exact non-production external-resource proposal. Preparing or accepting the
-evidence record does not authorize any resource or execution action.
+The local Avast/Docker TLS limitation has been explicitly accepted. The exact
+next separate approval is to create `codex/phase-1-gate-d`, commit the local
+changes, push that branch, and open a draft pull request for authoritative CI
+evidence.
 
 Running the release workflow, creating a GitHub package or protected
 environment, publishing an OCI image, provisioning resources, deploying, or

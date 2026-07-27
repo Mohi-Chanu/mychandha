@@ -10,7 +10,9 @@ Gate B evidence accepted: 2026-07-26
 Gate C repository approval: Granted 2026-07-26
 Gate C implementation merge/CI: Passed 2026-07-26
 Gate C evidence acceptance: Granted 2026-07-26
-Gate C evidence-record merge: Pending
+Gate C evidence-record merge/CI: Passed 2026-07-26
+Gate D staging-resource decisions: Accepted 2026-07-26
+Gate D repository proposal: Prepared for review
 Phase 2: Blocked until this gate closes
 
 ## Purpose
@@ -445,9 +447,12 @@ The repository-change proposal covers:
 
 Gate A implements the runtime, migration, security-routine, contract, test, and
 developer-experience subset while preserving the existing product behavior and
-Phase 1 security invariants. Gate B is accepted. Gate C merged through PR `#4`,
-and both its pull-request and post-merge `main` CI passed. Explicit evidence
-acceptance and publication of the evidence-only record remain separate.
+Phase 1 security invariants. Gate B is accepted. Gate C merged through PR `#4`;
+its evidence was accepted, evidence PR `#5` merged, and resulting `main` CI
+passed. Gate D resource decisions were accepted on 2026-07-26 in
+`docs/phase-1-staging-resource-proposal.md`. The bounded implementation is
+proposed in `docs/phase-1-gate-d-repository-proposal.md` and remains
+unapproved.
 
 ## Approval sequence
 
@@ -460,10 +465,13 @@ acceptance and publication of the evidence-only record remain separate.
    2026-07-26 through PR `#4`.
 4. Verify pull-request and post-merge `main` CI — completed; evidence is
    recorded in `docs/phase-1-gate-c-evidence.md`.
-5. Explicitly accept Gate C evidence — completed 2026-07-26; publish and merge
-   its evidence record.
-6. Review and approve the exact external resource proposal.
-7. Provision non-production resources and execute staging acceptance.
-8. Review the Phase 1 exit report and explicitly close or reject Phase 1.
-9. If Phase 1 closes, request a separate approval to prepare the Phase 2
-   design.
+5. Explicitly accept Gate C evidence and merge its evidence record — completed
+   2026-07-26 through PR `#5`; resulting `main` CI passed.
+6. Review and approve or refine the exact Gate D staging resource proposal —
+   completed 2026-07-26.
+7. Review, separately approve, and implement the bounded Gate D repository
+   prerequisites in `docs/phase-1-gate-d-repository-proposal.md`.
+8. Separately approve non-production resources and staging execution.
+9. Review the Phase 1 exit report and explicitly close or reject Phase 1.
+10. If Phase 1 closes, request a separate approval to prepare the Phase 2
+    design.
