@@ -226,8 +226,10 @@ application rate limiting, `DR-003` OCI rollback, and governed budget
 
 ## Gate D repository implementation
 
-Gate D repository implementation is complete in the local working tree. Its
-approved scope adds:
+Gate D repository implementation is merged into `main` through PR `#6`.
+Implementation commit `7b124dd1cc19987de2322863f850da80f1645da2`
+merged as `cc75d0c3c59dc9d11ef748bff2f3633770854ffd`. Its approved
+scope adds:
 
 - isolated, short-lived Render bootstrap and migration job-base contracts;
 - staging wrappers for credential-safe PostgreSQL role bootstrap and the
@@ -249,14 +251,19 @@ PostgreSQL `17.10`, with zero Checkstyle or SpotBugs findings and successful
 PMD/JaCoCo completion. The foundation, adapter, workflow, job-contract,
 evidence-sanitization, Markdown-link, Actionlint, and Gitleaks checks pass.
 
-The local `linux/amd64` OCI build remains incomplete because Avast HTTPS
-inspection presents a generated certificate inside Linux containers that the
-pinned Alpine runtime does not trust. The build correctly stopped before
-`apk` fetched an index. No TLS or scanner control was weakened. Consequently,
-the Gate D OCI, CycloneDX, and Trivy results remain for later local
-revalidation or the separately approved CI evidence run. The user explicitly
-accepted this local-machine limitation on 2026-07-27 without accepting missing
-CI evidence or weakening any gate.
+PR CI run `30244571128`, job `89908695051`, passed before merge. The
+authoritative post-merge `main` run `30245195541`, job `89910592727`, then
+passed on the exact merge commit. It recorded 67 passing tests, zero
+Checkstyle violations, successful PMD/JaCoCo/SpotBugs analysis, full-history
+Gitleaks with no leaks, a retained `linux/amd64` OCI archive, CycloneDX `1.7`
+with 152 components, and zero Trivy HIGH/CRITICAL vulnerabilities or secrets.
+The accepted OCI manifest digest is
+`sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0`.
+The user explicitly accepted this repository CI evidence on 2026-07-27.
+
+The local Avast/Docker TLS limitation remains recorded as a workstation
+limitation. CI supplied the mandatory OCI, SBOM, and Trivy evidence without
+weakening TLS or scanner controls.
 
 ## What is not done
 
@@ -268,19 +275,21 @@ CI evidence or weakening any gate.
 - The accepted CI-built OCI archive is retained only as a GitHub Actions
   artifact; it has not been published to an approved registry as a deployable
   digest.
-- Gate D repository validation, commit, push, PR, merge, and CI evidence are
-  not complete.
 - The repository implements the accepted `DR-001` and `DR-002` mechanisms
-  locally, but they have not been CI-verified, published, configured, or
-  exercised in staging. `DR-003` rollback evidence is also still pending.
+  and they are repository/CI verified, but they have not been published,
+  configured, or exercised in staging. `DR-003` live rollback evidence is
+  still pending.
+- The accepted CI artifacts expire on 2026-08-10 unless a separately approved
+  publication or retention action occurs.
+- This evidence-only documentation update remains local and uncommitted.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-The local Avast/Docker TLS limitation has been explicitly accepted. The exact
-next separate approval is to create `codex/phase-1-gate-d`, commit the local
-changes, push that branch, and open a draft pull request for authoritative CI
-evidence.
+Gate D repository implementation and CI evidence are accepted. The exact next
+approval, after review of this local evidence-only update, is to create
+`codex/phase-1-gate-d-evidence`, commit the evidence-only changes, push the
+branch, and open a draft evidence pull request.
 
 Running the release workflow, creating a GitHub package or protected
 environment, publishing an OCI image, provisioning resources, deploying, or

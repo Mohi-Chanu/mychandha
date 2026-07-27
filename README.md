@@ -34,13 +34,17 @@ post-merge `main` CI. The
 [staging resource proposal](docs/phase-1-staging-resource-proposal.md) and its
 Gate D decisions were accepted on 2026-07-26. The bounded
 [Gate D repository proposal](docs/phase-1-gate-d-repository-proposal.md) is
-approved for local implementation as of 2026-07-27. The implementation is
-complete in the local working tree; its local results and pending execution
-checklist are [Gate D evidence](docs/phase-1-gate-d-evidence.md). The local OCI
-build remains blocked by the workstation's Avast/Docker TLS interception path.
-The user accepted that local limitation on 2026-07-27 without waiving the
-authoritative CI gates. This approval does not authorize a commit, publication,
-provider change, migration, deployment, or staging execution.
+implemented and merged through PR `#6` as
+`cc75d0c3c59dc9d11ef748bff2f3633770854ffd`. Post-merge `main` CI run
+`30245195541` passed, and its repository evidence was explicitly accepted on
+2026-07-27. The retained OCI manifest digest is
+`sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0`;
+CycloneDX generation, full-history Gitleaks, and Trivy with zero
+HIGH/CRITICAL vulnerabilities and zero secrets passed. Full results and the
+still-pending external execution checklist are in
+[Gate D evidence](docs/phase-1-gate-d-evidence.md). This acceptance does not
+authorize registry publication, provider changes, migration, deployment, or
+staging execution.
 
 Engineering standards are recorded in the [ADR index](docs/adr/README.md),
 [module boundaries](docs/module-boundaries.md),

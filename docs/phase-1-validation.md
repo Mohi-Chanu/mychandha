@@ -197,7 +197,7 @@ recorded:
 No Supabase or Render resources were provisioned during the local validation
 pass.
 
-## Gate D repository validation
+## Gate D repository and accepted CI validation
 
 The bounded Gate D repository implementation was approved on 2026-07-27.
 Java `21.0.12`/Maven `3.9.16` verification passes 67 tests with Docker Engine
@@ -208,11 +208,29 @@ Markdown-link, and source/history Gitleaks checks pass.
 
 The local OCI build stopped securely when Avast HTTPS inspection supplied an
 untrusted generated certificate to the pinned Alpine container while `apk`
-requested its signed package index. The image, CycloneDX, and Trivy gates have
-therefore not completed locally and must be rerun after the local Docker trust
-path is corrected or in the separately approved CI evidence run. The user
-accepted this local-machine limitation on 2026-07-27; this does not waive or
-pre-accept the corresponding CI gates.
+requested its signed package index. The user accepted this local-machine
+limitation on 2026-07-27 without weakening or waiving any gate.
+
+Gate D implementation commit
+`7b124dd1cc19987de2322863f850da80f1645da2` passed PR `#6` CI run
+`30244571128`, job `89908695051`. PR `#6` merged as
+`cc75d0c3c59dc9d11ef748bff2f3633770854ffd`, and post-merge `main` run
+`30245195541`, job `89910592727`, passed on that exact commit.
+
+The accepted post-merge run recorded:
+
+- 67 tests with zero failures, errors, or skips;
+- zero Checkstyle violations and successful PMD, JaCoCo, and SpotBugs;
+- Gitleaks `8.30.1` over 19 full-history commits with no leaks;
+- a retained `linux/amd64` OCI archive with manifest digest
+  `sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0`;
+- CycloneDX `1.7` with 152 components;
+- Trivy `0.72.0` with zero HIGH/CRITICAL vulnerabilities and zero secrets; and
+- successful commit/run/digest and file-checksum verification.
+
+The user explicitly accepted this repository CI evidence on 2026-07-27. The
+artifacts expire on 2026-08-10 unless a separately approved action retains or
+publishes them.
 
 No result in this section is staging evidence. The pending execution package
 is `docs/phase-1-gate-d-evidence.md`, and no external action is authorized.
