@@ -2,7 +2,7 @@
 
 Status: Open
 Recommendation: **DO NOT PROCEED TO PHASE 2**
-Last updated: 2026-07-26
+Last updated: 2026-07-27
 
 ## Scope
 
@@ -18,15 +18,15 @@ behavior.
 | Area | Status | Evidence or blocker |
 |---|---|---|
 | Foundation source | Passed | Implemented on `main` |
-| Automated tests and static analysis | Passed | Gate C post-merge `main` run `30204430920` |
-| OCI image build | Passed | Retained OCI archive from run `30204430920` |
-| CycloneDX SBOM | Passed | Gate C verification artifact |
-| HIGH/CRITICAL vulnerability gate | Passed | Zero findings in the Gate C Trivy scope |
-| Explicit secret-scanning gate | Passed and accepted | Blocking, pinned full-history Gitleaks passed in post-merge `main` run `30204430920` |
+| Automated tests and static analysis | Passed | Gate D post-merge `main` run `30245195541` |
+| OCI image build | Passed | Retained OCI archive from run `30245195541` |
+| CycloneDX SBOM | Passed | Gate D CycloneDX `1.7` artifact with 152 components |
+| HIGH/CRITICAL vulnerability gate | Passed | Zero findings in the Gate D Trivy scope |
+| Explicit secret-scanning gate | Passed and accepted | Full-history Gitleaks and OCI secret scanning passed in post-merge `main` run `30245195541` |
 | Readiness design package | Approved | `docs/phase-1-platform-foundation-readiness.md` |
-| Repository-change proposal | Gate A, Gate B, and Gate C complete | Gate D repository implementation approved 2026-07-27; local validation in progress |
+| Repository-change proposal | Gate A through Gate D repository work complete | Gate D merged through PR `#6`; post-merge CI evidence accepted 2026-07-27 |
 | Runtime database-role separation | CI verified | V2 roles, routines, and runtime profiles passed the Docker-backed integration suite; deployment evidence remains open |
-| Immutable CI artifact | Passed and accepted | Verified OCI archive retained from `main` run `30166358486`; nothing published |
+| Immutable CI artifact | Passed and accepted | Verified Gate D OCI archive retained from `main` run `30245195541`; nothing published |
 | Non-production resources | Not started | External approval not granted |
 | Staging deployment | Not started | Depends on design, repository, and external approvals |
 | Staging security acceptance | Not started | No Supabase/Render staging environment |
@@ -75,6 +75,18 @@ tests, full-history Gitleaks, and zero HIGH/CRITICAL Trivy findings. Its OCI
 manifest digest is
 `sha256:bedff6884128fba53d1111563048af927443f20d6e43e53d1f3bd83f7e599400`.
 
+Gate D evidence is `docs/phase-1-gate-d-evidence.md`. Implementation commit
+`7b124dd1cc19987de2322863f850da80f1645da2` passed PR `#6` CI run
+`30244571128`, job `89908695051`, and merged as
+`cc75d0c3c59dc9d11ef748bff2f3633770854ffd`. Post-merge `main` run
+`30245195541`, job `89910592727`, passed on that exact commit with 67 tests,
+zero failures/errors/skips, static analysis, PostgreSQL integration tests,
+full-history Gitleaks with no leaks, OCI construction, CycloneDX `1.7`, and
+zero Trivy HIGH/CRITICAL vulnerabilities or secrets. The retained OCI manifest
+digest is
+`sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0`.
+The user explicitly accepted this repository CI evidence on 2026-07-27.
+
 ## Security
 
 Implemented automated controls include JWT claim validation, membership and
@@ -107,8 +119,8 @@ Production targets remain:
   integration suite but have not been applied to a staging environment.
 - The Render adapter is a non-live example with placeholders; exact provider
   conformance, materialization, and staging behavior remain unverified.
-- The latest accepted-record CI-built OCI archive from `main` run
-  `30207094828` expires on 2026-08-09 unless retained through a later approved
+- The latest accepted Gate D CI-built OCI archive from `main` run
+  `30245195541` expires on 2026-08-10 unless retained through a later approved
   promotion or evidence policy.
 - The CI-built image is not yet published to an approved registry as an
   immutable deployable digest.
@@ -133,13 +145,12 @@ later external-resource and execution approvals.
 
 ## Pending approvals
 
-The readiness design, Gate A, Gate B repository implementation/CI evidence,
-and Gate C repository implementation/CI evidence are approved and fully
-recorded on `main`. Pending approvals or evidence are:
+The readiness design and Gate A through Gate D repository implementation/CI
+evidence are approved. Gate D implementation is on `main`; its evidence-only
+record update remains local. Pending approvals or evidence are:
 
-- Gate D repository validation, commit/push/PR, CI evidence, and merge for
-  accepted `DR-001` bootstrap/migration isolation, `DR-002` rate limiting,
-  `DR-003` evidence, and acceptance automation;
+- Gate D evidence-only branch, commit, push, draft PR, merge, and resulting
+  evidence-record CI;
 - GitHub package creation, protected-environment configuration, or
   release-workflow execution;
 - current provider checkout confirmation, spending, exact non-production
@@ -168,8 +179,11 @@ recorded on `main`. Pending approvals or evidence are:
 - [x] Gate C evidence record merged and resulting `main` CI green.
 - [x] Exact staging resource proposal decisions approved.
 - [x] Bounded Gate D repository proposal approved.
-- [ ] Gate D repository implementation fully validated locally.
-- [ ] Gate D committed, pushed, opened as a draft PR, and CI verified.
+- [x] Gate D repository implementation fully validated locally.
+- [x] Gate D committed, pushed, opened as draft PR `#6`, merged, and
+      post-merge CI verified.
+- [x] Gate D repository CI evidence explicitly accepted.
+- [ ] Gate D evidence-only record merged and resulting `main` CI green.
 - [ ] Staging deployment ready.
 - [ ] Identity and tenant-isolation acceptance passed.
 - [ ] Audit, idempotency, inbox, and outbox acceptance passed.
@@ -182,8 +196,8 @@ recorded on `main`. Pending approvals or evidence are:
 
 **Proceed to Phase 2: NO**
 
-Next action: complete and review local Gate D repository validation. Commit,
-push, and draft-PR publication require a separate approval. Do not execute the
-release workflow, create or configure GitHub package/environment resources,
-publish an image, or provision external resources without their separate
-approvals.
+Next action: review the local Gate D evidence-only documentation update.
+Creating its branch, committing, pushing, and opening a draft evidence PR
+require separate approval. Do not execute the release workflow, create or
+configure GitHub package/environment resources, publish an image, or provision
+external resources without their separate approvals.

@@ -1,6 +1,6 @@
 # Phase 1 Gate D evidence package
 
-Status: Repository implementation locally accepted with documented OCI limitation; external execution not started
+Status: Repository implementation and post-merge CI evidence accepted; external execution not started
 Gate: Phase 1 Gate D — staging execution and acceptance
 Evidence package: `EP-001`
 Deployment contract: `MCDC-001` version `1`
@@ -14,12 +14,16 @@ Last updated: 2026-07-27
 |---|---|---|
 | Gate and evidence version | Passed | Gate D; `EP-001-GATE-D-1` |
 | Repository | Passed | `Mohi-Chanu/mychandha` |
-| Repository implementation branch | Pending | Commit/push approval has not been granted |
-| Full implementation commit | Pending | No Gate D implementation commit exists yet |
-| Pull request and merge commit | Pending | No Gate D implementation PR exists yet |
-| CI run, job, attempt, and timestamps | Pending | Requires a separately approved push and PR |
+| Repository implementation branch | Passed | `codex/phase-1-gate-d` |
+| Baseline commit | Passed | `6cf89fa62464c9e2f16ca1df29a47748edebf6eb` |
+| Full implementation commit | Passed | `7b124dd1cc19987de2322863f850da80f1645da2` |
+| Pull request and merge commit | Passed | PR `#6`; merged as `cc75d0c3c59dc9d11ef748bff2f3633770854ffd` on 2026-07-27 |
+| Pull-request merge-test commit | Passed | `6bcf88febe5d19ec8c6ea9c6ff9f0ef2db783724` |
+| Pull-request CI | Passed | `CI` run `30244571128`, run number `23`, job `89908695051`, attempt `1`; 2026-07-27 07:00:16Z through 07:03:13Z |
+| Post-merge `main` CI | Passed and accepted | `CI` run `30245195541`, run number `24`, job `89910592727`, attempt `1`; 2026-07-27 07:10:45Z through 07:14:43Z |
 | External environment and resources | Pending | No staging resource has been provisioned or changed |
-| Evidence retention and deletion owner | Pending | Must be approved with the protected environment and provider resources |
+| Evidence retention and deletion owner | Passed for repository CI | GitHub Actions artifacts retained for 14 days through 2026-08-10; accessible to authorized repository users and deletable by an authorized repository operator |
+| Evidence recorder and acceptor | Passed | Codex-assisted record; repository CI evidence explicitly accepted by `Mohi-Chanu` on 2026-07-27 |
 
 ## Scope and approval
 
@@ -27,10 +31,11 @@ Last updated: 2026-07-27
 |---|---|---|
 | Staging-resource decisions | Passed | `docs/phase-1-staging-resource-proposal.md`; accepted 2026-07-26 |
 | Repository implementation proposal | Passed | `docs/phase-1-gate-d-repository-proposal.md`; approved 2026-07-27 |
-| Repository implementation | Passed locally | Local working tree only; no commit created |
+| Repository implementation | Passed and merged | Implementation commit `7b124dd1cc19987de2322863f850da80f1645da2`; PR `#6`; merge commit `cc75d0c3c59dc9d11ef748bff2f3633770854ffd` |
+| Repository CI evidence | Passed and accepted | Post-merge `main` run `30245195541`, job `89910592727`; explicitly accepted 2026-07-27 |
 | Non-goals preserved | Passed | No Redis, Kafka, Key Value, Workflow, extra database, or Phase 2 behavior |
 | External action authorization | Pending | Not granted |
-| Unapproved actions not performed | Passed | No commit, push, publication, protected environment, provider mutation, migration, or deployment |
+| Unapproved actions not performed | Passed | No package publication, protected-environment change, provider mutation, migration, deployment, or staging execution |
 | Deviations | Passed | None from the approved repository scope |
 
 ## Repository source and validation
@@ -46,29 +51,98 @@ Last updated: 2026-07-27
 | Bootstrap/migration wrapper validation | Passed | Synthetic missing-input, TLS, command, and credential-boundary tests |
 | Evidence schema and sanitization validation | Passed | jq `1.8.1`; positive and tamper-rejection fixtures |
 | Foundation structural validation | Passed | `scripts/validate-foundation.sh` |
-| Secret scanning | Passed | Pinned Gitleaks `8.30.1`: 18 commits and source-only current tree, no leaks |
+| Secret scanning | Passed | Pinned Gitleaks `8.30.1`: local source/history checks passed; post-merge CI scanned 19 commits and found no leaks |
 | Whitespace and Markdown-link validation | Passed | `git diff --check`; all local Markdown targets resolve |
-| OCI build, SBOM, and Trivy | Accepted local limitation | Avast HTTPS interception presents an untrusted generated CA inside Linux containers; `apk` cannot securely fetch Alpine indexes. The user accepted this local limitation on 2026-07-27; authoritative CI evidence remains required |
+| OCI build, SBOM, and Trivy | Passed in authoritative CI | Post-merge `main` run `30245195541` built the retained `linux/amd64` OCI archive, generated CycloneDX `1.7`, and recorded zero Trivy HIGH/CRITICAL vulnerabilities and zero secrets |
+| Local OCI limitation | Accepted without waiver | Avast HTTPS interception presents an untrusted generated CA inside Linux containers; the user accepted this workstation limitation on 2026-07-27. CI supplied the mandatory evidence without weakening TLS or scanner controls |
 
 ## Artifact and supply chain
 
-Every release item in this section remains `Pending` until a separately
-approved commit/push/PR produces an accepted post-merge `main` artifact. A
-local `linux/amd64` build was attempted, but it stopped before package
-installation because Docker Desktop's Linux network path received an
-Avast-generated TLS certificate that the pinned image correctly rejected. No
-certificate check or vulnerability gate was weakened. The user accepted this
-local-machine limitation on 2026-07-27. This acceptance does not mark the OCI,
-SBOM, or Trivy evidence as passed; those remain mandatory in the later
-authoritative CI evidence package.
+The local build stopped before package installation because Docker Desktop's
+Linux network path received an Avast-generated TLS certificate that the pinned
+image correctly rejected. No certificate or scanner control was weakened. The
+accepted post-merge CI run supplied the mandatory provider-independent build
+and security evidence.
 
-- [ ] Exact `linux/amd64` OCI manifest digest
-- [ ] Source commit-to-artifact binding
-- [ ] OCI archive checksum
-- [ ] CycloneDX SBOM and checksum
-- [ ] Gitleaks full-history result and evidence checksum
-- [ ] Trivy HIGH/CRITICAL result and report checksum
-- [ ] Evidence-manifest checksum and verification
+### Pull-request CI evidence
+
+PR `#6` tested branch head
+`7b124dd1cc19987de2322863f850da80f1645da2` through synthetic merge commit
+`6bcf88febe5d19ec8c6ea9c6ff9f0ef2db783724`.
+
+| Field | Evidence |
+|---|---|
+| Workflow/run | `CI` run `30244571128`, run number `23`, attempt `1` |
+| Event and time | `pull_request`; 2026-07-27 07:00:16Z through 07:03:13Z |
+| Job | `verify`, job `89908695051` |
+| Result | Success |
+| Tests and analysis | 67 tests; zero failures/errors/skips; Checkstyle zero; PMD, JaCoCo, and SpotBugs passed |
+| Secret scan | Gitleaks `8.30.1`; full Git history; 19 commits; no leaks |
+| OCI platform and digest | `linux/amd64`; `sha256:7aa589746960ea13150ff7435288520599381db0893073fc00a6fc5f42946aba` |
+| SBOM and Trivy | CycloneDX generated; zero HIGH/CRITICAL vulnerabilities and zero secrets |
+| Evidence verification | Source/run/digest and all recorded hashes passed |
+
+The pull-request artifacts expire on 2026-08-10:
+
+| Artifact | Artifact ID | GitHub artifact digest |
+|---|---:|---|
+| `verification-reports` | `8644544262` | `sha256:36663a3e5b916275a43de14da3b0eea2e35ebcfb1a1548035060036890098b6e` |
+| `mychandha-oci-6bcf88febe5d19ec8c6ea9c6ff9f0ef2db783724` | `8644545660` | `sha256:c4935847c0dbf997d1df05aae93fe9b133be108a2def675268715d5445aed922` |
+
+### Accepted post-merge `main` CI evidence
+
+PR `#6` merged into `main` as
+`cc75d0c3c59dc9d11ef748bff2f3633770854ffd`. The user explicitly accepted the
+following repository CI evidence on 2026-07-27:
+
+| Field | Evidence |
+|---|---|
+| Workflow/run | `CI` run `30245195541`, run number `24`, attempt `1` |
+| Event and time | `push` to `main`; 2026-07-27 07:10:45Z through 07:14:43Z |
+| Initiator | `Mohi-Chanu` |
+| Job | `verify`, job `89910592727` |
+| Result | Success |
+| Java and build | Temurin Java 21; Maven `verify`; `BUILD SUCCESS` |
+| Tests | 67 tests across 21 report files; zero failures, errors, or skips |
+| PostgreSQL | Pinned PostgreSQL 17 service and PostgreSQL/Testcontainers integration suites passed |
+| Static analysis | Checkstyle zero violations; PMD `7.17.0`; JaCoCo generated; SpotBugs passed |
+| Secret scan | Gitleaks `8.30.1`; full Git history; 19 commits; `result=passed` |
+| OCI platform | `linux/amd64`; OCI layout `1.0.0` |
+| OCI media types | `application/vnd.oci.image.index.v1+json`; `application/vnd.oci.image.manifest.v1+json` |
+| OCI manifest digest | `sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0` |
+| SBOM | CycloneDX `1.7`; 152 components |
+| Vulnerability and secret scan | Trivy `0.72.0`; zero HIGH/CRITICAL vulnerabilities; zero secrets |
+| Evidence verification | Manifest commit/run/digest and all recorded file hashes independently matched |
+
+The `main` digest is the only Gate D candidate eligible for a later,
+separately approved no-rebuild publication. The pull-request digest must not
+be used as a deployment identity.
+
+### Retained `main` artifact index
+
+| Artifact | Artifact ID | GitHub artifact digest | Expiry |
+|---|---:|---|---|
+| `verification-reports` | `8644791692` | `sha256:cf9a0ea66b05c68c2234d31cb9cfae6050e81233dd4dc73d8097aee42e2dc5f5` | 2026-08-10 07:14:28Z |
+| `mychandha-oci-cc75d0c3c59dc9d11ef748bff2f3633770854ffd` | `8644793537` | `sha256:0c329ca4668315f47be6e85ef834ab71106529ad7a4b49c8e51c802a80f7b995` | 2026-08-10 07:14:30Z |
+
+The retained OCI artifact contains:
+
+| File | SHA-256 | Sensitivity |
+|---|---|---|
+| `mychandha.oci.tar` | `80238d287f564fb463742061e6130f48ac8072ee74a4d6d684ff25305fc9213b` | Internal build artifact |
+| `image-metadata.json` | `b4721127ca44d861d3bb14481f311f01371327b33bb8d6cfcd969b52d6c2fd2a` | Sanitized internal metadata |
+| `release-evidence.json` | `1f214fb2f15a679b8b7ac2ae6708ae00689ad864903c53bd4e38fb37c45ead5e` | Sanitized evidence |
+| `mychandha.cdx.json` | `4d4ef1bd32da005da1f0f017f1b42c95c8476a11a13c6ac5607aa7464d7ac439` | Internal dependency inventory |
+| `trivy-vulnerability-report.json` | `5e3397453916100784c32d52293e5ae85f47348d55405a3ce8e2695229b7af5f` | Sanitized security evidence |
+| `gitleaks-evidence.txt` | `c0cae7cf926c1893cc803cb4e6907a7249589003fd249dd22d126b01db5cfff4` | Sanitized security evidence |
+
+- [x] Exact `linux/amd64` OCI manifest digest
+- [x] Source commit-to-artifact binding
+- [x] OCI archive checksum
+- [x] CycloneDX SBOM and checksum
+- [x] Gitleaks full-history result and evidence checksum
+- [x] Trivy HIGH/CRITICAL and secret results and report checksum
+- [x] Evidence-manifest verification
 - [ ] No-rebuild GHCR publication record
 - [ ] Current and rollback digest retention
 
@@ -151,14 +225,23 @@ data are excluded.
 
 ## Acceptance record
 
-- [ ] All blocking `EP-001` items passed
-- [ ] Every not-applicable item has an accepted reason
-- [ ] Findings are resolved or explicitly dispositioned
-- [ ] Residual-risk owner and review date are recorded
-- [ ] Evidence integrity is verified
-- [ ] Gate D evidence is explicitly accepted
+- [x] Repository implementation and applicable repository CI items passed
+- [x] Repository non-goals and `CC-001` boundaries preserved
+- [x] Repository CI evidence integrity independently verified
+- [x] Gate D repository CI evidence explicitly accepted on 2026-07-27
+- [x] External execution items remain identified as pending rather than waived
+- [ ] All blocking staging `EP-001` items passed
+- [ ] Every external not-applicable item has an accepted reason
+- [ ] External findings and residual risks are resolved or dispositioned
+- [ ] Full Gate D staging evidence is explicitly accepted
 - [ ] Phase 1 closure is explicitly approved
 
-Green repository CI, successful deployment, or this evidence template alone
-does not accept Gate D. The next approval after local implementation
-validation is the separate commit/push/draft-PR approval.
+The accepted repository CI evidence closes only the Gate D repository
+implementation sub-gate. It does not authorize or accept registry publication,
+protected-environment configuration, provider resources, migration,
+deployment, live acceptance, Gate D closure, Phase 1 closure, or Phase 2.
+
+This evidence-only update remains local. Its next approval is the separate
+branch/commit/push/draft-PR authorization for the evidence record. After that
+record is merged and revalidated, external-resource and staging-execution
+approvals remain separately required.

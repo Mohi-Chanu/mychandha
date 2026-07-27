@@ -53,8 +53,11 @@ The gate uses separate approvals:
 6. Gate D staging-resource and execution-readiness decisions — accepted
    2026-07-26 in `docs/phase-1-staging-resource-proposal.md`;
 7. bounded repository prerequisites in
-   `docs/phase-1-gate-d-repository-proposal.md` — implementation approved
-   2026-07-27; local implementation and validation in progress;
+   `docs/phase-1-gate-d-repository-proposal.md` — implementation approved,
+   merged through PR `#6` as
+   `cc75d0c3c59dc9d11ef748bff2f3633770854ffd`, post-merge `main` CI run
+   `30245195541` passed, and repository CI evidence was explicitly accepted
+   2026-07-27; local evidence-record update in progress;
 8. separately approve external resources and execute staging acceptance; and
 9. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.
 
