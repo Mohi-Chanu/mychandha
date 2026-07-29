@@ -100,6 +100,9 @@ printf '%s\n' "$bootstrap" | grep -q 'BOOTSTRAP_DATABASE_PASSWORD:.*secrets\.' \
   || fail "bootstrap credential mapping is missing"
 printf '%s\n' "$bootstrap" | grep -q 'MYCHANDHA_STAGING_MIGRATION_PASSWORD:.*secrets\.' \
   || fail "bootstrap role-secret mapping is missing"
+printf '%s\n' "$bootstrap" \
+  | grep -q 'SUPABASE_DATABASE_CA_CERTIFICATE:.*secrets\.' \
+  || fail "bootstrap CA material mapping is missing"
 if printf '%s\n' "$bootstrap" | grep -Eq \
   'MIGRATION_DATABASE_(URL|USERNAME|PASSWORD):|API_DATABASE_|DISPATCHER_DATABASE_'; then
   fail "bootstrap job mixes a runtime or migration connection credential"
@@ -107,6 +110,9 @@ fi
 
 printf '%s\n' "$migrate" | grep -q 'MIGRATION_DATABASE_PASSWORD:.*secrets\.' \
   || fail "migration credential mapping is missing"
+printf '%s\n' "$migrate" \
+  | grep -q 'SUPABASE_DATABASE_CA_CERTIFICATE:.*secrets\.' \
+  || fail "migration CA material mapping is missing"
 if printf '%s\n' "$migrate" | grep -Eq \
   'BOOTSTRAP_DATABASE_|MYCHANDHA_STAGING_.*_PASSWORD|API_DATABASE_|DISPATCHER_DATABASE_'; then
   fail "migration job mixes another credential class"
@@ -117,6 +123,13 @@ for block_name in deploy rollback cleanup; do
   if printf '%s\n' "$block" | grep -Eq \
     'DATABASE_|STAGING_.*_TOKEN|MYCHANDHA_STAGING_.*_PASSWORD'; then
     fail "${block_name} job receives an unrelated credential class"
+  fi
+done
+for block_name in deploy rollback cleanup acceptance; do
+  eval "block=\$$block_name"
+  if printf '%s\n' "$block" | grep -q \
+    'SUPABASE_DATABASE_CA_CERTIFICATE'; then
+    fail "${block_name} job receives CA material"
   fi
 done
 if printf '%s\n' "$acceptance" | grep -Eq \

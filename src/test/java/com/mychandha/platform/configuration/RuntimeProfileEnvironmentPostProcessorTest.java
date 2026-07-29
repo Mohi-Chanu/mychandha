@@ -3,11 +3,18 @@ package com.mychandha.platform.configuration;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.SpringApplication;
 import org.springframework.mock.env.MockEnvironment;
 
 class RuntimeProfileEnvironmentPostProcessorTest {
+
+    @TempDir
+    Path temporaryDirectory;
 
     private final RuntimeProfileEnvironmentPostProcessor processor =
             new RuntimeProfileEnvironmentPostProcessor();
@@ -70,6 +77,81 @@ class RuntimeProfileEnvironmentPostProcessorTest {
     void acceptsExactlyOneConfiguredRuntime() {
         assertThatCode(() -> validate(configured("migration")))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    void rejectsProductionWithoutVerifyFullAndRootCertificate() {
+        MockEnvironment environment = configured("production", "migration");
+
+        assertThatThrownBy(() -> validate(environment))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("verify-full");
+    }
+
+    @Test
+    void rejectsProductionWithMissingRootCertificateFile() {
+        MockEnvironment environment = configured("production", "migration");
+        environment.setProperty(
+                "spring.datasource.hikari.data-source-properties.sslmode",
+                "verify-full");
+        environment.setProperty(
+                "spring.datasource.hikari.data-source-properties.sslrootcert",
+                temporaryDirectory.resolve("missing.crt").toString());
+
+        assertThatThrownBy(() -> validate(environment))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("absolute readable file");
+    }
+
+    @Test
+    void rejectsProductionWithRelativeRootCertificatePath() {
+        MockEnvironment environment = configured("production", "migration");
+        environment.setProperty(
+                "spring.datasource.hikari.data-source-properties.sslmode",
+                "verify-full");
+        environment.setProperty(
+                "spring.datasource.hikari.data-source-properties.sslrootcert",
+                "supabase-ca.crt");
+
+        assertThatThrownBy(() -> validate(environment))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("absolute readable file");
+    }
+
+    @Test
+    void rejectsProductionDatabaseUrlTlsOverrides() throws IOException {
+        Path certificate = temporaryDirectory.resolve("supabase-ca.crt");
+        Files.writeString(certificate, "test-ca");
+        MockEnvironment environment = configured("production", "migration");
+        environment.setProperty(
+                "spring.datasource.url",
+                "jdbc:postgresql://database:5432/mychandha?SSLMODE=require");
+        environment.setProperty(
+                "spring.datasource.hikari.data-source-properties.sslmode",
+                "verify-full");
+        environment.setProperty(
+                "spring.datasource.hikari.data-source-properties.sslrootcert",
+                certificate.toAbsolutePath().toString());
+
+        assertThatThrownBy(() -> validate(environment))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("must not override");
+    }
+
+    @Test
+    void acceptsProductionWithVerifyFullAndReadableRootCertificate()
+            throws IOException {
+        Path certificate = temporaryDirectory.resolve("supabase-ca.crt");
+        Files.writeString(certificate, "test-ca");
+        MockEnvironment environment = configured("production", "migration");
+        environment.setProperty(
+                "spring.datasource.hikari.data-source-properties.sslmode",
+                "verify-full");
+        environment.setProperty(
+                "spring.datasource.hikari.data-source-properties.sslrootcert",
+                certificate.toAbsolutePath().toString());
+
+        assertThatCode(() -> validate(environment)).doesNotThrowAnyException();
     }
 
     @Test

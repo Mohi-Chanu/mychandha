@@ -1,12 +1,12 @@
 # Phase 1 Gate D evidence package
 
-Status: Repository implementation and post-merge CI evidence accepted; external execution not started
+Status: Base Gate D evidence accepted; provider remediation locally validated; external execution not started
 Gate: Phase 1 Gate D — staging execution and acceptance
 Evidence package: `EP-001`
 Deployment contract: `MCDC-001` version `1`
 Change control: `CC-001`
 Decisions: `DR-001`, `DR-002`, `DR-003`, `R1-OPB-001`
-Last updated: 2026-07-27
+Last updated: 2026-07-29
 
 ## Package identity
 
@@ -37,6 +37,48 @@ Last updated: 2026-07-27
 | External action authorization | Pending | Not granted |
 | Unapproved actions not performed | Passed | No package publication, protected-environment change, provider mutation, migration, deployment, or staging execution |
 | Deviations | Passed | None from the approved repository scope |
+
+## Provider-conformance remediation repository evidence
+
+The user accepted `PF-R-001` through `PF-R-004`,
+`PF-EX-001`/`PF-EX-002`, and then explicitly approved implementation of only
+the bounded repository scope on 2026-07-29. The implementation remains local.
+Commit, push, pull request, workflow execution, publication, provider changes,
+spending, and deployment are not authorized.
+
+| Control | Local repository implementation | Evidence state |
+|---|---|---|
+| `PF-R-001` | Explicit `direct`, `trusted-proxy-cidr`, and `render-edge-first-hop` strategies; bounded first-hop parsing; safe socket-peer fallback; fixed-cardinality anomaly metric; readiness degradation; Render adapter and spoof-resistance checks | Local tests and repository validation passed |
+| `PF-R-002` | Per-process absolute readable CA-file inputs; code-owned `verify-full`; URL override rejection; `PGSSLROOTCERT`; Render secret-file materialization contract; non-root group `1000`; sanitized checksum evidence | Local tests and repository validation passed; live TLS pending |
+| `PF-R-003` | `Mohi-Chanu` sole Render owner and `hazwaTech` GitHub-mediated reviewer boundary recorded under `PF-EX-001`; no shared account or key | Repository documentation complete; account evidence pending |
+| `PF-R-004` | Native owner-notification and two-person bounded-check matrix recorded under `PF-EX-002` | Repository documentation complete; live route/check evidence pending |
+| Scope guard | No dependency, SQL migration, domain behavior, REST API, extra service, monitoring provider, Redis, worker tier, or budget change | Local validation passed |
+
+Local validation on 2026-07-29 recorded:
+
+- Java `21.0.12`, Maven `3.9.16`, and Docker Engine `29.6.2`;
+- `mvn -B -o verify`: 80 tests, zero failures/errors/skips, PostgreSQL
+  `17.10` Testcontainers integration, Checkstyle zero, PMD, JaCoCo, and
+  SpotBugs zero findings;
+- resolver, production-startup, health degradation/recovery, TLS URL-override,
+  missing-file, adapter, wrapper, workflow, and evidence tamper tests;
+- `scripts/validate-foundation.sh`, POSIX shell syntax, Actionlint `1.7.12`,
+  Markdown local links, `git diff --check`, pinned Gitleaks `8.30.1` full
+  history and changed/new working files; and
+- an ephemeral pinned-runtime check proving `mychandha` remains non-root and
+  belongs to Render secret-file group `1000`.
+
+The local `linux/amd64` OCI build again stopped at Alpine package retrieval
+because the Linux container received the known Avast-generated CA and rejected
+it. No TLS or scanner control was weakened. Consequently, local OCI, CycloneDX,
+and Trivy results remain unavailable and must be supplied by authoritative CI.
+
+The accepted historical OCI digest
+`sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0`
+predates these remediations and is no longer deployment-eligible if this
+implementation is accepted. It remains immutable historical evidence. A new
+post-merge `main` OCI digest, SBOM, Gitleaks result, Trivy result, and explicit
+evidence acceptance are required before any later publication or deployment.
 
 ## Repository source and validation
 
@@ -174,6 +216,11 @@ provisioning, and deployment.
 - [ ] Process/profile and credential-class mapping
 - [ ] Configuration inventory without values
 - [ ] TLS, network allowlist, and forwarded-address overwrite verification
+- [ ] `render-edge-first-hop` materialization and forged-header bucket proof
+- [ ] `/etc/secrets/supabase-ca.crt` filename and expected SHA-256 checksum
+- [ ] API, dispatcher, bootstrap, and migration CA readability
+- [ ] Positive `verify-full` connection and wrong-CA rejection for every path
+- [ ] Render sole-owner availability and GitHub-mediated backup-role evidence
 - [ ] Migration completed before runtime rollout
 - [ ] API readiness and dispatcher process state
 - [ ] Deployment event identifiers and routing acceptance timestamp
@@ -190,6 +237,8 @@ Repository tests do not substitute for live acceptance.
 - [ ] Organization rate-limit live proof or an accepted bounded test method
 - [ ] `429` RFC 9457 response, stable code, correlation ID, and `Retry-After`
 - [ ] Render forwarded-address overwrite and spoof-resistance proof
+- [ ] Missing, duplicate, malformed, overlong, and over-depth header behavior
+- [ ] Client-address anomaly metric and readiness degradation/recovery
 - [ ] Audit-chain recomputation
 - [ ] Idempotent replay and mismatch behavior
 - [ ] Inbox duplicate and payload-substitution behavior
@@ -202,6 +251,14 @@ Every item remains `Pending` until separately approved provider execution.
 
 - [ ] Liveness, readiness, startup, durable-delivery, and dispatcher signals
 - [ ] Protected metrics and alert test
+- [ ] Render native deploy, pull, health, and one-off-job notification routes
+- [ ] Each native event destination, receipt timestamp, and recovery timestamp
+- [ ] Dispatcher, backlog, dead-letter, denial, database, backup, and restore
+      bounded-check results
+- [ ] `Mohi-Chanu` evidence record and `hazwaTech` review for every bounded
+      check
+- [ ] Sanitized provider-log review completed within 24 hours
+- [ ] `PF-EX-001`/`PF-EX-002` expiry and termination-condition revalidation
 - [ ] Log route, retention, redaction, and access review
 - [ ] Backup status and retention
 - [ ] In-place restore drill and integrity result
@@ -230,6 +287,10 @@ data are excluded.
 - [x] Repository CI evidence integrity independently verified
 - [x] Gate D repository CI evidence explicitly accepted on 2026-07-27
 - [x] External execution items remain identified as pending rather than waived
+- [x] Provider-conformance implementation local validation passed, with the
+      accepted workstation OCI/SBOM/Trivy limitation recorded
+- [ ] Provider-conformance authoritative CI evidence passed and accepted
+- [ ] New remediation-containing OCI digest explicitly accepted
 - [ ] All blocking staging `EP-001` items passed
 - [ ] Every external not-applicable item has an accepted reason
 - [ ] External findings and residual risks are resolved or dispositioned
@@ -241,7 +302,9 @@ implementation sub-gate. It does not authorize or accept registry publication,
 protected-environment configuration, provider resources, migration,
 deployment, live acceptance, Gate D closure, Phase 1 closure, or Phase 2.
 
-This evidence-only update remains local. Its next approval is the separate
-branch/commit/push/draft-PR authorization for the evidence record. After that
-record is merged and revalidated, external-resource and staging-execution
-approvals remain separately required.
+The provider-conformance implementation and this evidence update remain local.
+Their next gate is separate authorization to create
+`codex/phase-1-gate-d-provider-conformance`, commit the bounded changes, push
+it, open a draft pull request, and allow its automatic CI run. Manual
+release/staging workflow execution, publication, external resources, spending,
+and staging execution remain separately required approvals.

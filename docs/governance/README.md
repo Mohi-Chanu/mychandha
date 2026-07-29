@@ -1,7 +1,7 @@
 # Governance decision index
 
 Status: Repository navigation authority
-Last updated: 2026-07-26
+Last updated: 2026-07-29
 
 ## Purpose
 
@@ -30,6 +30,17 @@ history and links. This index does not duplicate or supersede their content.
 | `DR-001` | Migration environment isolation | Accepted for Gate D | [`DR-001-migration-environment-isolation.md`](DR-001-migration-environment-isolation.md) |
 | `DR-002` | Application rate limiting | Accepted for Gate D | [`DR-002-application-rate-limiting.md`](DR-002-application-rate-limiting.md) |
 | `DR-003` | OCI rollback policy | Accepted for Gate D | [`DR-003-oci-rollback-policy.md`](DR-003-oci-rollback-policy.md) |
+| `PF-R-001` | Render client-address adapter | Accepted for Gate D | [`docs/phase-1-gate-d-provider-conformance-remediation-proposal.md`](../phase-1-gate-d-provider-conformance-remediation-proposal.md) |
+| `PF-R-002` | Supabase CA materialization | Accepted for Gate D | [`docs/phase-1-gate-d-provider-conformance-remediation-proposal.md`](../phase-1-gate-d-provider-conformance-remediation-proposal.md) |
+| `PF-R-003` | Render staging ownership and budget | Accepted for Gate D | [`docs/phase-1-gate-d-provider-conformance-remediation-proposal.md`](../phase-1-gate-d-provider-conformance-remediation-proposal.md) |
+| `PF-R-004` | Minimum staging alert and bounded-check contract | Accepted for Gate D | [`docs/phase-1-gate-d-provider-conformance-remediation-proposal.md`](../phase-1-gate-d-provider-conformance-remediation-proposal.md) |
+
+## Time-bounded exceptions
+
+| ID | Exception | Status | Canonical record |
+|---|---|---|---|
+| `PF-EX-001` | Render control-plane backup limitation | Accepted for synthetic Phase 1 staging; expires no later than 2026-09-30 | [`PF-EX-001-render-control-plane-operator.md`](PF-EX-001-render-control-plane-operator.md) |
+| `PF-EX-002` | Staging alert-delivery limitation | Accepted for bounded synthetic Phase 1 staging; expires no later than 2026-09-30 | [`PF-EX-002-staging-alert-delivery.md`](PF-EX-002-staging-alert-delivery.md) |
 
 ## Normative controls
 

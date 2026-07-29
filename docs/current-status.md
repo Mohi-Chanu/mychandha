@@ -1,6 +1,6 @@
 # Current development status
 
-Last updated: 2026-07-26
+Last updated: 2026-07-29
 
 ## Outcome
 
@@ -265,6 +265,61 @@ The local Avast/Docker TLS limitation remains recorded as a workstation
 limitation. CI supplied the mandatory OCI, SBOM, and Trivy evidence without
 weakening TLS or scanner controls.
 
+Gate D evidence PR `#7` merged as
+`afbb2109c6eb442baf01331296cdf3e0be294503` on 2026-07-27. Its post-merge
+`main` run `30249016269`, job `89922507241`, passed every configured step.
+The evidence-record artifacts remain available through 2026-08-10. This
+documentation-only rebuild does not replace the accepted deployment candidate
+from run `30245195541`.
+
+The external-resource preflight is prepared in
+`docs/phase-1-gate-d-external-resource-preflight.md`. Current official
+provider capabilities still support the core Singapore staging envelope, and
+the recurring baseline remains approximately USD 43/month excluding tax and
+variable overage. Four material gaps block external-resource approval:
+
+- Render's current client-address guidance does not match the accepted
+  terminal forwarded-hop resolver, and no authoritative ingress-proxy CIDRs
+  were found;
+- the Supabase CA trust path is not materialized for every Java and `psql`
+  process;
+- Render Hobby's one-member limit conflicts with the accepted backup-operator
+  model, while Render Pro would exceed `R1-OPB-001`; and
+- the selected native plans do not establish delivery for every accepted
+  application, dispatcher, database, backup, and restore alert.
+
+No provider, GitHub, registry, budget, owner, or repository change was made by
+the preflight.
+
+Preparation of the bounded remediation proposal was explicitly approved on
+2026-07-29. It is prepared in
+`docs/phase-1-gate-d-provider-conformance-remediation-proposal.md` and covers
+only `PF-HS-001` through `PF-HS-004`. It recommends:
+
+- a Render-specific, first-hop client-address adapter backed by Render's
+  edge-only public ingress contract;
+- a provider-neutral, per-process CA-file input mapped to
+  `/etc/secrets/supabase-ca.crt`, with `verify-full` retained;
+- Render Hobby under the current budget, with `Mohi-Chanu` as the sole Render
+  member and `hazwaTech` restricted to GitHub-mediated operation/review; and
+- Render-native owner notifications plus two-person review of bounded
+  application, database, backup, and restore checks.
+
+The user explicitly accepted `PF-R-001` through `PF-R-004` and the expiring
+staging-only `PF-EX-001`/`PF-EX-002` exceptions on 2026-07-29. They are not
+production controls. The design-decision portion of all four hard stops is
+dispositioned. The user then explicitly approved implementation of only the
+bounded repository scope. That local implementation is complete and covers
+the Render first-hop client-address strategy, fail-closed database CA-file
+contract, non-root Render secret-file group, adapter/workflow validation,
+sanitized evidence schema, and accepted ownership/alert governance. The hard
+Local Java 21/PostgreSQL verification and repository contract checks pass. The
+accepted Avast/Docker TLS limitation still prevents local OCI/SBOM/Trivy
+completion without weakening certificate verification. The hard stops remain
+open pending authoritative CI/evidence acceptance, account/provider
+materialization, and applicable live evidence. No GitHub or external action is
+authorized.
+
 ## What is not done
 
 - No Supabase or Render environment has been provisioned or changed.
@@ -281,19 +336,36 @@ weakening TLS or scanner controls.
   still pending.
 - The accepted CI artifacts expire on 2026-08-10 unless a separately approved
   publication or retention action occurs.
-- This evidence-only documentation update remains local and uncommitted.
+- GitHub environment/package existence, exact account checkout totals, desired
+  name availability, Render outbound CIDRs, Supabase project identifiers, and
+  the project CA remain account-specific confirmations.
+- External-resource approval is blocked by `PF-HS-001` through `PF-HS-004`.
+  Their bounded remediation decisions and local repository implementation are
+  approved and locally validated, but authoritative CI, provider
+  materialization, and live verification remain incomplete.
+- This external-resource preflight documentation remains local and uncommitted.
+- The provider-conformance remediation proposal remains local and uncommitted.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-Gate D repository implementation and CI evidence are accepted. The exact next
-approval, after review of this local evidence-only update, is to create
-`codex/phase-1-gate-d-evidence`, commit the evidence-only changes, push the
-branch, and open a draft evidence pull request.
+Gate D repository implementation and CI evidence are accepted, evidence PR
+`#7` is merged, and its resulting `main` CI is green. The bounded
+provider-conformance remediation decisions and staging-only exceptions are
+accepted. The bounded repository implementation is approved, complete, and
+locally validated. The exact next gate is explicit authorization to create a
+`codex/phase-1-gate-d-provider-conformance` branch, commit the bounded changes,
+push it, open a draft pull request, and allow its automatic CI run for
+authoritative repository evidence.
 
-Running the release workflow, creating a GitHub package or protected
-environment, publishing an OCI image, provisioning resources, deploying, or
-starting Phase 2 remain separate approval gates.
+The current accepted OCI digest must not be deployed because it predates these
+remediations. A new immutable post-merge `main` image and accepted `EP-001`
+evidence will be required.
+
+Manual release/staging workflow execution, creating a GitHub package or
+protected environment, publishing an OCI image, provisioning resources,
+spending, migrating, deploying, or starting Phase 2 remain separate approval
+gates.
 
 Do not provision or modify Supabase, Render, PostgreSQL, GitHub, an artifact
 registry, or another external resource until the applicable later proposal

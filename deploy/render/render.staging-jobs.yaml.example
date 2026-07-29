@@ -27,8 +27,8 @@ services:
         sync: false
       - key: BOOTSTRAP_DATABASE_PASSWORD
         sync: false
-      - key: BOOTSTRAP_DATABASE_SSLMODE
-        value: verify-full
+      - key: BOOTSTRAP_DATABASE_SSL_ROOT_CERTIFICATE
+        value: /etc/secrets/supabase-ca.crt
       - key: MYCHANDHA_STAGING_API_PASSWORD
         sync: false
       - key: MYCHANDHA_STAGING_DISPATCHER_PASSWORD
@@ -55,3 +55,5 @@ services:
         sync: false
       - key: MIGRATION_DATABASE_PASSWORD
         sync: false
+      - key: MIGRATION_DATABASE_SSL_ROOT_CERTIFICATE
+        value: /etc/secrets/supabase-ca.crt

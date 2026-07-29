@@ -62,14 +62,29 @@ metric labels. Metrics use only fixed `scope`, `endpoint_class`, and `outcome`
 values.
 
 The servlet container does not interpret forwarded headers. The rate-limit
-adapter starts from the socket peer address and accepts only the terminal
-`X-Forwarded-For` hop when that peer is inside an explicitly configured trusted
-proxy CIDR. Production API startup requires both rate limiting and this
-forwarded-address boundary. Render's actual overwrite behavior remains a live
-Gate D hard stop.
+adapter supports explicit direct, trusted-proxy-CIDR, and provider-edge
+strategies. The accepted Render mapping uses the first canonical
+`X-Forwarded-For` hop because Render owns the public ingress path and documents
+the real client in that position. It rejects conflicting CIDRs and never uses
+Render outbound ranges as ingress trust.
+
+Missing, duplicate, malformed, overlong, or over-depth Render forwarding falls
+back to the canonical socket peer, increments a fixed-cardinality anomaly
+metric, and degrades rate-limit readiness after three consecutive anomalies.
+A valid provider header resets the consecutive anomaly state. Raw addresses
+and header values never enter logs, responses, metric tags, or evidence.
+Production API startup requires rate limiting and an approved non-direct
+client-address boundary. Live spoof-resistance remains required before public
+staging traffic.
 
 Rejection returns RFC 9457 status `429`, stable code
 `RATE_LIMIT_EXCEEDED`, the safe correlation ID, and `Retry-After`. Cache
 capacity exhaustion fails readiness and rejects new keys rather than silently
 disabling the control. Scaling beyond one API instance requires a new
 distributed-control proposal under `CC-001`.
+
+Every production PostgreSQL profile uses code-owned `sslmode=verify-full` and
+its process-specific root-certificate path. Startup fails before datasource or
+Flyway use when the path is missing, relative, unreadable, or not a regular
+file. The Render mapping is `/etc/secrets/supabase-ca.crt`; database
+credentials remain disjoint.

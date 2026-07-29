@@ -22,4 +22,11 @@ final class RateLimitMetrics {
                         "outcome", decision.outcome())
                 .increment();
     }
+
+    void recordClientAddressAnomaly(ClientAddressStrategy strategy) {
+        registry.counter(
+                        "mychandha.rate.limit.client.address.anomalies",
+                        "strategy", strategy.tag())
+                .increment();
+    }
 }

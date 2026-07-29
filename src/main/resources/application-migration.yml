@@ -14,3 +14,14 @@ spring:
 mychandha:
   runtime:
     profile: migration
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+  datasource:
+    hikari:
+      data-source-properties:
+        sslmode: verify-full
+        sslrootcert: ${MIGRATION_DATABASE_SSL_ROOT_CERTIFICATE}

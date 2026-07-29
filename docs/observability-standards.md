@@ -125,3 +125,17 @@ Staging must prove alert paths for:
 
 Exact thresholds, destinations, retention, and on-call owners belong to the
 external-resource proposal.
+
+For bounded Phase 1 staging, `PF-R-004` and `PF-EX-002` define the accepted
+split:
+
+- Render-native notifications to `Mohi-Chanu` cover only documented
+  deploy/build, image-pull, one-off-job, and API unhealthy events.
+- Dispatcher exit/recovery, outbox age/dead letters,
+  authentication/authorization anomalies, Supabase capacity, backup, and
+  restore use bounded pre/during/post checks.
+- `hazwaTech` reviews the sanitized `EP-001` record for every bounded window.
+- A missing route, check, review, or 24-hour log review fails Gate D.
+
+This exception expires at cleanup or 2026-09-30, never applies to production,
+and does not claim continuous custom monitoring or dual-operator paging.

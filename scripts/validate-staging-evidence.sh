@@ -19,6 +19,8 @@ jq -e '
   and (.startedAt | type == "string")
   and (.finishedAt | type == "string")
   and (.temporaryBaseDeleted | IN("passed","failed","not_applicable"))
+  and ((has("caCertificateSha256") | not)
+    or (.caCertificateSha256 | test("^[0-9a-f]{64}$")))
 ' "$evidence_file" >/dev/null || fail "required evidence fields are invalid"
 
 if grep -Eqi \
@@ -27,7 +29,7 @@ if grep -Eqi \
   fail "credential-like material is present"
 fi
 
-allowed_keys='["schema","operation","status","commitSha","imageRef","startedAt","finishedAt","eventIds","serviceIds","checks","temporaryBaseDeleted"]'
+allowed_keys='["schema","operation","status","commitSha","imageRef","startedAt","finishedAt","eventIds","serviceIds","checks","temporaryBaseDeleted","caCertificateSha256"]'
 jq -e --argjson allowed "$allowed_keys" \
   '([keys_unsorted[] | select(. as $key | $allowed | index($key) | not)] | length) == 0' \
   "$evidence_file" >/dev/null || fail "an undeclared top-level field is present"

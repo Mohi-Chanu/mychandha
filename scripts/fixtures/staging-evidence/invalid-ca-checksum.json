@@ -4,12 +4,12 @@
   "status": "passed",
   "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "imageRef": "ghcr.io/mohi-chanu/mychandha@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-  "startedAt": "2026-07-27T00:00:00Z",
-  "finishedAt": "2026-07-27T00:01:00Z",
+  "startedAt": "2026-07-29T00:00:00Z",
+  "finishedAt": "2026-07-29T00:01:00Z",
   "eventIds": [
     "job-cccccccccccccccccccc"
   ],
   "serviceIds": [],
   "temporaryBaseDeleted": "passed",
-  "caCertificateSha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  "caCertificateSha256": "not-a-checksum"
 }

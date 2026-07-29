@@ -74,6 +74,29 @@ Common non-secret JVM and bounded runtime tuning MAY be shared. An adapter MUST
 reject a shared environment group, secret bundle, or inherited base-service
 configuration when it exposes a prohibited secret class.
 
+Database CA trust material is integrity-sensitive shared configuration, not a
+database credential. An adapter MAY install the same verified CA file in each
+process, but MUST keep database URLs, usernames, and passwords process-local.
+Every production PostgreSQL client MUST use `verify-full`, an absolute readable
+root-certificate path, and the exact provider hostname. The adapter MUST record
+the expected CA SHA-256 checksum without copying certificate contents into
+evidence.
+
+## Client-address trust contract
+
+An internet-facing adapter MUST declare exactly one client-address strategy:
+
+- direct socket peer with no forwarded-header trust;
+- authoritative trusted-proxy CIDRs with the provider-approved hop rule; or
+- an explicit provider edge contract whose public service port is not directly
+  reachable and whose forwarded-header overwrite/hop behavior is documented.
+
+Provider-specific behavior remains in the HTTP/deployment adapter boundary.
+The application MUST reject conflicting strategies, guessed CIDRs, outbound
+service ranges used as ingress trust, and global proxy ranges. Malformed
+forwarding must fail safe without exposing raw addresses in logs, responses,
+metrics, or evidence.
+
 ## Artifact contract
 
 Every release artifact MUST:

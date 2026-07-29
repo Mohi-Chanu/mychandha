@@ -59,8 +59,9 @@ resource.
 | Separate API/dispatcher secrets | Service-specific unsupplied environment entries | Adapter validator | Supported structurally | Secret store and owners open |
 | Migration-only credential | One-off job from `mychandha-staging-migration-base` with a disjoint allowlist | Job adapter validator and later execution evidence | Supported structurally | Network and live provider evidence remain open |
 | Database role bootstrap | One-off job from `mychandha-staging-bootstrap-base` using the packaged bootstrap authority | Job adapter validator and later execution evidence | Supported structurally | Statement logging and live provider evidence remain open |
-| TLS and restricted database path | Provider/network configuration | External conformance and acceptance evidence | Open and blocking | Plan/network capability open |
-| Dispatcher backlog evidence | Provider process state plus safe existing backlog/metric boundary | External monitoring design and acceptance | Open and blocking | Metrics/log/alert plan open |
+| Render client address | Edge-only ingress plus first `X-Forwarded-For` hop | Strategy validator, adversarial tests, and later spoof probe | Supported structurally; live proof blocking | No extra plan |
+| TLS and restricted database path | Code-owned `verify-full`, per-process CA path, Render secret file, and provider network configuration | Runtime/job validators, OCI group check, CA checksum, and later TLS evidence | Supported structurally; live proof blocking | Plan/network capability open |
+| Dispatcher backlog evidence | Provider process state plus bounded acceptance checks under `PF-EX-002` | Existing safe backlog/metric boundary and two-person evidence review | Supported structurally; live proof blocking | No monitoring provider for Gate D |
 | Log routing and retention | Render/provider log controls or approved drain | External proposal and test event | Open and blocking | Plan, destination, and retention open |
 | Backups and restore | Selected PostgreSQL plan capabilities | External proposal and restore drill | Open and blocking | Database plan/cost open |
 | Digest rollback | Retained prior registry digest and Render image deployment | `EP-001` artifact and rehearsal records | Supported conditionally | Registry retention and schema compatibility required |
@@ -117,12 +118,12 @@ Required:
 - `API_DATABASE_URL`
 - `API_DATABASE_USERNAME`
 - `API_DATABASE_PASSWORD`
+- `API_DATABASE_SSL_ROOT_CERTIFICATE=/etc/secrets/supabase-ca.crt`
 - `SUPABASE_JWT_ISSUER`
 - `SUPABASE_JWKS_URI`
 - `SUPABASE_JWT_AUDIENCE=authenticated`
 - `RATE_LIMIT_ENABLED=true`
-- `RATE_LIMIT_TRUST_FORWARDED=true`
-- `RATE_LIMIT_TRUSTED_PROXY_CIDRS`
+- `RATE_LIMIT_CLIENT_ADDRESS_STRATEGY=render-edge-first-hop`
 
 The URL, username, password, issuer, and JWKS URI remain unsupplied in the
 repository example. The API service must not receive dispatcher or migration
@@ -136,6 +137,7 @@ Required:
 - `DISPATCHER_DATABASE_URL`
 - `DISPATCHER_DATABASE_USERNAME`
 - `DISPATCHER_DATABASE_PASSWORD`
+- `DISPATCHER_DATABASE_SSL_ROOT_CERTIFICATE=/etc/secrets/supabase-ca.crt`
 
 Approved bounded outbox tuning may be added later only when the
 external-resource proposal records the value and reason. The dispatcher must
@@ -150,6 +152,7 @@ Required:
 - `MIGRATION_DATABASE_URL`
 - `MIGRATION_DATABASE_USERNAME`
 - `MIGRATION_DATABASE_PASSWORD`
+- `MIGRATION_DATABASE_SSL_ROOT_CERTIFICATE=/etc/secrets/supabase-ca.crt`
 
 The migration values must be available only to the approved short-lived
 runner. They must not be attached to either long-lived Render service.
@@ -178,10 +181,24 @@ The repository-defined protected release runner:
 - produces sanitized `EP-001` execution evidence.
 
 The bootstrap base receives only the bootstrap connection credential and the
-three one-time environment role passwords. The migration base receives only
-the migration connection credential. Both use the safe idle command as their
-ordinary process, are created only for a separately approved operation, and
-must be deleted no later than one hour after the job reaches a terminal state.
+three one-time environment role passwords. It sets
+`BOOTSTRAP_DATABASE_SSL_ROOT_CERTIFICATE=/etc/secrets/supabase-ca.crt`. The
+migration base receives only the migration connection credential and the
+matching migration CA path. Both use the safe idle command as their ordinary
+process, are created only for a separately approved operation, and must be
+deleted no later than one hour after the job reaches a terminal state.
+
+Upload the approved Supabase CA to each service as the Render runtime secret
+file `supabase-ca.crt`. The non-root OCI user is a member of Render's documented
+group `1000`. Bootstrap exports `PGSSLMODE=verify-full` and `PGSSLROOTCERT`;
+Java/Flyway profiles set pgJDBC `verify-full` and `sslrootcert` as code-owned
+properties. The protected temporary-job adapter uploads the file without
+logging it, waits for the resulting deployment, records only its SHA-256
+checksum, and removes its owner-only temporary request file.
+
+Do not put `sslmode`, `sslrootcert`, or `sslfactory` in the migration URL. Do
+not embed the CA in the OCI image or evidence. A missing, relative, unreadable,
+or wrong CA is a hard failure.
 
 If a GitHub-hosted runner cannot reach the selected database without weakening
 network policy, it is not acceptable. A private or provider-local alternative
@@ -234,9 +251,11 @@ After external-resource and execution approval:
 7. deploy the dispatcher and API from the same digest;
 8. wait for dispatcher process state and API readiness;
 9. run JWT, tenant, audit, idempotency, inbox, outbox, health, metrics, and
-   log-safety acceptance;
-10. accept routing only after all blocking checks pass; and
-11. finalize the staging `EP-001` evidence package.
+   log-safety acceptance, including forwarded-address spoof resistance;
+10. run the accepted native notification and bounded alert/check matrix with
+    two-person evidence review;
+11. accept routing only after all blocking checks pass; and
+12. finalize the staging `EP-001` evidence package.
 
 Stop immediately for a missing approval, unresolved blocking capability,
 mutable/mismatched digest, credential overlap, failed migration, failed
@@ -265,6 +284,23 @@ rollback.
 The dispatcher does not expose an HTTP health endpoint. If the selected Render
 and monitoring capabilities cannot provide the required evidence, stop and
 propose the smallest separate repository change.
+
+### Staging ownership and alert exception
+
+`PF-EX-001` makes `Mohi-Chanu` the sole Render workspace member and
+`hazwaTech` the protected GitHub operation/evidence reviewer. One initiates and
+the other reviews; account or API-key sharing is prohibited. The owner must be
+available for every execution window.
+
+`PF-EX-002` routes documented Render deploy, image-pull, one-off-job, and API
+health notifications to `Mohi-Chanu`. Dispatcher recovery, outbox age/dead
+letters, authentication/authorization anomalies, Supabase capacity, backup,
+and restore are bounded pre/during/post checks reviewed by both identities.
+Capture sanitized evidence within 24 hours. Missing evidence fails Gate D.
+
+Both exceptions apply only to synthetic Phase 1 staging and expire at cleanup
+or 2026-09-30. They do not authorize external configuration and must never be
+used as production readiness evidence.
 
 ## Rollback and forward fix
 

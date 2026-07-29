@@ -211,3 +211,52 @@ previous decision.
   push, pull request, merge, GitHub environment or package change, credential,
   provider resource, spending, bootstrap, migration, deployment, acceptance
   run, restore, rollback, cleanup, Phase 1 closure, or Phase 2 work.
+- 2026-07-27: Gate D repository implementation PR `#6` merged as
+  `cc75d0c3c59dc9d11ef748bff2f3633770854ffd`, and its post-merge repository
+  CI evidence was explicitly accepted. Evidence PR `#7` subsequently merged as
+  `afbb2109c6eb442baf01331296cdf3e0be294503`, and resulting `main` CI passed.
+  These approvals and results do not authorize image publication, GitHub
+  environment/package configuration, provider resources, spending, migration,
+  deployment, or staging execution.
+- 2026-07-27: Preparation of the Gate D external-resource preflight package
+  was approved using read-only provider verification only. The preflight
+  retains the accepted minimal resource envelope and records current
+  capability, price, owner/operator, budget, OCI, security, recovery,
+  retention, alert, and cleanup findings. Preparing this package does not
+  approve a repository remediation, GitHub change, publication, provider
+  configuration, resource creation, spending, migration, deployment,
+  workflow execution, acceptance, or cleanup.
+- 2026-07-29: Preparation of the bounded Gate D provider-conformance
+  remediation proposal was explicitly approved for `PF-HS-001` through
+  `PF-HS-004` only. The prepared recommendations address the Render
+  client-address adapter, Supabase CA materialization, the Render Hobby
+  owner/backup limitation, and the minimum staging alert/check contract.
+  Preparation records recommendations only; no resolution decision,
+  implementation, commit, push, publication, provider/GitHub change,
+  provisioning, spending, workflow, migration, deployment, acceptance,
+  cleanup, Phase 1 closure, or Phase 2 work is approved.
+- 2026-07-29: The user explicitly accepted `PF-R-001` through `PF-R-004`
+  and the staging-only `PF-EX-001`/`PF-EX-002` exceptions exactly as
+  documented. The exceptions apply only to synthetic Phase 1 staging, expire
+  at cleanup or 2026-09-30, and never apply to production. This decision
+  acceptance does not authorize repository implementation, commit, push, pull
+  request, merge, workflow execution, publication, GitHub/provider changes,
+  provisioning, spending, migration, deployment, acceptance execution,
+  cleanup, Phase 1 closure, or Phase 2.
+- 2026-07-29: The user explicitly approved implementation of only the bounded
+  repository scope documented in
+  `docs/phase-1-gate-d-provider-conformance-remediation-proposal.md`. This
+  authorizes local source, configuration, validation, evidence-contract, and
+  documentation changes for `PF-HS-001` through `PF-HS-004`. It does not
+  authorize a commit, push, pull request, merge, workflow execution,
+  publication, GitHub/provider configuration, provisioning, spending,
+  migration, deployment, live acceptance, restore, rollback, cleanup, Phase 1
+  closure, or Phase 2.
+- 2026-07-29: The bounded provider-conformance repository implementation was
+  completed and locally validated. Java 21 offline Maven verification passed
+  80 tests with PostgreSQL 17/Testcontainers and all configured analysis.
+  Repository structural, adapter, workflow, shell, evidence, Actionlint,
+  Gitleaks, Markdown-link, and whitespace checks passed. The previously
+  accepted local Avast/Docker TLS limitation prevented the OCI build, SBOM,
+  and Trivy steps without weakening certificate verification; authoritative
+  CI remains mandatory. This local result grants no GitHub or external action.
