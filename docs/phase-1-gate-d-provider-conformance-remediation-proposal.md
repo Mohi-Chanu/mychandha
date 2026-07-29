@@ -1,6 +1,6 @@
 # Phase 1 Gate D provider-conformance remediation proposal
 
-Status: Implemented and locally validated; authoritative CI not started
+Status: Repository implementation merged and CI evidence accepted; live/provider evidence pending
 Prepared: 2026-07-29
 Approved: 2026-07-29
 Scope: `PF-HS-001` through `PF-HS-004` only
@@ -362,8 +362,9 @@ date, or need for unattended operation terminates the exception immediately.
 ## Exact prospective repository impact
 
 The user authorized implementation of only the repository changes in this
-table on 2026-07-29. The implementation remains local until a later separate
-GitHub approval.
+table on 2026-07-29. It remained local until the later separate GitHub
+approval; implementation commit `94dd85d45da3aae655c468c9d2afbbe25908fec3`
+is now merged through PR `#8`.
 
 | Area | Prospective change |
 |---|---|
@@ -496,23 +497,29 @@ Official provider sources revalidated on 2026-07-29:
 
 ## CC-001 compliance
 
-- Current lifecycle step: bounded repository implementation complete and
-  locally validated; GitHub publication approval pending.
+- Current lifecycle step: bounded repository implementation merged through PR
+  `#8`; pull-request and post-merge `main` repository evidence and the new OCI
+  digest explicitly accepted; evidence-only documentation update local.
 - Approvals granted: preparation of this bounded proposal and explicit
   acceptance of `PF-R-001` through `PF-R-004` and
   `PF-EX-001`/`PF-EX-002`; implementation of only the exact repository scope
-  in this proposal.
-- Approvals not granted: commit, push, pull request, merge, workflow
-  execution, package/image publication,
+  in this proposal; branch, commit, push, draft PR, automatic PR CI,
+  pull-request evidence acceptance, merge, post-merge evidence acceptance,
+  acceptance of OCI digest
+  `sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829`,
+  and local preparation of the evidence-only record.
+- Approvals not granted: evidence-record commit, push, pull request, merge,
+  manual workflow execution, package/image publication,
   GitHub/provider configuration, provisioning, spending, migration,
-  deployment, acceptance execution or evidence acceptance, restore, rollback,
-  cleanup, hard-stop or Gate D closure, or Phase 2.
+  deployment, live acceptance execution or external/live evidence acceptance,
+  restore, rollback, cleanup, hard-stop or Gate D closure, or Phase 2.
 - Repository boundary: this proposal and status-document alignment only.
 - External boundary: official read-only provider documentation verification;
   no account or resource change.
 - Material deviations: none from the approved proposal-preparation scope.
-- Evidence package: `docs/phase-1-gate-d-evidence.md`; remediation evidence not
-  started.
+- Evidence package: `docs/phase-1-gate-d-evidence.md`; repository remediation
+  evidence accepted and recorded locally; account/provider and live evidence
+  pending.
 - Local validation: Java 21 offline Maven verification passed 80 tests with
   PostgreSQL 17/Testcontainers, Checkstyle, PMD, JaCoCo, and SpotBugs;
   structural, adapter, workflow, shell, evidence, Actionlint, Gitleaks,
@@ -520,8 +527,11 @@ Official provider sources revalidated on 2026-07-29:
   Avast/Docker TLS limitation still blocks `apk`, local OCI completion, SBOM,
   and Trivy; no TLS control was weakened. The pinned runtime image separately
   proved non-root `mychandha` membership in group `1000`.
+- Authoritative CI: accepted PR run `30440420020`, job `90538148786`, and
+  post-merge `main` run `30441738217`, job `90542418893`, passed 80 tests and
+  all analysis, OCI, CycloneDX, Gitleaks, Trivy, and immutable-evidence checks.
 - Next approval required: explicit authorization to create
-  `codex/phase-1-gate-d-provider-conformance`, commit the bounded changes, push
-  it, open a draft pull request, and allow the automatic pull-request CI run.
-  Manual release/staging workflow execution, publication, and external changes
-  remain separate.
+  `codex/phase-1-gate-d-provider-conformance-evidence`, commit only the
+  evidence documentation, push it, open a draft evidence pull request, and
+  allow the automatic pull-request CI run. Manual release/staging workflow
+  execution, publication, and external changes remain separate.

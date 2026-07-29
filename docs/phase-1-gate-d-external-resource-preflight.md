@@ -1,7 +1,7 @@
 # Phase 1 Gate D external-resource preflight
 
-Status: Preflight complete; bounded remediation implemented and locally validated
-Verified: 2026-07-27
+Status: Preflight complete; repository remediation merged and CI evidence accepted; live/provider hard stops remain
+Verified: 2026-07-29
 Gate: Phase 1 Gate D — external-resource readiness
 Change control: `CC-001`
 Evidence package: `EP-001`
@@ -94,6 +94,8 @@ be captured without secrets in the later `EP-001` package.
 | Accepted Gate D CI | Run `30245195541`; job `89910592727`; success |
 | Evidence record | PR `#7`; merge commit `afbb2109c6eb442baf01331296cdf3e0be294503` |
 | Evidence-record CI | Run `30249016269`; job `89922507241`; success |
+| Provider-conformance implementation | PR `#8`; merge commit `87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad` |
+| Accepted provider-conformance CI | Run `30441738217`; job `90542418893`; success |
 | External state | No external action is authorized or recorded |
 
 The evidence-record run proves the merged documentation state. It does not
@@ -101,21 +103,21 @@ replace the separately accepted deployment candidate.
 
 ## Accepted OCI source binding
 
-The only currently accepted publication source is:
+The accepted provider-conformance publication candidate is:
 
 | Field | Accepted value |
 |---|---|
 | Source repository | `Mohi-Chanu/mychandha` |
-| Source commit | `cc75d0c3c59dc9d11ef748bff2f3633770854ffd` |
-| Source CI run | `30245195541` |
-| Source CI job | `89910592727` |
-| OCI manifest digest | `sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0` |
-| OCI artifact | ID `8644793537`, `mychandha-oci-cc75d0c3c59dc9d11ef748bff2f3633770854ffd` |
-| OCI artifact archive digest | `sha256:0c329ca4668315f47be6e85ef834ab71106529ad7a4b49c8e51c802a80f7b995` |
-| Verification artifact | ID `8644791692`, `verification-reports` |
-| Verification artifact digest | `sha256:cf9a0ea66b05c68c2234d31cb9cfae6050e81233dd4dc73d8097aee42e2dc5f5` |
-| Artifact expiry | 2026-08-10 07:14Z |
-| Proposed registry identity | `ghcr.io/mohi-chanu/mychandha@sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0` |
+| Source commit | `87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad` |
+| Source CI run | `30441738217` |
+| Source CI job | `90542418893` |
+| OCI manifest digest | `sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829` |
+| OCI artifact | ID `8719792787`, `mychandha-oci-87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad` |
+| OCI artifact archive digest | `sha256:934bdaf44eeb028a4fdead21d67004790537e7e80f643399916988fb124dd058` |
+| Verification artifact | ID `8719790993`, `verification-reports` |
+| Verification artifact digest | `sha256:32d2a2cc1de7eabe6bee9f4726eeb3c9c5cb6493b75f25e3b6a632c8f5a1338e` |
+| Artifact expiry | 2026-08-12 10:00Z |
+| Proposed registry identity | `ghcr.io/mohi-chanu/mychandha@sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829` |
 
 The OCI manifest digest identifies the image. The GitHub artifact digests
 identify the downloadable archives and must not be substituted for the OCI
@@ -126,6 +128,11 @@ workflow against this exact retained archive. If the artifacts expire first,
 `main` CI must be rerun and the resulting candidate must receive explicit
 evidence acceptance. A rebuild, mutable tag, later documentation-only image,
 or manually uploaded image is not an equivalent source.
+
+The prior digest
+`sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0`
+predates the accepted provider-conformance controls and is historical evidence
+only.
 
 ## Exact desired resource inventory
 
@@ -170,15 +177,15 @@ change and stops execution.
 | Durable dispatcher | Image-backed background worker, Starter, one instance | Background workers support Starter at 512 MB and 0.5 CPU | Verified offering |
 | Isolated one-off execution | Same artifact, separate secret allowlists | Jobs inherit base artifact and all base environment variables and are billed per second | Verified; separate bases remain required |
 | Service outbound allowlist source | Current Singapore CIDRs | Render exposes region-specific shared outbound CIDRs per created service | Capability verified; exact CIDRs pending |
-| Ingress client-address trust | Stable spoof-resistant provider contract | Current public material identifies the real client as the first forwarded hop; no stable ingress-proxy CIDRs were found | Blocked by `PF-HS-001` |
-| Render secrets | Per-service variables and CA file | Runtime secret files are available at `/etc/secrets`; Docker user access has an extra group requirement | Capability verified; adapter blocked by `PF-HS-002` |
+| Ingress client-address trust | Stable spoof-resistant provider contract | Current public material identifies the real client as the first forwarded hop; no stable ingress-proxy CIDRs were found | Repository first-hop adapter accepted; live assumption and spoof evidence blocked by `PF-HS-001` |
+| Render secrets | Per-service variables and CA file | Runtime secret files are available at `/etc/secrets`; Docker user access has an extra group requirement | Repository CA-file/group adapter accepted; provider materialization and live TLS blocked by `PF-HS-002` |
 | Render native log retention | Seven days | Hobby retains application/deploy/job logs for seven days; HTTP request logs require Pro | Verified with limitation |
-| Render native notifications | Deploy, image-pull, job, and service-health failures | Email/Slack notifications support those events | Partially verified; blocked by `PF-HS-003`/`PF-HS-004` |
+| Render native notifications | Deploy, image-pull, job, and service-health failures | Email/Slack notifications support those events | Repository ownership/check contract accepted; account and live delivery blocked by `PF-HS-003`/`PF-HS-004` |
 | Singapore database region | Exact Singapore project placement | Supabase lists Singapore general and `ap-southeast-1` specific regions | Verified offering; checkout pending |
 | PostgreSQL direct connection | Port 5432 for long-lived backends and migrations | Supported; Render is documented as IPv4-only for this path | Verified |
 | Dedicated database IPv4 | Required for Render direct connectivity | Pro add-on is available and currently USD 4/month | Verified offering |
 | Database network restrictions | No global CIDRs | Supabase can restrict direct and pooled database routes by IPv4/IPv6 CIDR | Verified |
-| TLS hostname and CA verification | `verify-full` for every database process | Supabase provides a project CA; clients must install/reference it | Capability verified; adapter blocked by `PF-HS-002` |
+| TLS hostname and CA verification | `verify-full` for every database process | Supabase provides a project CA; clients must install/reference it | Repository contract accepted; CA installation and four-path live evidence blocked by `PF-HS-002` |
 | Supabase Auth asymmetric signing | JWKS validation without a shared signing secret in the app | Current signing-key system supports asymmetric keys and public JWKS discovery | Verified |
 | Supabase backups | Daily, seven days | Pro provides seven daily backups; restore is in place and causes downtime | Verified |
 | Supabase logs | Seven days | Pro includes seven-day log retention | Verified |
@@ -190,7 +197,7 @@ change and stops execution.
 |---|---|---|
 | Accountable and cost owner | `Mohi-Chanu` | Retained |
 | Release/deployment/database/security/incident/restore/cleanup owner | `Mohi-Chanu` | Retained |
-| Backup operator and reviewer | `hazwaTech` | User-attested GitHub access; provider access requires resolution of `PF-HS-003` |
+| Backup operator and reviewer | `hazwaTech` | Accepted `PF-EX-001` GitHub-mediated reviewer/operation boundary; account evidence and expiry revalidation remain under `PF-HS-003` |
 | Evidence recorder | Codex-assisted sanitized repository record | Retained; owner review required |
 
 Required controls:
@@ -413,61 +420,61 @@ The cleanup owner must:
 
 The bounded remediation proposal requested by this preflight is prepared
 in `phase-1-gate-d-provider-conformance-remediation-proposal.md`. Proposal
-decisions and staging-only exceptions were accepted on 2026-07-29. Preparation
-and decision acceptance do not resolve the hard stops: each remains open until
-its repository implementation, CI evidence, and applicable account/provider
-and live evidence are explicitly accepted under `CC-001`.
+decisions and staging-only exceptions were accepted on 2026-07-29.
+Implementation merged through PR `#8`, and its pull-request and post-merge
+repository CI evidence and new OCI digest were explicitly accepted. Each hard
+stop remains open only for its applicable account/provider materialization,
+current-assumption revalidation, live evidence, and explicit acceptance under
+`CC-001`.
 
 ### `PF-HS-001` — Render client-address trust contract
 
-The accepted resolver consumes the terminal `X-Forwarded-For` hop only when
-the socket peer is inside configured trusted proxy CIDRs. Render's current
-public guidance tells applications to read `X-Forwarded-For`, and Render's
-published response identifies the real client as the first hop. No
-authoritative stable Render ingress-proxy CIDRs were found.
+The repository now implements the accepted Render-specific
+`render-edge-first-hop` strategy separately from the provider-neutral direct
+and trusted-CIDR strategies. It does not guess an ingress CIDR and preserves
+bounded parsing, safe fallback, anomaly metrics, and readiness degradation.
 
-Do not set `RATE_LIMIT_TRUSTED_PROXY_CIDRS` to a guessed range, a service
-outbound CIDR, or a global network. Obtain an authoritative Render contract
-and prepare a bounded repository proposal for any resolver/configuration
-change. Staging traffic is blocked until spoof resistance is verified.
+Before public staging traffic, revalidate Render's edge-only ingress and
+first-hop behavior, materialize the exact strategy, and accept live forged,
+duplicate, malformed, overlong, and over-depth header evidence. Any provider
+contract change is material and returns to proposal review.
 
 ### `PF-HS-002` — Supabase CA materialization
 
-Supabase requires its CA certificate for `verify-full`. The current Render
-adapter contains no CA file contract or `sslrootcert` path, the bootstrap
-wrapper does not set `PGSSLROOTCERT`, and the image user is not in Render's
-documented group for Docker secret-file access.
+The repository now enforces provider-neutral, per-process CA-file inputs,
+code-owned `verify-full`, URL override rejection, `PGSSLROOTCERT`, the Render
+`/etc/secrets/supabase-ca.crt` adapter, and non-root group `1000` access.
 
-Define a provider-neutral CA-file input in `MCDC-001` terms and a Render
-adapter mapping for API, dispatcher, bootstrap, and migration. Preserve
-per-process configuration and checksum the non-secret CA material. Do not
-fall back to `sslmode=require` or a non-validating socket factory.
+The stop remains open until the exact project CA and expected checksum are
+approved and materialized, API/dispatcher/bootstrap/migration readability and
+positive `verify-full` connections pass, and wrong-CA rejection is accepted.
+Falling back to `sslmode=require` or a non-validating socket factory remains
+prohibited.
 
 ### `PF-HS-003` — Render operator model versus budget
 
-Render Hobby permits one workspace member. The accepted model names
-`Mohi-Chanu` as owner and `hazwaTech` as backup operator/reviewer. Either:
+The accepted staging-only `PF-EX-001` keeps `Mohi-Chanu` as the sole Render
+Hobby member and limits `hazwaTech` to GitHub-mediated operation and sanitized
+evidence review. No account sharing or shared credential is permitted.
 
-- refine the backup operator to GitHub-mediated operations only while
-  `Mohi-Chanu` remains the sole Render member; or
-- select a multi-member Render plan and amend `R1-OPB-001`.
-
-Render Pro currently adds USD 25/month, raising the recurring baseline to
-approximately USD 68/month. It cannot be selected under the current budget.
-The role or budget decision requires explicit material-change approval.
+The stop remains open until the Hobby plan and one-member rule, owner
+availability, GitHub permission, final `R1-OPB-001` checkout total, and
+exception expiry are revalidated immediately before external-resource
+approval. Selecting a multi-member plan or changing the role model is
+material.
 
 ### `PF-HS-004` — complete alert delivery
 
-Native Render notifications cover service/deploy/job/image events, but current
-public documentation does not establish delivery for every application,
-dispatcher, database, backup, and restore condition in the accepted proposal.
-Supabase exposes reports, but configurable alerts are documented through an
-external metrics stack.
+The accepted staging-only `PF-EX-002` uses Render-native owner notifications
+for documented provider events plus pre/during/post bounded checks and
+two-person review for the remaining application, dispatcher, database,
+backup, and restore conditions. The repository evidence schema records this
+contract without adding a monitoring provider.
 
-Define the minimum continuous alert set, the bounded acceptance-only checks,
-both operator destinations, and a test method. Do not add a monitoring
-provider without a separate dependency, cost, security, and retention
-proposal.
+The stop remains open until every native event route, receipt/recovery
+timestamp, bounded check, `Mohi-Chanu` record, `hazwaTech` review, and
+24-hour sanitized-log review has accepted live evidence. Missing a required
+route or review fails the gate.
 
 ## Required account-specific confirmations
 
@@ -553,25 +560,28 @@ revalidated again on 2026-07-29:
 
 ## CC-001 compliance and exact next gate
 
-- Current lifecycle step: preflight complete; bounded remediation decisions
-  and repository implementation approved; local implementation and validation
-  complete subject to the accepted workstation OCI-build TLS limitation.
+- Current lifecycle step: preflight complete; bounded remediation
+  implementation merged; pull-request and post-merge repository CI evidence
+  and the new OCI digest accepted; evidence-only documentation update local.
 - Granted: local preflight and bounded remediation-proposal preparation plus
   read-only provider verification; `PF-R-001` through `PF-R-004` and
-  `PF-EX-001`/`PF-EX-002` accepted; bounded repository implementation.
-- Not granted: commit, push, pull request, merge,
-  GitHub configuration, package publication, workflow execution, provider
-  change, spending, migration, deployment, acceptance, restore, rollback,
-  cleanup, Phase 1 closure, or Phase 2.
+  `PF-EX-001`/`PF-EX-002` accepted; bounded repository implementation, PR
+  `#8`, automatic PR CI, evidence acceptance, merge, post-merge evidence and
+  remediation-containing OCI digest acceptance; local evidence-record
+  preparation.
+- Not granted: evidence-record commit, push, pull request, merge, GitHub
+  configuration, package publication, manual workflow execution, provider
+  change, spending, migration, deployment, live acceptance, restore,
+  rollback, cleanup, Phase 1 closure, or Phase 2.
 - Material deviations discovered: `PF-HS-001` through `PF-HS-004`.
 - Evidence location: this document and the pending external sections of
   `docs/phase-1-gate-d-evidence.md`.
 - External boundary: only public documentation and read-only GitHub metadata
   were inspected.
 
-The exact next gate is explicit authorization for a named branch, commit,
-push, and draft pull request.
-External-resource approval should be requested only after the repository
-changes are merged, authoritative CI evidence is explicitly accepted, and the
-remaining account/provider and live-evidence portions of the four hard stops
-are ready for separately approved execution.
+The exact next gate is explicit authorization for
+`codex/phase-1-gate-d-provider-conformance-evidence`, an evidence-only commit,
+push, draft pull request, and its automatic pull-request CI.
+External-resource approval should be requested only after this evidence record
+is merged and the remaining account/provider and live-evidence portions of the
+four hard stops are ready for separately approved execution.

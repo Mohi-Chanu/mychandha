@@ -260,3 +260,15 @@ previous decision.
   accepted local Avast/Docker TLS limitation prevented the OCI build, SBOM,
   and Trivy steps without weakening certificate verification; authoritative
   CI remains mandatory. This local result grants no GitHub or external action.
+- 2026-07-29: Provider-conformance implementation commit
+  `94dd85d45da3aae655c468c9d2afbbe25908fec3` passed PR `#8` CI and merged as
+  `87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad`. The user explicitly accepted
+  PR run `30440420020`, job `90538148786`, post-merge `main` run
+  `30441738217`, job `90542418893`, and remediation-containing OCI digest
+  `sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829`.
+  Preparation of the local evidence-only documentation update was also
+  approved. This acceptance does not authorize a commit or push of the
+  evidence record, workflow execution, package/image publication,
+  GitHub/provider configuration, provisioning, spending, migration,
+  deployment, live acceptance, restore, rollback, cleanup, Phase 1 closure,
+  or Phase 2.

@@ -55,9 +55,15 @@ external-resource approval. The bounded
 now defines the recommended resolution and evidence path for those four hard
 stops. Its decisions and expiring staging-only exceptions were accepted on
 2026-07-29. Implementation of only its bounded repository scope was then
-approved, completed, and locally validated. The accepted Avast/Docker TLS
-limitation still prevents local OCI/SBOM/Trivy completion; authoritative CI is
-therefore still required. No GitHub workflow or external action is authorized.
+approved and merged through PR `#8` as
+`87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad`. PR CI run `30440420020`, job
+`90538148786`, and post-merge `main` run `30441738217`, job `90542418893`,
+passed and were explicitly accepted. The current remediation-containing OCI
+digest is
+`sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829`.
+The repository and CI portions of the four hard stops are complete; provider
+materialization and live evidence remain pending. No publication, provider
+change, spending, migration, deployment, or staging execution is authorized.
 
 Engineering standards are recorded in the [ADR index](docs/adr/README.md),
 [module boundaries](docs/module-boundaries.md),

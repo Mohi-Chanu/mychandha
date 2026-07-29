@@ -90,6 +90,17 @@ Evidence PR `#7` then merged as
 `afbb2109c6eb442baf01331296cdf3e0be294503`; post-merge `main` run
 `30249016269`, job `89922507241`, passed.
 
+The bounded provider-conformance implementation commit
+`94dd85d45da3aae655c468c9d2afbbe25908fec3` passed PR `#8` run
+`30440420020`, job `90538148786`, and merged as
+`87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad`. Post-merge `main` run
+`30441738217`, job `90542418893`, passed on that exact commit with 80 tests,
+zero static-analysis findings, full-history Gitleaks with no leaks, CycloneDX
+`1.7` with 152 components, and zero Trivy HIGH/CRITICAL vulnerabilities or
+secrets. The user explicitly accepted both evidence stages and OCI digest
+`sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829`
+on 2026-07-29.
+
 ## Security
 
 Implemented automated controls include JWT claim validation, membership and
@@ -120,19 +131,19 @@ Production targets remain:
 
 - The repository-defined role and profile boundaries passed the Docker-backed
   integration suite but have not been applied to a staging environment.
-- The Render adapter is a non-live example with placeholders; exact provider
-  conformance, materialization, and staging behavior remain unverified.
-- The latest accepted Gate D CI-built OCI archive from `main` run
-  `30245195541` expires on 2026-08-10 unless retained through a later approved
+- The Render adapter's repository contract and CI evidence are accepted;
+  account/provider materialization and staging behavior remain unverified.
+- The latest accepted Gate D provider-conformance OCI archive from `main` run
+  `30441738217` expires on 2026-08-12 unless retained through a later approved
   promotion or evidence policy.
 - The CI-built image is not yet published to an approved registry as an
   immutable deployable digest.
 - External rate limits, alerts, backups, log drain, and restore behavior are
   unverified.
-- The Gate D external-resource preflight identified four pre-provisioning hard
-  stops: the Render forwarded-address/trusted-proxy contract, Supabase CA
-  materialization, Render Hobby's one-member limit versus the backup-operator
-  model, and incomplete native alert-delivery coverage.
+- The repository and CI portions of the four Gate D provider-conformance hard
+  stops are accepted. Account/provider materialization, current-assumption
+  revalidation, and live spoof, TLS, owner/reviewer, notification, and bounded
+  check evidence remain open.
 
 ## Deferred items
 
@@ -155,17 +166,17 @@ later external-resource and execution approvals.
 The readiness design and Gate A through Gate D repository implementation/CI
 evidence are approved. Gate D implementation and evidence PRs are on `main`,
 and their resulting CI is green. The external-resource preflight and bounded
-provider-conformance remediation proposal are prepared locally; its bounded
-repository implementation is approved, complete, and locally validated.
-Pending
-approvals or evidence are:
+provider-conformance remediation proposal are merged. Provider-conformance
+implementation PR `#8`, its pull-request evidence, its post-merge `main`
+evidence, and the new remediation-containing OCI digest are explicitly
+accepted. Pending approvals or evidence are:
 
-- GitHub publication approval and authoritative CI evidence for the bounded
-  provider-conformance remediation implementation;
+- publication of the local provider-conformance evidence-only documentation
+  record;
 - GitHub package creation, protected-environment configuration, or
   release-workflow execution;
-- current provider checkout confirmation, spending, exact non-production
-  resource creation, and operational execution; and
+- current account/provider assumption and checkout revalidation, spending,
+  exact non-production resource creation, and operational execution;
 - provisioning and staging execution.
 
 ## Exit criteria
@@ -202,6 +213,10 @@ approvals or evidence are:
 - [x] Bounded provider-conformance repository implementation approved.
 - [x] Bounded provider-conformance repository implementation completed and
       locally validated.
+- [x] Provider-conformance implementation committed, pushed, merged through PR
+      `#8`, and pull-request CI verified.
+- [x] Provider-conformance post-merge `main` CI and remediation-containing OCI
+      digest explicitly accepted.
 - [ ] Gate D provider-conformance hard stops resolved and accepted.
 - [ ] Staging deployment ready.
 - [ ] Identity and tenant-isolation acceptance passed.
@@ -215,9 +230,10 @@ approvals or evidence are:
 
 **Proceed to Phase 2: NO**
 
-Next action: review the locally validated bounded implementation. Creating
-`codex/phase-1-gate-d-provider-conformance`, committing, pushing, and opening
-a draft pull request with its automatic CI run require the next explicit
-approval. Manual release/staging workflow execution, GitHub
-package/environment changes, publication, spending, and external resources
-remain unauthorized.
+Next action: review this local evidence-only documentation update. Creating
+`codex/phase-1-gate-d-provider-conformance-evidence`, committing only these
+documentation changes, pushing, and opening a draft evidence pull request
+with its automatic CI run require the next explicit approval. Manual
+release/staging workflow execution, GitHub package/environment changes,
+publication, spending, provider resources, and staging execution remain
+unauthorized.

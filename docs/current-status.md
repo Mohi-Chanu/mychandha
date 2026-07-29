@@ -309,16 +309,32 @@ The user explicitly accepted `PF-R-001` through `PF-R-004` and the expiring
 staging-only `PF-EX-001`/`PF-EX-002` exceptions on 2026-07-29. They are not
 production controls. The design-decision portion of all four hard stops is
 dispositioned. The user then explicitly approved implementation of only the
-bounded repository scope. That local implementation is complete and covers
+bounded repository scope. The implementation covers
 the Render first-hop client-address strategy, fail-closed database CA-file
 contract, non-root Render secret-file group, adapter/workflow validation,
-sanitized evidence schema, and accepted ownership/alert governance. The hard
-Local Java 21/PostgreSQL verification and repository contract checks pass. The
-accepted Avast/Docker TLS limitation still prevents local OCI/SBOM/Trivy
-completion without weakening certificate verification. The hard stops remain
-open pending authoritative CI/evidence acceptance, account/provider
-materialization, and applicable live evidence. No GitHub or external action is
-authorized.
+sanitized evidence schema, and accepted ownership/alert governance.
+
+Implementation commit `94dd85d45da3aae655c468c9d2afbbe25908fec3`
+merged through PR `#8` as
+`87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad`. PR CI run `30440420020`, job
+`90538148786`, and post-merge `main` run `30441738217`, job `90542418893`,
+passed. The user explicitly accepted both repository evidence stages and the
+new remediation-containing `linux/amd64` OCI digest
+`sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829`
+on 2026-07-29. The authoritative run recorded 80 passing tests, zero
+Checkstyle and SpotBugs findings, PMD/JaCoCo completion, full-history Gitleaks
+with no leaks, CycloneDX `1.7` with 152 components, and zero Trivy
+HIGH/CRITICAL vulnerabilities or secrets. Every release-manifest checksum
+matched.
+
+The accepted Avast/Docker TLS limitation remains a local workstation
+constraint; authoritative CI supplied the mandatory image, SBOM, and scanner
+evidence without weakening certificate verification. The repository and CI
+portions of `PF-HS-001` through `PF-HS-004` are complete. The hard stops remain
+open only for the applicable account/provider materialization, current
+assumption revalidation, live spoof/TLS/alert evidence, budget and exception
+checks, and later explicit acceptance. No publication, provider, spending,
+migration, deployment, or staging execution is authorized.
 
 ## What is not done
 
@@ -327,40 +343,44 @@ authorized.
 - No environment has applied the V2 database roles or runtime-profile
   separation; rate limits, alerts, backups, restore drill, log
   routing/retention, and rollback rehearsal remain open.
-- The accepted CI-built OCI archive is retained only as a GitHub Actions
-  artifact; it has not been published to an approved registry as a deployable
-  digest.
+- The accepted remediation-containing OCI archive is retained only as a
+  GitHub Actions artifact; it has not been published to an approved registry
+  as a deployable digest.
 - The repository implements the accepted `DR-001` and `DR-002` mechanisms
   and they are repository/CI verified, but they have not been published,
   configured, or exercised in staging. `DR-003` live rollback evidence is
   still pending.
-- The accepted CI artifacts expire on 2026-08-10 unless a separately approved
-  publication or retention action occurs.
+- The latest accepted CI artifacts expire on 2026-08-12 unless a separately
+  approved publication or retention action occurs.
 - GitHub environment/package existence, exact account checkout totals, desired
   name availability, Render outbound CIDRs, Supabase project identifiers, and
   the project CA remain account-specific confirmations.
 - External-resource approval is blocked by `PF-HS-001` through `PF-HS-004`.
-  Their bounded remediation decisions and local repository implementation are
-  approved and locally validated, but authoritative CI, provider
-  materialization, and live verification remain incomplete.
-- This external-resource preflight documentation remains local and uncommitted.
-- The provider-conformance remediation proposal remains local and uncommitted.
+  Their bounded remediation decisions, repository implementation, and
+  authoritative repository CI evidence are accepted, but provider
+  materialization and live verification remain incomplete.
+- This provider-conformance evidence-only documentation update remains local
+  and uncommitted.
 - Phase 2 implementation has not begun.
 
 ## Next action
 
-Gate D repository implementation and CI evidence are accepted, evidence PR
-`#7` is merged, and its resulting `main` CI is green. The bounded
-provider-conformance remediation decisions and staging-only exceptions are
-accepted. The bounded repository implementation is approved, complete, and
-locally validated. The exact next gate is explicit authorization to create a
-`codex/phase-1-gate-d-provider-conformance` branch, commit the bounded changes,
-push it, open a draft pull request, and allow its automatic CI run for
-authoritative repository evidence.
+Gate D repository implementation and its original evidence record are merged.
+The bounded provider-conformance decisions, staging-only exceptions,
+repository implementation, PR evidence, post-merge `main` evidence, and new
+remediation-containing OCI digest are explicitly accepted. This evidence-only
+documentation update is prepared locally. The exact next gate is explicit
+authorization to create
+`codex/phase-1-gate-d-provider-conformance-evidence`, commit only the
+documentation changes, push it, open a draft evidence pull request, and allow
+its automatic CI run.
 
-The current accepted OCI digest must not be deployed because it predates these
-remediations. A new immutable post-merge `main` image and accepted `EP-001`
-evidence will be required.
+The old digest
+`sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0`
+is historical and must not be deployed. The accepted current Gate D
+candidate is
+`sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829`,
+but accepting it does not authorize publication or deployment.
 
 Manual release/staging workflow execution, creating a GitHub package or
 protected environment, publishing an OCI image, provisioning resources,
