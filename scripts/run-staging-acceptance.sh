@@ -115,6 +115,7 @@ exercise_rate_limit() {
   token="$3"
   organization_id="$4"
   maximum_requests="$5"
+  forge_forwarded_address="$6"
   rate_limited=0
   request_number=1
   while [ "$request_number" -le "$maximum_requests" ]; do
@@ -132,6 +133,10 @@ exercise_rate_limit() {
       fi
       if [ -n "$organization_id" ]; then
         printf 'header = "X-Organization-Id: %s"\n' "$organization_id"
+      fi
+      if [ "$forge_forwarded_address" = "true" ]; then
+        printf 'header = "X-Forwarded-For: 198.51.100.%s"\n' \
+          "$request_number"
       fi
       printf 'dump-header = "%s"\n' "$headers"
       printf 'output = "%s"\n' "$response"
@@ -162,12 +167,15 @@ exercise_rate_limit() {
 }
 
 exercise_rate_limit subject_rate_limit /api/v1/platform/me \
-  "$STAGING_VALID_TOKEN" "" 65
+  "$STAGING_VALID_TOKEN" "" 65 false
 exercise_rate_limit metrics_rate_limit /actuator/prometheus \
-  "$STAGING_METRICS_TOKEN" "" 35
-exercise_rate_limit client_rate_limit /actuator/health/liveness "" "" 130
+  "$STAGING_METRICS_TOKEN" "" 35 false
+exercise_rate_limit client_rate_limit_spoof_resistance \
+  /actuator/health/liveness "" "" 130 true
 
-retry_after="$(cat "$raw_directory/client_rate_limit.retry")"
+retry_after="$(
+  cat "$raw_directory/client_rate_limit_spoof_resistance.retry"
+)"
 test "$retry_after" -le 65
 sleep "$((retry_after + 1))"
 request client_rate_limit_refill /actuator/health/liveness 200 "" ""

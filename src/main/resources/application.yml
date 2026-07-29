@@ -61,7 +61,7 @@ mychandha:
     enabled: ${RATE_LIMIT_ENABLED:true}
     cache-maximum-size: ${RATE_LIMIT_CACHE_MAXIMUM_SIZE:10000}
     cache-expire-after-access: ${RATE_LIMIT_CACHE_EXPIRE_AFTER_ACCESS:PT10M}
-    trust-forwarded: ${RATE_LIMIT_TRUST_FORWARDED:false}
+    client-address-strategy: ${RATE_LIMIT_CLIENT_ADDRESS_STRATEGY:direct}
     trusted-proxy-cidrs: ${RATE_LIMIT_TRUSTED_PROXY_CIDRS:}
     client-address:
       capacity: ${RATE_LIMIT_CLIENT_CAPACITY:120}

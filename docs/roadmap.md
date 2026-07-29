@@ -57,9 +57,18 @@ The gate uses separate approvals:
    merged through PR `#6` as
    `cc75d0c3c59dc9d11ef748bff2f3633770854ffd`, post-merge `main` CI run
    `30245195541` passed, and repository CI evidence was explicitly accepted
-   2026-07-27; local evidence-record update in progress;
-8. separately approve external resources and execute staging acceptance; and
-9. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.
+   2026-07-27; evidence PR `#7` merged as
+   `afbb2109c6eb442baf01331296cdf3e0be294503`, and post-merge `main` run
+   `30249016269`, job `89922507241`, passed;
+8. bounded provider-conformance remediation proposal prepared in
+   `docs/phase-1-gate-d-provider-conformance-remediation-proposal.md`;
+   `PF-R-001` through `PF-R-004` and `PF-EX-001`/`PF-EX-002` accepted
+   2026-07-29; bounded repository implementation separately approved,
+   completed, and locally validated; then resolve the hard stops through
+   separately approved GitHub, CI, account/provider, and live-evidence steps;
+9. separately approve exact external resources, publication, and staging
+   execution only after the hard stops close; and
+10. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.
 
 Repository-change approval does not authorize external changes. External
 resource approval does not authorize Phase 2.

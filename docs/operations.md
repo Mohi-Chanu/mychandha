@@ -91,6 +91,22 @@ workflow does not create its GitHub environment or authorize a dispatch.
 The execution checklist is `docs/phase-1-gate-d-evidence.md`. All provider,
 database, deployment, recovery, cost, and cleanup results remain pending.
 
+The current read-only provider and cost reconciliation is
+`docs/phase-1-gate-d-external-resource-preflight.md`. It blocks
+external-resource approval until the Render client-address trust contract,
+Supabase CA materialization, Render owner/backup-operator plan decision, and
+minimum alert-delivery contract are resolved through `CC-001`.
+
+The bounded repository and staging-control recommendations for those four
+items are prepared in
+`docs/phase-1-gate-d-provider-conformance-remediation-proposal.md`. The
+decisions and expiring staging-only exceptions were accepted on 2026-07-29,
+and implementation of only the bounded repository scope was approved,
+completed, and locally validated subject to the accepted local OCI-build TLS
+limitation. No provider control is materialized or live-verified.
+The Hobby owner/backup mapping and alert split must not be represented as
+production operations readiness.
+
 Future gate and deployment evidence must follow the reusable checklist in
 `docs/evidence-package.md`. Approval progression follows `CC-001` in
 `docs/change-control.md`.

@@ -14,13 +14,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public final class ClientAddressRateLimitFilter extends OncePerRequestFilter {
 
     private static final String PROCESS_KEY = "single-api-instance";
-    private final TrustedProxyClientAddressResolver addressResolver;
+    private final ClientAddressResolver addressResolver;
     private final RateLimitEndpointClassifier endpointClassifier;
     private final RateLimitService rateLimits;
     private final RateLimitProblemWriter problemWriter;
 
     ClientAddressRateLimitFilter(
-            TrustedProxyClientAddressResolver addressResolver,
+            ClientAddressResolver addressResolver,
             RateLimitEndpointClassifier endpointClassifier,
             RateLimitService rateLimits,
             RateLimitProblemWriter problemWriter) {

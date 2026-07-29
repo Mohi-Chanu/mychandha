@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 final class ProductionRateLimitValidator {
 
     private final RateLimitProperties properties;
-    private final TrustedProxyClientAddressResolver addressResolver;
+    private final ClientAddressResolver addressResolver;
 
     ProductionRateLimitValidator(
             RateLimitProperties properties,
-            TrustedProxyClientAddressResolver addressResolver) {
+            ClientAddressResolver addressResolver) {
         this.properties = properties;
         this.addressResolver = addressResolver;
     }
@@ -24,9 +24,9 @@ final class ProductionRateLimitValidator {
             throw new IllegalStateException(
                     "Application rate limiting must be enabled for production API runtime");
         }
-        if (!addressResolver.isForwardedBoundaryConfigured()) {
+        if (!addressResolver.isProductionBoundaryConfigured()) {
             throw new IllegalStateException(
-                    "Production API requires a trusted forwarded-address boundary");
+                    "Production API requires an approved client-address boundary");
         }
     }
 }

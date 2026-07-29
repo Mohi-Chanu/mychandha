@@ -9,7 +9,7 @@ public record RateLimitProperties(
         boolean enabled,
         int cacheMaximumSize,
         Duration cacheExpireAfterAccess,
-        boolean trustForwarded,
+        ClientAddressStrategy clientAddressStrategy,
         List<String> trustedProxyCidrs,
         Limit clientAddress,
         Limit subject,
@@ -25,6 +25,10 @@ public record RateLimitProperties(
                 || cacheExpireAfterAccess.isZero()
                 || cacheExpireAfterAccess.isNegative()) {
             throw new IllegalArgumentException("Rate-limit cache expiry must be positive");
+        }
+        if (clientAddressStrategy == null) {
+            throw new IllegalArgumentException(
+                    "Rate-limit client-address strategy is required");
         }
         trustedProxyCidrs = trustedProxyCidrs == null
                 ? List.of()

@@ -57,7 +57,7 @@ grep -q "UNIQUE (organization_id, source, external_event_id)" src/main/resources
 grep -q "lock-timeout" src/main/resources/application.yml
 grep -q "forward-headers-strategy: none" src/main/resources/application.yml
 grep -q "cache-maximum-size:.*10000" src/main/resources/application.yml
-grep -q "trust-forwarded:.*false" src/main/resources/application.yml
+grep -q "client-address-strategy:.*direct" src/main/resources/application.yml
 grep -q "enabled: false" src/main/resources/application-api.yml
 grep -q "enabled: false" src/main/resources/application-dispatcher.yml
 grep -q "enabled: true" src/main/resources/application-migration.yml
@@ -66,8 +66,23 @@ grep -q "REVOKE ALL ON FUNCTION platform.claim_outbox_events" src/main/resources
 grep -q "platform.claim_outbox_events" src/main/java/com/mychandha/platform/events/OutboxPublisher.java
 grep -q "bucket4j_jdk17-caffeine" pom.xml
 grep -q "postgresql17-client" Dockerfile
+grep -q "addgroup -S -g 1000 rendersecrets" Dockerfile
 grep -q "run-staging-bootstrap.sh" Dockerfile
 grep -q "run-staging-migration.sh" Dockerfile
+grep -q -- '--rawfile content' scripts/run-render-staging-operation.sh
+if grep -q -- '--arg content' scripts/run-render-staging-operation.sh; then
+  echo "CA certificate contents must not be passed on a process command line" >&2
+  exit 1
+fi
+grep -q "secret-files/supabase-ca.crt" \
+  scripts/run-render-staging-operation.sh
+grep -q "sslmode: verify-full" src/main/resources/application-api.yml
+grep -q "sslrootcert:.*API_DATABASE_SSL_ROOT_CERTIFICATE" \
+  src/main/resources/application-api.yml
+grep -q "sslrootcert:.*DISPATCHER_DATABASE_SSL_ROOT_CERTIFICATE" \
+  src/main/resources/application-dispatcher.yml
+grep -q "sslrootcert:.*MIGRATION_DATABASE_SSL_ROOT_CERTIFICATE" \
+  src/main/resources/application-migration.yml
 grep -q "addFilterAfter(clientAddressRateLimitFilter, CorrelationIdFilter.class)" \
   src/main/java/com/mychandha/platform/security/SecurityConfiguration.java
 grep -q "addFilterAfter(subjectRateLimitFilter, BearerTokenAuthenticationFilter.class)" \

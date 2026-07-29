@@ -153,6 +153,7 @@ jobs:
           RENDER_ENVIRONMENT_ID: ${{ secrets.RENDER_ENVIRONMENT_ID }}
           RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
           STAGING_OPERATION: bootstrap
+          SUPABASE_DATABASE_CA_CERTIFICATE: ${{ secrets.SUPABASE_DATABASE_CA_CERTIFICATE }}
         run: sh scripts/run-render-staging-operation.sh
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -182,6 +183,7 @@ jobs:
           RENDER_ENVIRONMENT_ID: ${{ secrets.RENDER_ENVIRONMENT_ID }}
           RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
           STAGING_OPERATION: migrate
+          SUPABASE_DATABASE_CA_CERTIFICATE: ${{ secrets.SUPABASE_DATABASE_CA_CERTIFICATE }}
         run: sh scripts/run-render-staging-operation.sh
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

@@ -15,7 +15,7 @@ final class RateLimitTestSupport {
                 true,
                 100,
                 Duration.ofMinutes(10),
-                false,
+                ClientAddressStrategy.DIRECT,
                 List.of(),
                 limit,
                 limit,
@@ -31,8 +31,24 @@ final class RateLimitTestSupport {
                 true,
                 100,
                 Duration.ofMinutes(10),
-                true,
+                ClientAddressStrategy.TRUSTED_PROXY_CIDR,
                 cidrs,
+                limit,
+                limit,
+                limit,
+                limit,
+                limit);
+    }
+
+    static RateLimitProperties renderProperties() {
+        RateLimitProperties.Limit limit =
+                new RateLimitProperties.Limit(10, Duration.ofMinutes(1));
+        return new RateLimitProperties(
+                true,
+                100,
+                Duration.ofMinutes(10),
+                ClientAddressStrategy.RENDER_EDGE_FIRST_HOP,
+                List.of(),
                 limit,
                 limit,
                 limit,

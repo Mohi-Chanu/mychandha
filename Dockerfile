@@ -10,8 +10,10 @@ RUN --mount=type=cache,target=/root/.m2 mvn -B package -DskipTests
 FROM eclipse-temurin:21-jre-alpine@sha256:3f08b13888f595cc49edabea7250ba69499ba25602b267da591720769400e08c
 RUN apk upgrade --no-cache \
     && apk add --no-cache postgresql17-client \
+    && addgroup -S -g 1000 rendersecrets \
     && addgroup -S mychandha \
-    && adduser -S mychandha -G mychandha
+    && adduser -S mychandha -G mychandha \
+    && addgroup mychandha rendersecrets
 WORKDIR /app
 COPY --from=build /workspace/target/mychandha-platform-*.jar app.jar
 COPY --chmod=0555 scripts/run-staging-bootstrap.sh /app/ops/run-bootstrap.sh

@@ -6,6 +6,8 @@ evidence_directory="target/staging-evidence/sanitized"
 temporary_directory="$(mktemp -d)"
 base_service_id=""
 base_deleted="not_applicable"
+ca_certificate_sha256=""
+ca_secret_deploy_id=""
 started_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 umask 077
@@ -126,6 +128,55 @@ wait_for_deploy() {
   return 1
 }
 
+wait_for_new_deploy() {
+  service_id="$1"
+  prior_deploy_id="$2"
+  attempts=0
+  while [ "$attempts" -lt 60 ]; do
+    response="$temporary_directory/latest-deploy.json"
+    api_call GET "/services/${service_id}/deploys?limit=1" "" "$response"
+    deploy_id="$(jq -r '.[0].deploy.id // empty' "$response")"
+    if [ -n "$deploy_id" ] && [ "$deploy_id" != "$prior_deploy_id" ]; then
+      ca_secret_deploy_id="$(wait_for_deploy "$service_id" "$deploy_id")"
+      return
+    fi
+    attempts=$((attempts + 1))
+    sleep 5
+  done
+  echo "staging_operation_result=failed reason=secret_file_deploy_timeout" >&2
+  return 1
+}
+
+install_ca_secret_file() {
+  service_id="$1"
+  prior_deploy_id="$2"
+  case "$SUPABASE_DATABASE_CA_CERTIFICATE" in
+    *"-----BEGIN CERTIFICATE-----"*"-----END CERTIFICATE-----"*)
+      ;;
+    *)
+      echo "staging_operation_result=failed reason=invalid_ca_certificate" >&2
+      return 1
+      ;;
+  esac
+  ca_certificate_sha256="$(
+    printf '%s' "$SUPABASE_DATABASE_CA_CERTIFICATE" \
+      > "$temporary_directory/supabase-ca.crt"
+    sha256sum "$temporary_directory/supabase-ca.crt" | awk '{print $1}'
+  )"
+  ca_material="$temporary_directory/supabase-ca.crt"
+  request="$temporary_directory/ca-secret-file.json"
+  response="$temporary_directory/ca-secret-file-response.json"
+  jq -n \
+    --rawfile content "$ca_material" \
+    '{content:$content}' > "$request"
+  api_call PUT \
+    "/services/${service_id}/secret-files/supabase-ca.crt" \
+    "$request" \
+    "$response"
+  rm -f "$request" "$response" "$ca_material"
+  wait_for_new_deploy "$service_id" "$prior_deploy_id"
+}
+
 wait_for_job() {
   service_id="$1"
   job_id="$2"
@@ -170,7 +221,7 @@ create_base_and_run_job() {
           {key:"BOOTSTRAP_DATABASE_NAME",value:$name},
           {key:"BOOTSTRAP_DATABASE_USERNAME",value:$username},
           {key:"BOOTSTRAP_DATABASE_PASSWORD",value:$password},
-          {key:"BOOTSTRAP_DATABASE_SSLMODE",value:"verify-full"},
+          {key:"BOOTSTRAP_DATABASE_SSL_ROOT_CERTIFICATE",value:"/etc/secrets/supabase-ca.crt"},
           {key:"MYCHANDHA_STAGING_API_PASSWORD",value:$apiPassword},
           {key:"MYCHANDHA_STAGING_DISPATCHER_PASSWORD",value:$dispatcherPassword},
           {key:"MYCHANDHA_STAGING_MIGRATION_PASSWORD",value:$migrationPassword}
@@ -187,7 +238,8 @@ create_base_and_run_job() {
           {key:"SPRING_PROFILES_ACTIVE",value:"production,migration"},
           {key:"MIGRATION_DATABASE_URL",value:$url},
           {key:"MIGRATION_DATABASE_USERNAME",value:$username},
-          {key:"MIGRATION_DATABASE_PASSWORD",value:$password}
+          {key:"MIGRATION_DATABASE_PASSWORD",value:$password},
+          {key:"MIGRATION_DATABASE_SSL_ROOT_CERTIFICATE",value:"/etc/secrets/supabase-ca.crt"}
         ]')"
       ;;
   esac
@@ -221,6 +273,8 @@ create_base_and_run_job() {
   base_service_id="$(jq -r '.id // empty' "$response")"
   require_render_id base_service_id "$base_service_id"
   base_deploy_id="$(wait_for_deploy "$base_service_id")"
+  install_ca_secret_file "$base_service_id" "$base_deploy_id"
+  base_deploy_id="$ca_secret_deploy_id"
 
   job_request="$temporary_directory/create-job.json"
   job_response="$temporary_directory/create-job-response.json"
@@ -283,6 +337,7 @@ write_evidence() {
     --arg serviceOne "$service_one" \
     --arg serviceTwo "$service_two" \
     --arg baseDeleted "$base_deleted" \
+    --arg caCertificateSha256 "$ca_certificate_sha256" \
     '{
       schema:$schema,
       operation:$operation,
@@ -294,7 +349,10 @@ write_evidence() {
       eventIds:[$eventOne,$eventTwo] | map(select(length > 0)),
       serviceIds:[$serviceOne,$serviceTwo] | map(select(length > 0)),
       temporaryBaseDeleted:$baseDeleted
-    }' > "$evidence"
+    }
+    + if $caCertificateSha256 == "" then {}
+      else {caCertificateSha256:$caCertificateSha256}
+      end' > "$evidence"
   sh scripts/validate-staging-evidence.sh "$evidence"
 }
 
@@ -330,11 +388,13 @@ case "$STAGING_OPERATION" in
   bootstrap)
     : "${RENDER_OWNER_ID:?RENDER_OWNER_ID is required}"
     : "${RENDER_ENVIRONMENT_ID:?RENDER_ENVIRONMENT_ID is required}"
+    : "${SUPABASE_DATABASE_CA_CERTIFICATE:?SUPABASE_DATABASE_CA_CERTIFICATE is required}"
     create_base_and_run_job bootstrap
     ;;
   migrate)
     : "${RENDER_OWNER_ID:?RENDER_OWNER_ID is required}"
     : "${RENDER_ENVIRONMENT_ID:?RENDER_ENVIRONMENT_ID is required}"
+    : "${SUPABASE_DATABASE_CA_CERTIFICATE:?SUPABASE_DATABASE_CA_CERTIFICATE is required}"
     create_base_and_run_job migrate
     ;;
   deploy)

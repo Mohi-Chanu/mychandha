@@ -135,8 +135,8 @@ test "$(printf '%s\n' "$api_block" \
   | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 10 \
   || fail "API environment allowlist must contain exactly ten keys"
 test "$(printf '%s\n' "$dispatcher_block" \
-  | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 4 \
-  || fail "dispatcher environment allowlist must contain exactly four keys"
+  | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 5 \
+  || fail "dispatcher environment allowlist must contain exactly five keys"
 
 printf '%s\n' "$api_block" \
   | grep -Eq 'DISPATCHER_DATABASE_|MIGRATION_DATABASE_' \
@@ -151,7 +151,6 @@ for key in \
   API_DATABASE_PASSWORD \
   SUPABASE_JWT_ISSUER \
   SUPABASE_JWKS_URI \
-  RATE_LIMIT_TRUSTED_PROXY_CIDRS \
   DISPATCHER_DATABASE_URL \
   DISPATCHER_DATABASE_USERNAME \
   DISPATCHER_DATABASE_PASSWORD
@@ -165,10 +164,24 @@ test "$(count_lines '^        value: authenticated$' "$adapter_file")" -eq 1 \
   || fail "Supabase audience must use the accepted value"
 test "$(count_lines '^      - key: RATE_LIMIT_ENABLED$' "$adapter_file")" -eq 1 \
   || fail "rate limiting must be explicitly enabled"
-test "$(count_lines '^      - key: RATE_LIMIT_TRUST_FORWARDED$' "$adapter_file")" -eq 1 \
-  || fail "trusted forwarded-address parsing must be explicitly enabled"
-test "$(count_lines '^        value: \"true\"$' "$adapter_file")" -eq 2 \
-  || fail "both accepted rate-limit boolean settings must be true"
+test "$(count_lines '^        value: \"true\"$' "$adapter_file")" -eq 1 \
+  || fail "the accepted rate-limit enabled setting must be true"
+test "$(count_lines '^      - key: RATE_LIMIT_CLIENT_ADDRESS_STRATEGY$' \
+  "$adapter_file")" -eq 1 \
+  || fail "the client-address strategy must occur exactly once"
+test "$(count_lines '^        value: render-edge-first-hop$' \
+  "$adapter_file")" -eq 1 \
+  || fail "the accepted Render client-address strategy is missing"
+if grep -Eq 'RATE_LIMIT_TRUST_FORWARDED|RATE_LIMIT_TRUSTED_PROXY_CIDRS' \
+  "$adapter_file"; then
+  fail "legacy or guessed forwarded-address configuration is prohibited"
+fi
+test "$(count_lines '^      - key: (API|DISPATCHER)_DATABASE_SSL_ROOT_CERTIFICATE$' \
+  "$adapter_file")" -eq 2 \
+  || fail "both runtime CA path inputs are required"
+test "$(count_lines '^        value: /etc/secrets/supabase-ca.crt$' \
+  "$adapter_file")" -eq 2 \
+  || fail "both runtime CA paths must use the accepted Render secret file"
 
 if grep -Eq \
   '(^|[[:space:]])(password|token|secret|credential):[[:space:]]*[^#[:space:]]' \

@@ -20,6 +20,8 @@ services:
         sync: false
       - key: API_DATABASE_PASSWORD
         sync: false
+      - key: API_DATABASE_SSL_ROOT_CERTIFICATE
+        value: /etc/secrets/supabase-ca.crt
       - key: SUPABASE_JWT_ISSUER
         sync: false
       - key: SUPABASE_JWKS_URI
@@ -28,10 +30,8 @@ services:
         value: authenticated
       - key: RATE_LIMIT_ENABLED
         value: "true"
-      - key: RATE_LIMIT_TRUST_FORWARDED
-        value: "true"
-      - key: RATE_LIMIT_TRUSTED_PROXY_CIDRS
-        sync: false
+      - key: RATE_LIMIT_CLIENT_ADDRESS_STRATEGY
+        value: render-edge-first-hop
   - type: worker
     name: approved-dispatcher-fixture
     runtime: image
@@ -50,3 +50,5 @@ services:
         sync: false
       - key: DISPATCHER_DATABASE_PASSWORD
         sync: false
+      - key: DISPATCHER_DATABASE_SSL_ROOT_CERTIFICATE
+        value: /etc/secrets/supabase-ca.crt

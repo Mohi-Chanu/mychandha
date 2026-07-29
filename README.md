@@ -44,7 +44,20 @@ HIGH/CRITICAL vulnerabilities and zero secrets passed. Full results and the
 still-pending external execution checklist are in
 [Gate D evidence](docs/phase-1-gate-d-evidence.md). This acceptance does not
 authorize registry publication, provider changes, migration, deployment, or
-staging execution.
+staging execution. Evidence PR `#7` merged as
+`afbb2109c6eb442baf01331296cdf3e0be294503`, and resulting `main` CI run
+`30249016269`, job `89922507241`, passed. The
+[Gate D external-resource preflight](docs/phase-1-gate-d-external-resource-preflight.md)
+records the current provider capabilities, exact proposed inventory, cost and
+control reconciliation, and four hard stops that must be resolved before
+external-resource approval. The bounded
+[Gate D provider-conformance remediation proposal](docs/phase-1-gate-d-provider-conformance-remediation-proposal.md)
+now defines the recommended resolution and evidence path for those four hard
+stops. Its decisions and expiring staging-only exceptions were accepted on
+2026-07-29. Implementation of only its bounded repository scope was then
+approved, completed, and locally validated. The accepted Avast/Docker TLS
+limitation still prevents local OCI/SBOM/Trivy completion; authoritative CI is
+therefore still required. No GitHub workflow or external action is authorized.
 
 Engineering standards are recorded in the [ADR index](docs/adr/README.md),
 [module boundaries](docs/module-boundaries.md),

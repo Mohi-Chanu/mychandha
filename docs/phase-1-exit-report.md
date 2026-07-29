@@ -2,7 +2,7 @@
 
 Status: Open
 Recommendation: **DO NOT PROCEED TO PHASE 2**
-Last updated: 2026-07-27
+Last updated: 2026-07-29
 
 ## Scope
 
@@ -86,6 +86,9 @@ zero Trivy HIGH/CRITICAL vulnerabilities or secrets. The retained OCI manifest
 digest is
 `sha256:a19c285d61c62927093bad4adc898a66122adb37978d3894f6f53c54d0e206b0`.
 The user explicitly accepted this repository CI evidence on 2026-07-27.
+Evidence PR `#7` then merged as
+`afbb2109c6eb442baf01331296cdf3e0be294503`; post-merge `main` run
+`30249016269`, job `89922507241`, passed.
 
 ## Security
 
@@ -126,6 +129,10 @@ Production targets remain:
   immutable deployable digest.
 - External rate limits, alerts, backups, log drain, and restore behavior are
   unverified.
+- The Gate D external-resource preflight identified four pre-provisioning hard
+  stops: the Render forwarded-address/trusted-proxy contract, Supabase CA
+  materialization, Render Hobby's one-member limit versus the backup-operator
+  model, and incomplete native alert-delivery coverage.
 
 ## Deferred items
 
@@ -146,11 +153,15 @@ later external-resource and execution approvals.
 ## Pending approvals
 
 The readiness design and Gate A through Gate D repository implementation/CI
-evidence are approved. Gate D implementation is on `main`; its evidence-only
-record update remains local. Pending approvals or evidence are:
+evidence are approved. Gate D implementation and evidence PRs are on `main`,
+and their resulting CI is green. The external-resource preflight and bounded
+provider-conformance remediation proposal are prepared locally; its bounded
+repository implementation is approved, complete, and locally validated.
+Pending
+approvals or evidence are:
 
-- Gate D evidence-only branch, commit, push, draft PR, merge, and resulting
-  evidence-record CI;
+- GitHub publication approval and authoritative CI evidence for the bounded
+  provider-conformance remediation implementation;
 - GitHub package creation, protected-environment configuration, or
   release-workflow execution;
 - current provider checkout confirmation, spending, exact non-production
@@ -183,7 +194,15 @@ record update remains local. Pending approvals or evidence are:
 - [x] Gate D committed, pushed, opened as draft PR `#6`, merged, and
       post-merge CI verified.
 - [x] Gate D repository CI evidence explicitly accepted.
-- [ ] Gate D evidence-only record merged and resulting `main` CI green.
+- [x] Gate D evidence-only record merged and resulting `main` CI green.
+- [x] Gate D external-resource preflight prepared.
+- [x] Bounded `PF-HS-001` through `PF-HS-004` remediation proposal prepared.
+- [x] Provider-conformance remediation decisions and staging-only exceptions
+      explicitly accepted.
+- [x] Bounded provider-conformance repository implementation approved.
+- [x] Bounded provider-conformance repository implementation completed and
+      locally validated.
+- [ ] Gate D provider-conformance hard stops resolved and accepted.
 - [ ] Staging deployment ready.
 - [ ] Identity and tenant-isolation acceptance passed.
 - [ ] Audit, idempotency, inbox, and outbox acceptance passed.
@@ -196,8 +215,9 @@ record update remains local. Pending approvals or evidence are:
 
 **Proceed to Phase 2: NO**
 
-Next action: review the local Gate D evidence-only documentation update.
-Creating its branch, committing, pushing, and opening a draft evidence PR
-require separate approval. Do not execute the release workflow, create or
-configure GitHub package/environment resources, publish an image, or provision
-external resources without their separate approvals.
+Next action: review the locally validated bounded implementation. Creating
+`codex/phase-1-gate-d-provider-conformance`, committing, pushing, and opening
+a draft pull request with its automatic CI run require the next explicit
+approval. Manual release/staging workflow execution, GitHub
+package/environment changes, publication, spending, and external resources
+remain unauthorized.

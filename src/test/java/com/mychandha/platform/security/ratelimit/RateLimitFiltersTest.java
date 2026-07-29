@@ -40,7 +40,7 @@ class RateLimitFiltersTest {
     @Test
     void clientFilterRejectsRepeatedAddressWithProblemDetails() throws Exception {
         ClientAddressRateLimitFilter filter = new ClientAddressRateLimitFilter(
-                new TrustedProxyClientAddressResolver(properties),
+                new ClientAddressResolver(properties, new RateLimitMetrics(meters)),
                 classifier,
                 service,
                 writer);

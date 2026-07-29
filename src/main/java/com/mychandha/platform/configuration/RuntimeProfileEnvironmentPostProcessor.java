@@ -1,6 +1,10 @@
 package com.mychandha.platform.configuration;
 
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.boot.SpringApplication;
@@ -70,6 +74,47 @@ public final class RuntimeProfileEnvironmentPostProcessor
                 rejectPlaceholder(environment, "mychandha.identity.issuer");
                 rejectPlaceholder(environment, "mychandha.identity.jwk-set-uri");
             }
+        }
+        if (profiles.contains("production")) {
+            validateDatabaseTls(environment);
+        }
+    }
+
+    private void validateDatabaseTls(ConfigurableEnvironment environment) {
+        String databaseUrl = environment.getProperty("spring.datasource.url", "");
+        String normalizedUrl = databaseUrl.toLowerCase(Locale.ROOT);
+        if (normalizedUrl.contains("sslmode=")
+                || normalizedUrl.contains("sslrootcert=")
+                || normalizedUrl.contains("sslfactory=")
+                || normalizedUrl.contains("sslhostnameverifier=")
+                || normalizedUrl.contains("ssl=")) {
+            throw new IllegalStateException(
+                    "Production database URL must not override the code-owned TLS policy");
+        }
+        String sslMode = environment.getProperty(
+                "spring.datasource.hikari.data-source-properties.sslmode");
+        if (!"verify-full".equals(sslMode)) {
+            throw new IllegalStateException(
+                    "Production database TLS mode must be verify-full");
+        }
+        String rootCertificate = environment.getProperty(
+                "spring.datasource.hikari.data-source-properties.sslrootcert");
+        if (rootCertificate == null || rootCertificate.isBlank()) {
+            throw new IllegalStateException(
+                    "Production database TLS root certificate is required");
+        }
+        try {
+            Path certificatePath = Path.of(rootCertificate);
+            if (!certificatePath.isAbsolute()
+                    || !Files.isRegularFile(certificatePath)
+                    || !Files.isReadable(certificatePath)) {
+                throw new IllegalStateException(
+                        "Production database TLS root certificate must be an absolute readable file");
+            }
+        } catch (InvalidPathException exception) {
+            throw new IllegalStateException(
+                    "Production database TLS root certificate path is invalid",
+                    exception);
         }
     }
 

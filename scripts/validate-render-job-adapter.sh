@@ -116,8 +116,8 @@ test "$(printf '%s\n' "$bootstrap_block" \
   | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 9 \
   || fail "bootstrap allowlist must contain exactly nine keys"
 test "$(printf '%s\n' "$migration_block" \
-  | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 4 \
-  || fail "migration allowlist must contain exactly four keys"
+  | count_lines '^[[:space:]]*- key:' /dev/stdin)" -eq 5 \
+  || fail "migration allowlist must contain exactly five keys"
 printf '%s\n' "$bootstrap_block" | grep -q 'MIGRATION_DATABASE_' \
   && fail "bootstrap base contains migration connection credentials"
 printf '%s\n' "$migration_block" \
@@ -141,8 +141,16 @@ done
 
 test "$(count_lines '^        value: production,migration$' "$adapter_file")" -eq 1 \
   || fail "migration profile mapping is missing"
-test "$(count_lines '^        value: verify-full$' "$adapter_file")" -eq 1 \
-  || fail "bootstrap TLS verification is missing"
+test "$(count_lines '^      - key: (BOOTSTRAP|MIGRATION)_DATABASE_SSL_ROOT_CERTIFICATE$' \
+  "$adapter_file")" -eq 2 \
+  || fail "both privileged job CA path inputs are required"
+test "$(count_lines '^        value: /etc/secrets/supabase-ca.crt$' \
+  "$adapter_file")" -eq 2 \
+  || fail "both privileged job CA paths must use the accepted Render secret file"
+if grep -Eq 'BOOTSTRAP_DATABASE_SSLMODE|value: (require|prefer)$|sslfactory' \
+  "$adapter_file"; then
+  fail "privileged job TLS policy must remain code-owned verify-full"
+fi
 if grep -Eq \
   '(^|[[:space:]])(password|token|secret|credential):[[:space:]]*[^#[:space:]]' \
   "$adapter_file"; then

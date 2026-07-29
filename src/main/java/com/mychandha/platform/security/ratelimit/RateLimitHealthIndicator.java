@@ -10,20 +10,29 @@ import org.springframework.stereotype.Component;
 public final class RateLimitHealthIndicator implements HealthIndicator {
 
     private final RateLimitService rateLimits;
+    private final ClientAddressResolver addressResolver;
 
-    RateLimitHealthIndicator(RateLimitService rateLimits) {
+    RateLimitHealthIndicator(
+            RateLimitService rateLimits,
+            ClientAddressResolver addressResolver) {
         this.rateLimits = rateLimits;
+        this.addressResolver = addressResolver;
     }
 
     @Override
     public Health health() {
-        Health.Builder health = rateLimits.enabled() && !rateLimits.capacityExceeded()
+        Health.Builder health = rateLimits.enabled()
+                        && !rateLimits.capacityExceeded()
+                        && !addressResolver.forwardingDegraded()
                 ? Health.up()
                 : Health.down();
         return health
                 .withDetail("enabled", rateLimits.enabled())
                 .withDetail("entries", rateLimits.estimatedSize())
                 .withDetail("maximumEntries", rateLimits.maximumSize())
+                .withDetail(
+                        "forwardingAnomalies",
+                        addressResolver.consecutiveForwardingAnomalies())
                 .build();
     }
 }
