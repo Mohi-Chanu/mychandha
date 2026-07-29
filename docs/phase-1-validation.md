@@ -234,3 +234,31 @@ publishes them.
 
 No result in this section is staging evidence. The pending execution package
 is `docs/phase-1-gate-d-evidence.md`, and no external action is authorized.
+
+## Gate D provider-conformance accepted CI validation
+
+The bounded provider-conformance implementation commit
+`94dd85d45da3aae655c468c9d2afbbe25908fec3` passed PR `#8` CI run
+`30440420020`, job `90538148786`. The user explicitly accepted that
+pull-request evidence, PR `#8` merged as
+`87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad`, and post-merge `main` run
+`30441738217`, job `90542418893`, passed on that exact commit. The user
+explicitly accepted the post-merge evidence and new OCI digest on 2026-07-29.
+
+The accepted post-merge run recorded:
+
+- 80 tests across 22 report files with zero failures, errors, or skips;
+- zero Checkstyle violations, PMD `7.17.0`, JaCoCo completion, and zero
+  SpotBugs findings;
+- Gitleaks `8.30.1` over 21 full-history commits with no leaks;
+- a retained `linux/amd64` OCI archive with manifest digest
+  `sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829`;
+- CycloneDX `1.7` with 152 components;
+- Trivy `0.72.0` with zero HIGH/CRITICAL vulnerabilities and zero secrets; and
+- successful source-commit, run, OCI-digest, and file-checksum verification.
+
+The artifacts expire on 2026-08-12. The older Gate D digest predates the
+provider-conformance remediation and is retained only as historical evidence.
+The new digest has not been published or deployed. Live Render
+client-address, Supabase CA/TLS, owner/reviewer, notification, bounded-check,
+backup, restore, and rollback evidence remains pending and separately gated.

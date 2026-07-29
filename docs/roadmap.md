@@ -64,8 +64,13 @@ The gate uses separate approvals:
    `docs/phase-1-gate-d-provider-conformance-remediation-proposal.md`;
    `PF-R-001` through `PF-R-004` and `PF-EX-001`/`PF-EX-002` accepted
    2026-07-29; bounded repository implementation separately approved,
-   completed, and locally validated; then resolve the hard stops through
-   separately approved GitHub, CI, account/provider, and live-evidence steps;
+   merged through PR `#8` as
+   `87d0b7bc0891f29482ad9c46856e9a3e4b7a22ad`; pull-request run
+   `30440420020`, job `90538148786`, and post-merge `main` run `30441738217`,
+   job `90542418893`, passed and were explicitly accepted with OCI digest
+   `sha256:7b97937aed5a44b4ad7a177ebeadf8f631740b7051949c7d2e56f17cfbdf0829`;
+   repository and CI portions are complete, while account/provider
+   materialization and live evidence remain separately gated;
 9. separately approve exact external resources, publication, and staging
    execution only after the hard stops close; and
 10. review `docs/phase-1-exit-report.md` and explicitly close Phase 1.
